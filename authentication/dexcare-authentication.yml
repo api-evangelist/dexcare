@@ -1,0 +1,41 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/api/
+docs: https://developers.dexcarehealth.com/api/
+summary:
+  types: [oauth2, http, none]
+  api_key_in: []
+  oauth2_flows: [authorizationCode]
+  note: >-
+    Public endpoints returning non-sensitive directory information (clinics,
+    providers) require no authentication. Endpoints touching PHI/PII require a
+    JWT bearer token obtained via OAuth 2.0. Credentials and identity providers
+    are health-system specific; developers coordinate with each health system
+    for application credentials.
+schemes:
+  - name: bearerJWT
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+    in: header
+    header: Authorization
+    description: >-
+      JSON Web Token passed as a bearer token in the Authorization header for
+      any endpoint that works with protected health information (PHI) or
+      personally identifiable information (PII).
+    sources: [https://developers.dexcarehealth.com/api/]
+  - name: oauth2AuthorizationCode
+    type: oauth2
+    flow: authorizationCode
+    description: >-
+      OAuth 2.0 Authorization Code Grant flow used to obtain the JWT bearer
+      token. Authorization and token endpoints are provided per health system
+      via that system's identity provider (IdP); no single global endpoint is
+      published.
+    sources: [https://developers.dexcarehealth.com/api/]
+  - name: public
+    type: none
+    description: >-
+      Publicly available information (clinic directories, provider listings,
+      care-options discovery) is served without authentication.
+    sources: [https://developers.dexcarehealth.com/api/]
