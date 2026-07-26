@@ -1,0 +1,44 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/api/
+authentication:
+  style: bearer-jwt
+  detail: >-
+    JWT bearer token in Authorization header for PHI/PII endpoints; OAuth 2.0
+    authorization code grant to obtain the token; public directory endpoints
+    require no auth. See authentication/dexcare-authentication.yml.
+versioning:
+  style: uri-path
+  example: /v1/patient
+common_parameters:
+  - name: product
+    location: query
+    required: false
+    description: >-
+      Identifier related to the client provided by DexCare, used to scope
+      analytics and use-case-specific features/behavior.
+  - name: domain
+    location: header
+    required: false
+    description: Identifier related to the patient's identity provider (IdP).
+idempotency:
+  supported: false
+  note: No idempotency key header or contract is documented.
+pagination:
+  supported: unknown
+  note: No cross-cutting pagination convention documented in the public API reference.
+request_tracing:
+  supported: unknown
+  note: No documented request-id/correlation header convention.
+error_envelope:
+  format: http-status
+  detail: >-
+    Errors are signaled with standard HTTP status codes (e.g. 400 Bad Request,
+    401 Unauthorized). No RFC 9457 application/problem+json envelope is
+    documented. See errors/dexcare-problem-types.yml.
+rate_limiting:
+  signaled: unknown
+cross_links:
+  authentication: authentication/dexcare-authentication.yml
+  errors: errors/dexcare-problem-types.yml
+  lifecycle: lifecycle/dexcare-lifecycle.yml

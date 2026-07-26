@@ -1,0 +1,36 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/mobilesdk/installation
+packages:
+  - language: swift
+    platform: ios
+    registry: cocoapods
+    name: DexcareSDK
+    url: https://github.com/DexCare/DexCareSDK-iOS
+    install: "pod 'DexcareSDK', :git => 'https://github.com/DexCare/DexCareSDK-iOS.git'"
+    official: true
+    notes: Distributed via CocoaPods from the DexCare-hosted GitHub source repository.
+  - language: kotlin
+    platform: android
+    registry: maven-github-packages
+    name: org.dexcare:dexcare
+    version: 9.1.0
+    url: https://github.com/DexCare/DexCareSDK-Android
+    maven_repo: https://maven.pkg.github.com/DexCare/DexCareSDK-Android/
+    install: "implementation \"org.dexcare:dexcare:9.1.0\""
+    official: true
+    notes: Requires GitHub Packages auth (DEXCARE_MAVEN_ACCOUNT / DEXCARE_MAVEN_TOKEN).
+  - language: javascript
+    registry: npm-github-packages
+    name: dexcare-javascript-sdk
+    url: https://developers.dexcarehealth.com/jssdk/index
+    official: false
+    notes: >-
+      Published as an npm module in DexCare's GitHub Packages registry. Documented
+      as a working example wrapping the DexCare REST API, explicitly not among the
+      supported products of DexCare. No public npm registry coordinates published.
+sample_apps:
+  - url: https://github.com/DexCare/DexCareSDK.iOS.SampleApp
+    language: swift
+  - url: https://github.com/DexCare/DexCareSDK.Android.SampleApp
+    language: kotlin

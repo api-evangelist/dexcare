@@ -1,0 +1,24 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/api/
+environments:
+  - tier: uat
+    host: https://api.care-uat.dexcarehealth.com
+    description: >-
+      User acceptance testing / non-production tier. Each health system is
+      provisioned its own UAT domain; the pattern above is the documented
+      convention.
+  - tier: production
+    host: https://api.care.dexcarehealth.com
+    description: >-
+      Production tier. Each health system is provisioned its own production
+      domain following this pattern.
+test_credentials:
+  note: >-
+    DexCare does not publish public/self-serve sandbox credentials or magic
+    test identifiers. Application credentials and UAT access are provisioned
+    per health system through DexCare onboarding; there are no published test
+    tokens, patients, or fixtures to capture verbatim.
+sample_apps:
+  - https://github.com/DexCare/DexCareSDK.iOS.SampleApp
+  - https://github.com/DexCare/DexCareSDK.Android.SampleApp

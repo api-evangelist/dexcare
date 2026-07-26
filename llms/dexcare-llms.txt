@@ -1,0 +1,33 @@
+# DexCare
+
+> DexCare is a healthcare navigation and care-orchestration platform that connects patients to available care across fragmented health systems and helps providers fill capacity. Its REST API and native SDKs power search-and-schedule, virtual care, patient management, provider data, and care-options discovery for health systems. This is an API Evangelist enrichment profile generated from DexCare's public developer surface.
+
+## APIs
+
+- [DexCare REST API](https://developers.dexcarehealth.com/api/): RESTful service for accessing business information and performing actions against DexCare-managed healthcare environments (Virtual Care, Care Options, Booking, Patient, Provider Data Management, Omni Search, Reporting). Base hosts: api.care.dexcarehealth.com (production), api.care-uat.dexcarehealth.com (UAT), provisioned per health system.
+
+## Docs
+
+- [Developer Portal](https://developers.dexcarehealth.com/): DexCare SDK and API documentation home.
+- [REST API Reference](https://developers.dexcarehealth.com/api/): Endpoint reference for the REST API.
+- [Patient API](https://developers.dexcarehealth.com/api/patient/): Retrieving and creating patient information.
+- [Care Options API](https://developers.dexcarehealth.com/api/careoptions/): Aggregated in-person and virtual timeslot discovery.
+- [Virtual Care API](https://developers.dexcarehealth.com/api/visits/): Programmatic virtual visit booking.
+- [Reporting API](https://developers.dexcarehealth.com/api/reporting): Reporting endpoints (require a reporting service key).
+- [Platform Concepts](https://developers.dexcarehealth.com/): Recommended starting point before the REST API or native SDKs.
+- [Release Notes](https://developers.dexcarehealth.com/home/releasenotes): Per-platform, per-version release notes.
+
+## SDKs
+
+- [iOS SDK (DexcareSDK)](https://developers.dexcarehealth.com/ios/): CocoaPods, source at https://github.com/DexCare/DexCareSDK-iOS
+- [Android SDK](https://developers.dexcarehealth.com/android/): Gradle org.dexcare:dexcare via GitHub Packages Maven, source at https://github.com/DexCare/DexCareSDK-Android
+- [JavaScript SDK](https://developers.dexcarehealth.com/jssdk/index): npm module in GitHub Packages (unsupported working example wrapping the REST API).
+
+## Authentication
+
+- OAuth 2.0 Authorization Code Grant to obtain a JWT bearer token, passed in the Authorization header for PHI/PII endpoints. Public directory endpoints require no authentication. Credentials and IdP are health-system specific.
+
+## Legal
+
+- [Privacy Policy](https://dexcare.com/privacy-policy/): DexCare operates as a HIPAA business associate.
+- [Terms of Service](https://dexcare.com/terms-of-service/)

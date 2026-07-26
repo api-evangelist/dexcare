@@ -1,0 +1,15 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/home/releasenotes
+scheme: semver
+url: https://developers.dexcarehealth.com/home/releasenotes
+platforms: [Core, Search, Availability, Service Discovery, iOS, Android]
+current:
+  ios: 9.x
+  android: 9.x
+note: >-
+  DexCare publishes release notes filtered by platform and version behind a
+  dynamic selector; individual dated entries are not statically enumerable from
+  the public page. Current major SDK line is 9.x for both iOS and Android, with
+  documented migration guides across the 7.x -> 8.x -> 9.x lines.
+entries: []

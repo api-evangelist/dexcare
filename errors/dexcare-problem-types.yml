@@ -1,0 +1,20 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/api/patient/
+format: http-status
+note: >-
+  DexCare signals errors with standard HTTP status codes. No RFC 9457
+  application/problem+json envelope is documented in the public REST reference.
+  The entries below are the status codes explicitly documented on the API
+  reference pages.
+problems:
+  - status: 400
+    title: Bad Request
+    meaning: The request was malformed or contained invalid parameters.
+    source_operation: POST /v1/patient/other
+  - status: 401
+    title: Unauthorized
+    meaning: >-
+      Missing or invalid authentication. A valid JWT bearer token is required
+      for endpoints that access PHI/PII.
+    source_operation: POST /v1/patient/other

@@ -1,0 +1,31 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/api/
+standards:
+  - id: rest
+    conforms: true
+    evidence: RESTful service over HTTPS with URI-path versioning (/v1/...).
+  - id: oauth2
+    conforms: true
+    evidence: >-
+      OAuth 2.0 Authorization Code Grant documented for obtaining JWT access
+      tokens (developers.dexcarehealth.com/api/).
+  - id: jwt
+    conforms: true
+    evidence: JSON Web Tokens used as bearer credentials for PHI/PII endpoints.
+  - id: hipaa
+    conforms: true
+    evidence: >-
+      DexCare operates as a HIPAA business associate, processing patient
+      protected health information on behalf of clinicians and practices under
+      business associate agreements (dexcare.com/privacy-policy/).
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: Errors use plain HTTP status codes; no application/problem+json envelope documented.
+  - id: fhir-r4
+    conforms: false
+    evidence: No FHIR resource conformance published in the public API reference.
+compliance:
+  hipaa:
+    posture: business-associate
+    source: https://dexcare.com/privacy-policy/

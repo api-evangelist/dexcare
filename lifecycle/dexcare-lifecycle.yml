@@ -1,0 +1,28 @@
+generated: '2026-07-18'
+method: searched
+source: https://developers.dexcarehealth.com/home/releasenotes
+versioning:
+  scheme: uri-path
+  current: v1
+  docs: https://developers.dexcarehealth.com/api/
+  note: >-
+    REST resources are versioned in the URI path (e.g. /v1/patient). Native
+    SDKs are versioned with semantic versioning (major.minor.patch); current
+    major line is 9.x for both iOS and Android.
+release_notes:
+  url: https://developers.dexcarehealth.com/home/releasenotes
+  platforms: [Core, Search, Availability, Service Discovery, iOS, Android]
+  scheme: semver
+support_policy:
+  url: https://developers.dexcarehealth.com/home/supportpolicy
+deprecation:
+  documented: true
+  evidence: >-
+    The REST API reference includes a dedicated "Deprecated" endpoints section,
+    and the SDK docs publish version migration guides (e.g. iOS/Android 7.x ->
+    8.x -> 9.x). No formal RFC 8594 Sunset/Deprecation header policy is
+    published.
+  reference_url: https://developers.dexcarehealth.com/api/
+status_page: null
+sla: null
+deprecated_operations: []

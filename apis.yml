@@ -1,27 +1,127 @@
 aid: dexcare
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/dexcare.png
 name: DexCare
-description: 'DexCare is a company surfaced as a portfolio company of iconiq-capital and added to the
-  API Evangelist network as a stub for enrichment. Sector: healthcare. This profile is a lead awaiting
-  the enrichment pipeline.'
+description: >-
+  DexCare is a healthcare navigation and care-orchestration platform, launched from within
+  Providence Health, that connects patients to available care across fragmented health systems
+  while helping providers fill capacity and reduce wait times. Its products span Search & Schedule,
+  Virtual On Demand, Provider Data Management (PDM+), Optimize AI, and Acquire. DexCare exposes a
+  RESTful API and native iOS, Android, and JavaScript SDKs that power search-and-schedule, virtual
+  visits, patient records, provider data management, care-options discovery, omni search, and
+  reporting for health systems. Public directory endpoints are open, while PHI/PII endpoints
+  require OAuth 2.0-issued JWT bearer tokens. DexCare operates as a HIPAA business associate. This
+  profile was enriched from DexCare's public developer surface as part of the API Evangelist
+  network (originally surfaced as an ICONIQ Capital portfolio lead).
 url: https://raw.githubusercontent.com/api-evangelist/dexcare/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - iconiq-capital
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: profiled
+x-tier-reason: enriched-from-public-developer-surface
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-18'
 tags:
 - Company
 - Healthcare
-apis: []
+- Health IT
+- Patient Access
+- Scheduling
+- Virtual Care
+- Telehealth
+- Care Navigation
+- Provider Data
+- SDK
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- name: DexCare REST API
+  description: >-
+    RESTful service for accessing business information and performing actions against
+    DexCare-managed healthcare environments — Virtual Care, Care Options, Booking, Patient,
+    Provider Data Management, Omni Search, and Reporting. URI-path versioned (/v1), OAuth 2.0 +
+    JWT bearer auth for PHI/PII endpoints, with open public directory endpoints.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - Healthcare
+  - Patient Access
+  - Scheduling
+  - Virtual Care
+  properties:
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: Conventions
+    url: conventions/dexcare-conventions.yml
+  - type: ErrorCatalog
+    url: errors/dexcare-problem-types.yml
+  - type: Lifecycle
+    url: lifecycle/dexcare-lifecycle.yml
+  - type: Sandbox
+    url: sandbox/dexcare-sandbox.yml
 common:
 - type: Website
   url: https://dexcare.com/
+- type: DeveloperPortal
+  url: https://developers.dexcarehealth.com/
+- type: Documentation
+  url: https://developers.dexcarehealth.com/
+- type: APIReference
+  url: https://developers.dexcarehealth.com/api/
+- type: GettingStarted
+  url: https://developers.dexcarehealth.com/jssdk/getting-started/
+- type: GitHubOrganization
+  url: https://github.com/DexCare
+- type: TermsOfService
+  url: https://dexcare.com/terms-of-service/
+- type: PrivacyPolicy
+  url: https://dexcare.com/privacy-policy/
+- type: Support
+  url: https://dexcare.com/contact-info/
+- type: Packages
+  url: packages/dexcare-packages.yml
+- type: SDKs
+  url: packages/dexcare-packages.yml
+- type: Authentication
+  url: authentication/dexcare-authentication.yml
+- type: Conventions
+  url: conventions/dexcare-conventions.yml
+- type: ErrorCatalog
+  url: errors/dexcare-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/dexcare-lifecycle.yml
+- type: Deprecation
+  url: https://developers.dexcarehealth.com/api/
+- type: Sandbox
+  url: sandbox/dexcare-sandbox.yml
+- type: Conformance
+  url: conformance/dexcare-conformance.yml
+- type: Compliance
+  url: https://dexcare.com/privacy-policy/
+- type: ChangeLog
+  url: changelog/dexcare-changelog.yml
+- type: LLMsTxt
+  url: llms/dexcare-llms.txt
+- type: DomainSecurity
+  url: security/dexcare-domain-security.yml
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence
