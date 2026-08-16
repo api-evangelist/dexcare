@@ -1,29 +1,34 @@
 aid: dexcare
 accessModel:
-  pricing: unknown
-  onboarding: self-serve
+  pricing: contract
+  onboarding: sales-gate
   trial: false
   try_now: false
   public: false
-  label: Self-serve signup
-  confidence: medium
+  label: Enterprise contract; API credentials provisioned per health system
+  confidence: high
   source:
-  - authentication
-  generated: '2026-07-22'
-  method: derived
+  - plans/dexcare-plans-pricing.yml
+  - https://developers.dexcarehealth.com/api/
+  generated: '2026-08-15'
+  method: searched
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/dexcare.png
 name: DexCare
 description: >-
   DexCare is a healthcare navigation and care-orchestration platform, launched from within
   Providence Health, that connects patients to available care across fragmented health systems
   while helping providers fill capacity and reduce wait times. Its products span Search & Schedule,
-  Virtual On Demand, Provider Data Management (PDM+), Optimize AI, and Acquire. DexCare exposes a
-  RESTful API and native iOS, Android, and JavaScript SDKs that power search-and-schedule, virtual
-  visits, patient records, provider data management, care-options discovery, omni search, and
-  reporting for health systems. Public directory endpoints are open, while PHI/PII endpoints
-  require OAuth 2.0-issued JWT bearer tokens. DexCare operates as a HIPAA business associate. This
-  profile was enriched from DexCare's public developer surface as part of the API Evangelist
-  network (originally surfaced as an ICONIQ Capital portfolio lead).
+  Virtual On Demand, Provider Data Management (PDM+), Optimize AI, and Acquire. DexCare publishes
+  six OpenAPI definitions on its own developer portal covering 27 operations across the Visit
+  Service, Visit Booking, Care Options, Slots Availability, Omni Search and Provider Data
+  Management services, alongside prose references for the Patient and Reporting APIs and native
+  iOS, Android and JavaScript SDKs. There is no shared base URL: every health system is
+  provisioned its own UAT and production hosts, and the published specifications use templated or
+  per-tenant servers. Public directory, availability and search endpoints are open, while PHI/PII
+  endpoints require an OAuth 2.0-issued JWT bearer token and server-to-server services require a
+  DexCare-issued x-api-key. DexCare operates as a HIPAA business associate. This profile was
+  enriched from DexCare's public developer surface as part of the API Evangelist network
+  (originally surfaced as an ICONIQ Capital portfolio lead).
 url: https://raw.githubusercontent.com/api-evangelist/dexcare/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -33,7 +38,7 @@ x-tier: profiled
 x-tier-reason: enriched-from-public-developer-surface
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-18'
+modified: '2026-08-15'
 tags:
 - Company
 - Healthcare
@@ -44,6 +49,7 @@ tags:
 - Telehealth
 - Care Navigation
 - Provider Data
+- Search
 - SDK
 maintainers:
 - FN: Kin Lane
@@ -54,9 +60,10 @@ apis:
 - name: DexCare REST API
   description: >-
     RESTful service for accessing business information and performing actions against
-    DexCare-managed healthcare environments — Virtual Care, Care Options, Booking, Patient,
-    Provider Data Management, Omni Search, and Reporting. URI-path versioned (/v1), OAuth 2.0 +
-    JWT bearer auth for PHI/PII endpoints, with open public directory endpoints.
+    DexCare-managed healthcare environments. The umbrella reference covering the Patient and
+    Reporting surfaces, which are documented in prose without an OpenAPI, plus the platform-wide
+    domain, authentication and product-parameter conventions. URI-path versioned, OAuth 2.0 + JWT
+    bearer auth for PHI/PII endpoints, with open public directory endpoints.
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
@@ -75,6 +82,120 @@ apis:
     url: lifecycle/dexcare-lifecycle.yml
   - type: Sandbox
     url: sandbox/dexcare-sandbox.yml
+  - type: RateLimits
+    url: rate-limits/dexcare-rate-limits.yml
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- name: DexCare Visit Service API
+  description: >-
+    Create and follow on-demand virtual visits, and read regional virtual-care availability and
+    estimated wait times. Declares two distinct bearer schemes, PatientJWT and StaffJWT, bound to
+    different operations. OpenAPI 3.0.3, version 9.2.0, 9 operations.
+  humanURL: https://developers.dexcarehealth.com/api/visits/
+  baseURL: https://ecvapi.demo-uat.dex.care/api/9
+  tags:
+  - Virtual Care
+  - Telehealth
+  - Scheduling
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-visit-service-openapi.yml
+  - type: Overlay
+    url: overlays/dexcare-visit-service-overlay.yaml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+- name: DexCare Care Options API
+  description: >-
+    Aggregated in-person and virtual appointment discovery across a health system, returning
+    available providers and timeslots filtered by location, specialty, visit type and date range.
+    OpenAPI 3.0.3, version 1.0.0, 3 operations.
+  humanURL: https://developers.dexcarehealth.com/api/careoptions/
+  baseURL: https://api.{customerShorthand}.dexcare.io/v1
+  tags:
+  - Scheduling
+  - Patient Access
+  - Care Navigation
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-care-options-openapi.yml
+  - type: Overlay
+    url: overlays/dexcare-care-options-overlay.yaml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+- name: DexCare Slots Availability API
+  description: >-
+    Provider- and department-level appointment slot search, addressed by National Provider
+    Identifier, plus the slot-taken and slot-released notifications a health system sends DexCare
+    when its own schedule changes. OpenAPI 3.0.3, version 5.0.0, 4 operations.
+  humanURL: https://developers.dexcarehealth.com/api/provider_timeslots/
+  baseURL: https://api.{customerShorthand}.dexcare.io/v5
+  tags:
+  - Scheduling
+  - Provider Data
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-slots-availability-openapi.yml
+  - type: Overlay
+    url: overlays/dexcare-slots-availability-overlay.yaml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+- name: DexCare Visit Booking API
+  description: >-
+    Books an in-person appointment for a queued guest visit once a timeslot has been selected.
+    OpenAPI 3.0.3, version 1.2.0, 1 operation.
+  humanURL: https://developers.dexcarehealth.com/api/booking/
+  baseURL: https://api.{customerShorthand}.dexcare.io/v1
+  tags:
+  - Scheduling
+  - Patient Access
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-visit-booking-openapi.yml
+  - type: Overlay
+    url: overlays/dexcare-visit-booking-overlay.yaml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+- name: DexCare Omni Search API
+  description: >-
+    Natural-language care search across a health system's clinicians and clinics. Rules-based NLP
+    tokenizes and stems the query, expands clinical synonyms, tolerates spelling errors and infers
+    intent and location, returning faceted results plus the filters it derived. OpenAPI 3.1.0,
+    version 2.21.0, 8 operations.
+  humanURL: https://developers.dexcarehealth.com/api/omnisearch/
+  baseURL: https://${brand}omni.azurewebsites.net
+  tags:
+  - Search
+  - Care Navigation
+  - Patient Access
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omni-search-openapi.yml
+  - type: Overlay
+    url: overlays/dexcare-omni-search-overlay.yaml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+- name: DexCare Provider Data Management API
+  description: >-
+    Schema-driven query and export of the provider, department, location and business-line golden
+    record held in DexCare PDM+. The JSON Schema for any entity type is itself retrievable at
+    runtime, and batch queries support structured field filters, reference expansion and
+    offset/limit paging. OpenAPI 3.1.0, version 1.0.0, 2 operations.
+  humanURL: https://developers.dexcarehealth.com/api/pdm/
+  baseURL: https://entities-service.{hostname}/v1
+  tags:
+  - Provider Data
+  - Health IT
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-provider-data-management-openapi.yml
+  - type: Overlay
+    url: overlays/dexcare-provider-data-management-overlay.yaml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
 common:
 - type: Website
   url: https://dexcare.com/
@@ -88,12 +209,14 @@ common:
   url: https://developers.dexcarehealth.com/jssdk/getting-started/
 - type: GitHubOrganization
   url: https://github.com/DexCare
+- type: Blog
+  url: https://dexcare.com/news/
 - type: TermsOfService
   url: https://dexcare.com/terms-of-service/
 - type: PrivacyPolicy
   url: https://dexcare.com/privacy-policy/
 - type: Support
-  url: https://dexcare.com/contact-info/
+  url: https://developers.dexcarehealth.com/home/support
 - type: Packages
   url: packages/dexcare-packages.yml
 - type: SDKs
@@ -107,7 +230,7 @@ common:
 - type: Lifecycle
   url: lifecycle/dexcare-lifecycle.yml
 - type: Deprecation
-  url: https://developers.dexcarehealth.com/api/
+  url: https://developers.dexcarehealth.com/home/support
 - type: Sandbox
   url: sandbox/dexcare-sandbox.yml
 - type: Conformance
@@ -120,8 +243,18 @@ common:
   url: llms/dexcare-llms.txt
 - type: DomainSecurity
   url: security/dexcare-domain-security.yml
+- type: DataModel
+  url: data-model/dexcare-data-model.yml
+- type: RateLimits
+  url: rate-limits/dexcare-rate-limits.yml
+- type: Plans
+  url: plans/dexcare-plans-pricing.yml
+- type: MCPServer
+  url: mcp/dexcare-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
 x-enrichment:
-  date: '2026-07-19'
-  status: backfilled
+  date: '2026-08-15'
+  status: enriched
+  artifacts_added: 29
   pass: local-v1
-  note: backfilled from .gitignore signal + verified work evidence
