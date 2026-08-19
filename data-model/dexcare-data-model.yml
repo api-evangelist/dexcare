@@ -1,0 +1,163 @@
+generated: '2026-08-15'
+method: derived
+source: openapi/dexcare-visit-service-openapi.yml, openapi/dexcare-visit-booking-openapi.yml, openapi/dexcare-care-options-openapi.yml, openapi/dexcare-slots-availability-openapi.yml, openapi/dexcare-provider-data-management-openapi.yml, openapi/dexcare-omni-search-openapi.yml
+docs: https://developers.dexcarehealth.com/api/
+note: >-
+  Entity graph derived from the six OpenAPI definitions DexCare publishes on its own
+  developer portal plus the documented request/response payloads on the REST API
+  reference. Four of the six specs inline every schema rather than naming
+  components, so entities below are identified from operation payload shapes and
+  from the id-reference fields that appear across them; only Omni Search (76 named
+  schemas) and Provider Data Management (11) carry a named component library.
+identifier_style:
+  primary: GUID/UUID
+  note: >-
+    Most DexCare-native identifiers are GUIDs (patient id, visitId, providerId,
+    departmentGuid, visitTypeGuid). Alongside them DexCare carries EMR-native
+    identifiers (emrId, departmentEmrId, visitTypeEmrId) and national identifiers
+    (NPI for providers), because the platform brokers between health-system EMRs.
+    Patient records also carry an identifiers[] array whose entries name the
+    issuing system (e.g. org.<healthsystem>.epic.<emr_name>) and a type such as
+    mrn, epi, INTERNAL, EXTERNAL, FHIR or FHIR STU3.
+entities:
+  - name: Patient
+    description: A person receiving care, identified by a DexCare GUID and linked to one or more EMR records.
+    key: id
+    spec: documented on https://developers.dexcarehealth.com/api/patient/
+    fields: [id, links, identifiers, name, birthdate, gender, ssn, addresses, email, homePhone, workPhone, mobilePhone, documents]
+  - name: Visit
+    description: A virtual or in-person care encounter created through the Visit Service.
+    key: visitId
+    spec: openapi/dexcare-visit-service-openapi.yml
+    operations: [createVisitV9, getEstimatedVirtualVisitWaitTime, visitSummaryV9, updateAcceptTerms]
+  - name: QueuedGuestVisit
+    description: A guest (unauthenticated patient) visit queued for booking.
+    spec: openapi/dexcare-visit-booking-openapi.yml
+    operations: [createQueuedGuestVisit]
+  - name: Practice
+    description: A clinical practice within a health system.
+    key: practiceId
+    spec: openapi/dexcare-visit-service-openapi.yml
+  - name: Department
+    description: A clinic or department location; the unit timeslots hang off.
+    key: departmentId
+    alternate_keys: [departmentGuid, departmentUuid, departmentEmrId, urlName]
+    spec: openapi/dexcare-care-options-openapi.yml
+  - name: Provider
+    description: An individual clinician, addressed by DexCare providerId or by national NPI.
+    key: providerId
+    alternate_keys: [npi]
+    spec: openapi/dexcare-slots-availability-openapi.yml
+    operations: [getSingleProviderTimeslots, availableProvidersV1]
+  - name: Slot
+    description: A bookable appointment timeslot on a department or a provider.
+    spec: openapi/dexcare-slots-availability-openapi.yml
+    operations: [getSlotsAvailability, getAggregatedSlotsV1, aggregatedSlotsV1, slotTaken, slotReleased]
+  - name: VisitType
+    description: The type of visit a slot supports.
+    key: visitTypeId
+    alternate_keys: [visitTypeGuid, visitTypeEmrId]
+    spec: openapi/dexcare-care-options-openapi.yml
+  - name: Modality
+    description: A supported care modality (e.g. virtual, in-person).
+    spec: openapi/dexcare-visit-service-openapi.yml
+    operations: [getModalities]
+  - name: Region
+    description: A geographic region carrying virtual-care availability and wait times.
+    key: regionCode
+    spec: openapi/dexcare-visit-service-openapi.yml
+    operations: [getRegionAvailabilityAndWaitTimes, getAvailabilityAndWaitTimes]
+  - name: AssignmentQualifier
+    description: A qualifier used to assign a visit to an eligible provider.
+    spec: openapi/dexcare-visit-service-openapi.yml
+    operations: [getAssignmentQualifiers]
+  - name: Insurance
+    description: Patient coverage attached to a visit at booking time.
+    fields: [insuranceProviderId, insuranceMemberId, insurancePayorId, insuranceSubscriberId]
+    spec: openapi/dexcare-visit-service-openapi.yml
+  - name: Entity
+    description: >-
+      Provider Data Management (PDM) record. PDM is schema-driven — the schema for
+      any namespace/name pair is itself retrievable as JSON Schema.
+    spec: openapi/dexcare-provider-data-management-openapi.yml
+    schemas: [BaseEntity, Entity, AnyEntity, EntityList, EntityQueryResult, PdmEntitySchema, EntitySchemaProperties, JSONSchemaProperty]
+    operations: [batchFindEntitiesByType, getPdmEntitySchema]
+  - name: ClinicianFastPage
+    description: Omni Search denormalized clinician document used to power search results.
+    spec: openapi/dexcare-omni-search-openapi.yml
+    schemas: [clinicianFastPages, specialtyFastPages, ratingDistributionFastPages, reviewsFastPages]
+  - name: DepartmentFastPage
+    description: Omni Search denormalized department/clinic document.
+    spec: openapi/dexcare-omni-search-openapi.yml
+    schemas: [departmentFastPages, locationFastPages, hoursDayFastPages, phoneNumberFastPages, visitTypeFastPages]
+relationships:
+  - from: Visit
+    to: Patient
+    type: belongs_to
+    via: patientGuid
+  - from: Visit
+    to: Practice
+    type: belongs_to
+    via: practiceId
+  - from: Visit
+    to: Department
+    type: belongs_to
+    via: scheduledDepartmentId
+  - from: Visit
+    to: Provider
+    type: belongs_to
+    via: providerId
+  - from: Visit
+    to: Insurance
+    type: has_one
+    via: insuranceProviderId
+  - from: Visit
+    to: Region
+    type: belongs_to
+    via: regionCode
+  - from: QueuedGuestVisit
+    to: Practice
+    type: belongs_to
+    via: practiceId
+  - from: QueuedGuestVisit
+    to: Department
+    type: belongs_to
+    via: scheduledDepartmentId
+  - from: Slot
+    to: Department
+    type: belongs_to
+    via: departmentId
+  - from: Slot
+    to: VisitType
+    type: belongs_to
+    via: visitTypeId
+  - from: Slot
+    to: Provider
+    type: belongs_to
+    via: npi
+  - from: Department
+    to: VisitType
+    type: has_many
+    via: visitTypeId
+  - from: Patient
+    to: Patient
+    type: has_many
+    via: links[].identifiers[].system
+    note: A DexCare patient record links to one or many EMR-native patient records.
+  - from: DepartmentFastPage
+    to: Department
+    type: belongs_to
+    via: departmentPrimaryUuid
+  - from: ClinicianFastPage
+    to: Provider
+    type: belongs_to
+    via: npis
+cross_system_identifiers:
+  - field: emrId
+    meaning: Identifier native to the health system's EMR (commonly Epic).
+  - field: emrSystemId
+    meaning: Identifies which EMR system issued an emrId, for multi-EMR health systems.
+  - field: npi
+    meaning: US National Provider Identifier.
+  - field: clockwiseDeptId
+    meaning: Identifier from the Clockwise.MD partner system, carried on Omni Search department pages.

@@ -1,0 +1,51 @@
+generated: '2026-08-15'
+method: probed
+source: https://developers.dexcarehealth.com/api/ + live response headers from https://ecvapi.demo-uat.dex.care
+limit_count: 0
+note: >-
+  DexCare documents no rate limits. The full REST API reference, the six published
+  OpenAPI definitions and the support policy were searched for limit, quota,
+  throttle, 429, Retry-After and RateLimit terms — none appear anywhere. No 429
+  response is declared on any of the 27 published operations. A live unauthenticated
+  request to a DexCare tenant gateway returned no RateLimit-*, X-RateLimit-* or
+  Retry-After header. An agent integrating DexCare has no published or observable
+  runtime budget signal to work from.
+limits: []
+response_headers:
+  documented: []
+  observed:
+    - name: correlation-id
+      example_shape: <uuid>#<sequence>
+      note: >-
+        Present on every response from the tenant gateway. This is the only
+        request-correlation signal DexCare emits; it is not documented anywhere in
+        the developer portal.
+    - name: strict-transport-security
+      observed_value: max-age=31536000; includeSubDomains
+    - name: x-content-type-options
+      observed_value: nosniff
+    - name: referrer-policy
+      observed_value: same-origin
+  absent:
+    - RateLimit-Limit
+    - RateLimit-Remaining
+    - RateLimit-Reset
+    - X-RateLimit-Limit
+    - X-RateLimit-Remaining
+    - Retry-After
+exhaustion_status: null
+evidence:
+  - url: https://ecvapi.demo-uat.dex.care/api/9/modalities
+    status: 404
+    note: >-
+      DexCare's own demo tenant host, taken verbatim from the servers[] block of
+      openapi/dexcare-visit-service-openapi.yml. The host resolves and terminates
+      TLS on a Kong gateway, but the gateway matches no route and answers
+      {"message":"no Route matched with those values","request_id":"..."}. No
+      rate-limit headers were returned on any response.
+  - url: https://developers.dexcarehealth.com/api/
+    status: 200
+    note: No rate limit, quota, or throttling section anywhere in the REST API reference.
+  - url: https://developers.dexcarehealth.com/home/support
+    status: 200
+    note: Support and deprecation policy publishes support terms only; no rate or usage limits.

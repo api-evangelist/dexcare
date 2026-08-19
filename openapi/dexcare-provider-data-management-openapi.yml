@@ -1,0 +1,369 @@
+openapi: 3.1.0
+info:
+  description: Export provider data from DexCare
+  version: 1.0.0
+  title: Entities Service (External)
+  contact:
+    name: Product Config & SSP
+    email: configuration-ssp@dexcarehealth.com
+servers:
+- url: https://entities-service.{hostname}/v1
+  description: Extenral API URI
+  variables:
+    codename:
+      default: frosh
+      description: Customer's Code Name
+security:
+- ApiKey: []
+tags:
+- name: Entities
+paths:
+  /pdm/batch:
+    post:
+      operationId: batchFindEntitiesByType
+      description: Get list of entities by type
+      summary: Retrieve entities in batch
+      security:
+      - ApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaginatedFilteredEntityRequest'
+      responses:
+        '200':
+          description: List of entities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityQueryResult'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+  /pdm/schema/{namespace}/{name}:
+    get:
+      operationId: getPdmEntitySchema
+      description: Returns the json schema the entity
+      summary: Returns the json schema the entity
+      security:
+      - ApiKey: []
+      parameters:
+      - $ref: '#/components/parameters/name'
+      - $ref: '#/components/parameters/namespace'
+      - name: resolveReferences
+        in: query
+        description: 'If true, the references will be resolved and the schema will contain the full schema
+          of the reference.
+
+          If false, the references will be left as is.
+
+          Default is false.'
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Metadata for the entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PdmEntitySchema'
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for ApiKey to ApiKey Authorization, provided by DexCare to customer
+  schemas:
+    PaginatedFilteredEntityRequest:
+      type: object
+      required:
+      - type
+      - namespace
+      properties:
+        type:
+          type: string
+          example: department
+          description: Entity type to retrieve
+        namespace:
+          type: string
+          example: healthSystem
+          description: namespace of the Entity Type to retrieve
+        offset:
+          type: number
+          example: 10
+          description: Offset for paginated API usage
+        limit:
+          type: number
+          example: 10
+          description: Limit number of results for API response
+        refs:
+          type: array
+          example:
+          - location
+          items:
+            type: string
+          description: Referenced entity types to additionally retrieve
+        resolveAllRefs:
+          type: boolean
+          description: when true resolve all referenced types instead of declaring them in the 'refs'
+            array parameter.
+        filters:
+          type: array
+          description: 'The attributes against which we are searching. Fields related to the top level
+            entity can be included.
+
+            '
+          items:
+            type: object
+            required:
+            - field
+            - value
+            properties:
+              field:
+                type: string
+              value:
+                anyOf:
+                - type: string
+                  description: String value to filter by
+                  example: University Health Urgent Care
+                - type: number
+                  description: Numeric value to filter by
+                  example: 12345
+                - type: boolean
+                  description: Boolean value to filter by
+                  example: true
+                - type: array
+                  items:
+                    type: string
+                  description: Array of values to filter by, e.g., for multi-select fields
+              operator:
+                type: string
+                description: The operator to use for the search (e.g., "EQUAL", "GT"), defaults to "EQUAL"
+                enum:
+                - EQUAL
+                - LIKE
+                - GT
+                - LT
+                - BETWEEN
+                - NOT BETWEEN
+                - IS NULL
+                - IS NOT NULL
+                - CONTAINS
+                - ANY
+          example:
+          - field: name
+            value: University Health Urgent Care
+          - field: businessLine.name
+            value: Urgent Care
+          - field: facilityTypes
+            value:
+            - Urgent Care
+            operator: CONTAINS
+    ApiError:
+      title: API Error
+      description: API Error object
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+          description: Standardized code that can be used as a key for localization
+        message:
+          type: string
+          description: Human readable error details
+        details:
+          type: object
+          description: Additional details about the error
+          additionalProperties: true
+      required:
+      - code
+      - message
+    QueryResult:
+      title: Query Result
+      description: 'This is a generic query result schema.
+
+        '
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+      required:
+      - total
+    BaseEntity:
+      title: Base Entity Schema
+      description: This is a base entity schema.
+      type: object
+      properties:
+        type:
+          type: string
+          description: type of entity
+        version:
+          type: string
+          description: version of entity
+      required:
+      - type
+      - version
+      - lastModifiedDate
+      - createDate
+      - lastModifiedUser
+    Entity:
+      title: Generic Entity Schema
+      description: This is a generic entity schema.
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: id of entity
+          lastModifiedDate:
+            type: string
+            format: date-time
+            description: last modified date of entity
+          createDate:
+            type: string
+            format: date-time
+            description: create date of entity
+          lastModifiedUser:
+            type: string
+            description: last modified user of entity
+        required:
+        - id
+        - lastModifiedDate
+        - createDate
+        - lastModifiedUser
+    AnyEntity:
+      title: Any Entity Schema
+      description: This is a generic entity schema.
+      allOf:
+      - $ref: '#/components/schemas/Entity'
+      - type: object
+        additionalProperties: true
+    EntityList:
+      title: Generic Entity List Schema
+      description: This is a generic entity list schema.
+      type: array
+      items:
+        $ref: '#/components/schemas/AnyEntity'
+    EntityQueryResult:
+      title: EntityQueryResult
+      description: EntityQueryResult
+      allOf:
+      - $ref: '#/components/schemas/QueryResult'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/EntityList'
+        required:
+        - data
+    JSONSchemaProperty:
+      title: JSON Schema Property
+      description: This is a JSON schema property.
+      type: object
+      additionalProperties: true
+    EntitySchemaProperties:
+      title: Entity Schema Properties
+      description: This is a list of entity schema properties.
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        version:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        type:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        lastModifiedDate:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        lastModifiedUser:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        createdDate:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+    PdmEntitySchema:
+      title: PDM Entity Schema
+      description: This is an entity schema.
+      type: object
+      additionalProperties: true
+      properties:
+        title:
+          type: string
+          description: Title of the schema.
+        description:
+          type: string
+          description: Description of the schema.
+        $id:
+          type: string
+          description: Unique identifier of the schema.
+        $schema:
+          type: string
+          description: The schema of the entity schema.
+        properties:
+          $ref: '#/components/schemas/EntitySchemaProperties'
+  responses:
+    '400':
+      description: invalid input error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '401':
+      description: invalid authentication error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '404':
+      description: Not found error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '500':
+      description: internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  parameters:
+    name:
+      name: name
+      in: path
+      description: Entity type name
+      required: true
+      schema:
+        type: string
+        minLength: 3
+    namespace:
+      name: namespace
+      in: path
+      description: Entity type namespace
+      required: true
+      schema:
+        type: string
+        minLength: 3

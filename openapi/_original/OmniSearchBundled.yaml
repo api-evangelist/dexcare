@@ -1,0 +1,4455 @@
+openapi: 3.1.0
+info:
+  title: 'Omni - '
+  description: API specification for Omni's endpoints. Fast Pages Entities Schema Version - (4.2.2)
+  version: 2.21.0
+  license:
+    name: None
+    url: None
+servers:
+  - url: https://dev${brand}omni.azurewebsites.net
+    description: Dev Server
+  - url: https://qa${brand}omni.azurewebsites.net
+    description: QA Server
+  - url: https://uat${brand}omni.azurewebsites.net
+    description: Test Server
+  - url: https://${brand}omni.azurewebsites.net
+    description: Prod Server
+security:
+  - {}
+paths:
+  /api/OmniData/{version}:
+    get:
+      operationId: Get_Data
+      summary: Omni Data
+      description: Retrieve clinician or department data using their identifiers.
+      parameters:
+        - name: version
+          in: path
+          required: false
+          schema:
+            description: '(Optional) The version of the API '
+            type: string
+            const: 2.21.0
+        - name: allLocations
+          in: query
+          schema:
+            $ref: '#/components/schemas/allLocations'
+        - $ref: '#/components/parameters/BrandParam'
+        - name: departmentIds
+          in: query
+          schema:
+            $ref: '#/components/schemas/departmentIds'
+        - name: departmentUrls
+          in: query
+          schema:
+            $ref: '#/components/schemas/departmentUrls'
+        - name: ids
+          in: query
+          schema:
+            $ref: '#/components/schemas/ids'
+        - name: npis
+          in: query
+          schema:
+            $ref: '#/components/schemas/npis'
+        - name: select
+          in: query
+          schema:
+            $ref: '#/components/schemas/select'
+        - name: urls
+          in: query
+          schema:
+            $ref: '#/components/schemas/urls'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniDataSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Failure tests the mettle of heart, brain and body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniSearch/{version}:
+    get:
+      operationId: Omni_Search
+      summary: Omni Search
+      description: Perform a search or autocomplete `type` query. See the `search` parameter for examples of plain text searches. Additional options include location, longitude/latitude, time, or visit type.
+      parameters:
+        - name: version
+          in: path
+          required: false
+          schema:
+            description: '(Optional) The version of the API '
+            type: string
+            const: 2.21.0
+        - name: acceptingNewPatients
+          in: query
+          schema:
+            $ref: '#/components/schemas/acceptingNewPatients'
+        - $ref: '#/components/parameters/BrandParam'
+        - name: childBrand
+          in: query
+          schema:
+            $ref: '#/components/schemas/childBrand'
+        - name: cid
+          in: query
+          schema:
+            $ref: '#/components/schemas/cid'
+        - name: clinicians
+          in: query
+          schema:
+            $ref: '#/components/schemas/clinicians'
+        - name: clinicVisits
+          in: query
+          schema:
+            $ref: '#/components/schemas/clinicVisits'
+        - name: days
+          in: query
+          schema:
+            $ref: '#/components/schemas/days'
+        - name: departments
+          in: query
+          schema:
+            $ref: '#/components/schemas/departments'
+        - name: distance
+          in: query
+          schema:
+            $ref: '#/components/schemas/distance'
+        - name: endDate
+          in: query
+          schema:
+            $ref: '#/components/schemas/endDate'
+        - name: highlightPostTag
+          in: query
+          schema:
+            $ref: '#/components/schemas/highlightPostTag'
+        - name: highlightPreTag
+          in: query
+          schema:
+            $ref: '#/components/schemas/highlightPreTag'
+        - name: includeFallbackResults
+          in: query
+          schema:
+            $ref: '#/components/schemas/includeFallbackResults'
+        - name: inferLocationFromSearch
+          in: query
+          schema:
+            $ref: '#/components/schemas/inferLocationFromSearch'
+        - name: latitude
+          in: query
+          schema:
+            $ref: '#/components/schemas/latitude'
+        - name: location
+          in: query
+          schema:
+            $ref: '#/components/schemas/location'
+        - name: locations
+          in: query
+          schema:
+            $ref: '#/components/schemas/locations'
+        - name: longitude
+          in: query
+          schema:
+            $ref: '#/components/schemas/longitude'
+        - name: practiceGroup
+          in: query
+          schema:
+            $ref: '#/components/schemas/practiceGroup'
+        - name: search
+          in: query
+          allowEmptyValue: true
+          examples:
+            query1:
+              value: Spanish speaking primary care clinicians near me
+            query2:
+              value: family medicine
+          schema:
+            $ref: '#/components/schemas/search'
+        - name: skip
+          in: query
+          schema:
+            $ref: '#/components/schemas/skip'
+        - name: soonest
+          in: query
+          schema:
+            $ref: '#/components/schemas/soonest'
+        - name: startDate
+          in: query
+          schema:
+            $ref: '#/components/schemas/startDate'
+        - name: time
+          in: query
+          schema:
+            $ref: '#/components/schemas/time'
+        - name: top
+          in: query
+          schema:
+            $ref: '#/components/schemas/top'
+        - name: type
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/type'
+        - name: videoVisits
+          in: query
+          schema:
+            $ref: '#/components/schemas/videoVisits'
+        - name: virtualCare
+          in: query
+          schema:
+            $ref: '#/components/schemas/virtualCare'
+        - name: <Any>
+          in: query
+          description: A catch-all parameter for filtering results by an arbitrary field.
+          allowEmptyValue: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: Successful search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSearchSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Great adversity has a beauty — it is the fire that tempers the blade.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniSearchFacets:
+    get:
+      operationId: Facet_Search
+      summary: Omni Search Facets
+      description: Retrieve properties and their potential values/counts used for 'guided navigation' or 'smart filters' related to clincians and/or departments
+      parameters:
+        - $ref: '#/components/parameters/BrandParam'
+        - name: childBrand
+          in: query
+          schema:
+            $ref: '#/components/schemas/childBrand'
+        - name: count
+          in: query
+          schema:
+            $ref: '#/components/schemas/count'
+        - $ref: '#/components/parameters/DataParam'
+        - name: stringvalues
+          in: query
+          schema:
+            $ref: '#/components/schemas/stringvalues'
+      responses:
+        '200':
+          description: Successful search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSearchFacetsSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to load facets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: The sin is not in being outmatched, but in failing to recognize it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniAnalytics:
+    get:
+      operationId: Submit_Analytics_Events
+      summary: Omni Analytics
+      description: Submit analytics events.
+      parameters:
+        - $ref: '#/components/parameters/BrandParam'
+        - name: debug
+          in: query
+          schema:
+            $ref: '#/components/schemas/debug'
+        - name: dh
+          in: query
+          schema:
+            $ref: '#/components/schemas/dh'
+        - name: event_name
+          in: query
+          schema:
+            $ref: '#/components/schemas/event_name'
+        - name: tid
+          in: query
+          schema:
+            $ref: '#/components/schemas/tid'
+        - name: uip
+          in: query
+          schema:
+            $ref: '#/components/schemas/uip'
+        - name: v
+          in: query
+          schema:
+            $ref: '#/components/schemas/v'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniAnalyticsSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - type: object
+                    properties:
+                      validationMessages:
+                        description: Validation errors from GA4
+                        type: array
+                        items:
+                          type: string
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Ruin has come to our family.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniSearchAnalytics:
+    get:
+      operationId: Search_Analytics
+      summary: Omni Search Analytics
+      description: Proxy for Google Analytics (GA) collect endpoint, specifically for search page view events.
+      parameters:
+        - $ref: '#/components/parameters/BrandParam'
+        - name: cid
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/properties-cid'
+        - name: debug
+          in: query
+          schema:
+            $ref: '#/components/schemas/debug'
+        - name: dp
+          in: query
+          schema:
+            $ref: '#/components/schemas/dp'
+        - name: path
+          in: query
+          schema:
+            $ref: '#/components/schemas/path'
+        - name: tid
+          in: query
+          schema:
+            $ref: '#/components/schemas/tid'
+      responses:
+        '200':
+          description: Successful search analytics results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSearchAnalyticsSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Death waits for the slightest lapse in concentration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniSynonyms:
+    get:
+      operationId: Synonym_Search
+      summary: Omni Synonym Search
+      description: Retrieve a list of terms/phrases from the Omni Search synonym dictionary that match a given search query.
+      parameters:
+        - $ref: '#/components/parameters/BrandParam'
+        - $ref: '#/components/parameters/DataParam'
+        - name: search
+          in: query
+          allowEmptyValue: true
+          examples:
+            query1:
+              value: Spanish speaking primary care clinicians near me
+            query2:
+              value: family medicine
+          schema:
+            $ref: '#/components/schemas/properties-search'
+          required: true
+      responses:
+        '200':
+          description: Successful synonym results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSynonymsSuccessResponse'
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to search for synonyms.
+        default:
+          description: Remind yourself that overconfidence is a slow and insidious killer!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniSitemap:
+    get:
+      operationId: Sitemap
+      summary: Omni Sitemap
+      description: Retrieve a list of URLs (typically just pathnames) from the search index for a brand.
+      parameters:
+        - $ref: '#/components/parameters/BrandParam'
+        - $ref: '#/components/parameters/DataParam'
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSitemapSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: An internal error occurred in the API application (please notify the developers if you ever encounter this).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Sitemap support is not yet implemented for the requested brand/data combination.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/OmniSlugs:
+    get:
+      operationId: Get_Slugs
+      summary: Omni Slugs
+      description: The slugs endpoint is used during frontend page builds to add search optimization and to set default Omni search parameters like search terms, custom descriptions, and location.
+      parameters:
+        - $ref: '#/components/parameters/BrandParam'
+        - name: name
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/name'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSlugsSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not a known slug.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to load slugs reference.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: You will endure this loss and learn from it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    allLocations:
+      default: false
+      description: If false, only a clinicians's primary department will be returned. If true, all departments for a clinician will be returned. Make sure to set this to true if you're looking up a clinician's secondary department, such as when looking up a clinician by id, or when looking up a list of all clinicians at a department.
+      type: boolean
+    departmentIds:
+      description: A list of department ids to lookup, separated by commas. Equivalent to passing the ids for the clinicians at that department.
+      items:
+        type: string
+      type: array
+    departmentUrls:
+      description: A list of department urls to lookup, separated by commas. Equivalent to passing the ids for the clinicians at the department with that url.
+      items:
+        type: string
+      type: array
+    ids:
+      description: A list of ids to lookup, separated by commas. Use this parameter if possible since it does not require an intermediate lookup; other parameters will be slower and may have to wait for the intermediate cache to refresh.
+      items:
+        type: string
+      type: array
+    npis:
+      description: A list of npis to lookup, separated by commas. Equivalent to passing the ids for the clinicians with those npis.
+      items:
+        type: string
+      type: array
+    select:
+      description: A list of fields to be returned, separated by commas. Should be used to reduce response size where possible.
+      items:
+        type: string
+      type: array
+    urls:
+      description: A list of urls to lookup, separated by commas. Equivalent to passing the ids for the documents with those urls.
+      items:
+        type: string
+      type: array
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+        - error
+    clinicianFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/clinicianFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Fast Pages Clinician
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        '@search.distance':
+          description: "This provides details regarding how far the user is from the clinician.\n\n@example\n```\n{\n\t miles: 12.199344228250027, \n\t type: \"absolute\"\n}\n```\n\nscope - `OmniSearch` `OmniData`"
+          properties:
+            miles:
+              description: |-
+                The distance in miles the user is from the clinician
+
+                @example
+                `12.199344228250027`
+
+                scope - `OmniSearch` `OmniData`
+              example: 12.199344228250027
+              type: number
+            type:
+              description: |-
+                The type of distance measurement.
+
+                 Values:
+
+                `"absolute"` - the exact amount of miles from the user
+
+                `"neighborhood, city, county, zip"` - determines the geographical distance from the user. ex: `"zip"` is returned, the location result is within the same postal code
+
+                @example
+                `"absolute"`
+
+                scope - `OmniSearch` `OmniData`
+              example: absolute
+              type: string
+          tags:
+            - fastPages
+          type: object
+        '@search.features':
+          description: "This provides more detail about the relevance score at the field level associated with the returned result.\n\n @link: https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring#featuresmode-parameter-preview \n\n@example\n ```\n {\n\t specialties.name: {\n\t\tuniqueTokenMatches: 2, \n\t\tsimilarityScore: 13.0041493, \n\t\ttermFrequency: 2\n\t}\n}\n``` \n\nscope - `OmniSearch`"
+          properties:
+            uniqueTokenMatches:
+              description: Number of unique tokens found in the field
+              example: 2
+              type: number
+            similarityScore:
+              description: Similarity score, or a measure of how similar the content of the field is, relative to the query term
+              example: 13.0041493
+              type: number
+            termFrequency:
+              description: Term frequency, or the number of times the query term was found in the field
+              example: 2
+              type: number
+          tags:
+            - fastPages
+          type: object
+        '@search.highlights':
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: "This includes bolded matches to the search.\n\n @link: https://learn.microsoft.com/en-us/azure/search/search-pagination-page-layout#hit-highlighting \n\n@example\n ```\n{\n\t specialties.name: [\n\t\t '<strong>Family Medicine</strong>',\n\t\t '<strong>Internal Medicine</strong>'\n\t ]\n}\n``` \n\nscope - `OmniSearch`"
+          example:
+            specialties.name:
+              - <strong>Family Medicine</strong>
+              - <strong>Internal Medicine</strong>
+          tags:
+            - fastPages
+          type: object
+        '@search.score':
+          description: |-
+            This is the relevance score associated with the returned result.
+
+             @link: https://learn.microsoft.com/en-us/azure/search/search-query-odata-search-score-function 
+
+            @example
+             `4360.5723` 
+
+            scope - `OmniSearch`
+          example: '4360.5723'
+          tags:
+            - fastPages
+          type: string
+        adhoc:
+          description: |-
+            Adhoc properties for the clinician. These will be key/value pairs of strings. ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        agesSeen:
+          description: |-
+            Age groups seen by the clinician.
+
+            @example
+             ```
+            [
+              "Geriatrics",
+              "Adults"
+            ]
+            ``` 
+            scope - `OmniData`
+          example:
+            - Geriatrics
+            - Adults
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        badges:
+          description: |-
+            Badges for displaying applied facet filters on search page clinician cards.
+
+            @example
+            ```
+            [
+              "Gender: Male",
+              "Languages: English",
+              "Specialties: Orthopedic Surgery"
+            ]
+            ```
+            scope - `OmniSearch`
+          example:
+            - 'Gender: Male'
+            - 'Languages: English'
+            - 'Specialties: Orthopedic Surgery'
+          items:
+            type: string
+          tags:
+            - omni
+            - fastPages
+          type: array
+        bio:
+          description: |-
+            Biography of clinician. string or html.
+
+            @example
+            ```"<div>Zahidul I. Chowdhury, MD., earned his medical degree from Ross University...</div>"``` 
+
+            scope - `OmniSearch` `OmniData`
+          example: <div>Zahidul I. Chowdhury, MD., earned his medical degree from Ross University...</div>
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        careTeam:
+          description: |-
+
+            Clinician's care team. This is typically a list of APPs (Advanced Practice Providers). Useful for rendering care teams on clinician detail pages. Not needed in Search results. uses clinician schema. 
+
+            example of clinician with a care-team cross sell care-tile:
+            https://www.care.texashealth.org/Providers/THPG/Texas-Health-Family-Care/Family-Medicine/randall-todd-richwine-do 
+
+            scope - `OmniData`
+          items:
+            $ref: '#/components/schemas/clinicianFastPages'
+          tags:
+            - omni
+            - fastPages
+          type: array
+        certifications:
+          description: |-
+            Certifications linked to a clinician.
+
+            @example
+            ```
+            [
+              "American Board of Emergency Medicine"
+            ]
+            ```
+            scope - `OmniData`
+          example:
+            - American Board of Emergency Medicine
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        cmsContent:
+          $ref: '#/components/schemas/cmsContent'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        conditionsTreated:
+          description: |-
+            List of conditions treated by the clinician
+
+            @example
+            ```
+            [
+              "Cold and Flu",
+              "COVID-19",
+              "Ear Infections"
+            ]
+            ```
+            scope - `OmniData`
+          example:
+            - Cold and Flu
+            - COVID-19
+            - Ear Infections
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        credentials:
+          description: |-
+            Credentials linked to a clinician such as DO, MD, etc.
+
+            @example
+            ```
+            [
+              "MD"
+            ]
+            ```
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example:
+            - MD
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        departmentPrimaryUuid:
+          description: |-
+            A UUID string that identifies the primary department 
+
+            scope - `none`
+          format: uuid
+          nullable: true
+          tags:
+            - omni
+            - fastPages
+          type: string
+        departments:
+          description: |-
+            EMR departments that a clinician is associated with. Needed in Search Results and Data Results to render multi-department clinician care-tiles. 
+
+            scope - `OmniSearch` `OmniData`
+          items:
+            $ref: '#/components/schemas/departmentFastPages'
+          tags:
+            - omni
+            - fastPages
+          type: array
+        education:
+          description: |-
+            Clinician's education history 
+
+            scope - `OmniData`
+          items:
+            properties:
+              fieldOfStudy:
+                description: |-
+                  Title of education focus, eg. 'Doctor of Nursing Practice'.
+
+                  @example
+                  ```"Master of Science in Nursing"``` 
+
+                  scope - `OmniData`
+                example: Master of Science in Nursing
+                type: string
+              gradYear:
+                description: |-
+                  Year of graduation from education institution.
+
+                  @example
+                  ```2003``` 
+
+                  scope - `OmniData`
+                example: 2003
+                type: integer
+              name:
+                description: |-
+                  Name of education institution.
+
+                  @example
+                  ```"Uniformed Services University of the Health Sciences"``` 
+
+                  scope - `OmniData`
+                example: Uniformed Services University of the Health Sciences
+                type: string
+              position:
+                description: |-
+                  Usable as an additional field for education title
+
+                  @example
+                  ```"Medical School"``` 
+
+                  scope - `OmniData`
+                example: Medical School
+                type: string
+              unstructuredDescription:
+                description: |-
+                  Free form text field for information about the education. 
+
+                  scope - `OmniData`
+                example: University of Seattle Medicine<br/>Graduate, Nursing, MSN, 2011
+                type: string
+            required:
+              - name
+            type: object
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        emrIdentifiers:
+          description: |-
+            EMR Identifiers 
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          items:
+            $ref: '#/components/schemas/emrIdentifierFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        extended:
+          description: |-
+            Extended properties for the clinician. These will be described by a customer defined schema. ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        gender:
+          description: |-
+            Gender of clinician.
+
+            @example
+            ```"Male"```
+
+            scope - `OmniData`
+          example: Male
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+            - applications
+          type: string
+        hospitalAffiliations:
+          description: |-
+            Hospitals that a clinician is affiliated with.
+
+            @example
+            ```
+            [
+              "University Health"
+            ]
+            ``` 
+            scope - `OmniSearch` `OmniData`
+          example:
+            - University Health
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        id:
+          description: |-
+            Unique identifier for the clinician
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: 123456abcd
+          pattern: ^(TEMP-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+          tags:
+            - omni
+            - fastPages
+          type: string
+        imageUrl:
+          description: |-
+            URL where the clinician's image is stored. Full url with production origin.
+
+            @example
+            ```"https://www.universityhealth.com/photos/200/chowdhury-zahidul-1023458890.jpg"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: https://www.universityhealth.com/photos/200/chowdhury-zahidul-1023458890.jpg
+          format: uri
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        insurances:
+          description: |-
+            Insurances a clinician is accepting.
+
+            scope - `OmniData`
+          items:
+            description: Insurance name a clinician is accepting.
+            properties:
+              isNewPatientEnabled:
+                description: |-
+                  Insurance accepts new patients. If not provided, defaults to yes
+
+                  scope - `OmniData`
+                example: false
+                type: boolean
+              isReturningPatientEnabled:
+                description: |-
+                  Insurance accepts returning patients. If not provided, defaults to yes
+
+                  @example
+                  ```true```
+
+                  scope - `OmniData`
+                example: true
+                type: boolean
+              name:
+                description: |-
+                  insurance name
+
+                  @example
+                  ```"Aetna"```
+
+                  scope - `OmniData`
+                example: Aetna
+                type: string
+            type: object
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        isAcceptingNewPatients:
+          description: |-
+            Flag to determine if a clinician is accepting new patients.
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isAffiliate:
+          description: |-
+            Flag to determine if a clinician is a direct employee or an affiliate group employee.
+
+            @example
+            ```true``` 
+
+            scope - `OmniData`
+          example: true
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isBookableOnline:
+          description: |-
+            Flag to determine if a clinician webpage should display the timeslot widget
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isBookablePhone:
+          description: |-
+            Flag to determine if a clinician webpage should display phone visit types on the timeslot widget.
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isBookableVirtual:
+          description: |-
+            Flag to determine if a clinician webpage should display virtual visit types on the timeslot widget.
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isNewPatientEnabled:
+          description: |-
+            Flag to determine if a clinician accepts new patients (open scheduling in epic).
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isReturningPatientEnabled:
+          description: |-
+            Flag to determine if a clinician accepts returning patients (direct scheduling in epic).
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        languages:
+          description: |-
+            Languages a clinician speaks.
+
+            @example
+            ```
+            [
+              "English",
+              "Klingon"
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - English
+            - Klingon
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        medicalInterests:
+          description: |-
+            Similar to specialities but typically more granular.  Examples of this include 'groin pain' or 'learning disabilities'.
+
+            @example
+            ```
+            [
+              "learning disabilities",
+              "abdominal migraine",
+              "lateral epicondylitis"
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - learning disabilities
+            - abdominal migraine
+            - lateral epicondylitis
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        name:
+          description: |-
+            The sections of a clinician's name
+
+            @example
+            ```
+            {
+              "first": "Andrea",
+              "last": "Ford",
+              "middles": [
+                "Price"
+              ],
+              "prefix": "Prof.",
+              "suffix": "IV"
+            }
+            ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example:
+            first: Andrea
+            last: Ford
+            middles:
+              - Price
+            prefix: Prof.
+            suffix: IV
+          properties:
+            first:
+              description: |-
+                First name of clinician.
+
+                @example
+                ```"Andrea"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: Andrea
+              pattern: ^.+$
+              type: string
+            last:
+              description: |-
+                Last name of clinician.
+
+                @example
+                ```"Ford"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: Ford
+              pattern: ^.+$
+              type: string
+            middles:
+              description: |-
+                Middle name(s) of clinician.
+
+                @example
+                ```
+                [
+                  "Price"
+                ]
+                ```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example:
+                - Price
+              items:
+                type: string
+              type: array
+            prefix:
+              description: |-
+                Prefix of clinician's name.
+
+                @example
+                ```"Prof."```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: Prof.
+              type: string
+            suffix:
+              description: |-
+                Suffix of clinician's name.
+
+                @example
+                ```"IV"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: IV
+              type: string
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        networks:
+          description: |-
+            Networks the clinician is associated with.
+
+            @example
+            ```
+            [
+              "University Health",
+              "Employed"
+            ]
+            ```
+
+            scope - `OmniSearch` `OmniData`
+          example:
+            - University Health
+            - Employed
+          items:
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        npi:
+          description: |-
+            National Provider Id associated with clinician.
+
+            @example
+            ```"1234567890"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: '1234567890'
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        pageDescription:
+          description: |-
+            SEO page description. meta[name='description'] tag content
+
+            @example
+            ```"Dr. Yassmeen Abdel-Aty is an Otolaryngologist Head and Neck Surgeon who received additional training in the treatment of voice, airway, and swallowing disorders. She is currently practicing at the University Health General Hospital and is on faculty there."```
+
+            scope - `OmniSearch` `OmniData`
+          example: Dr. Yassmeen Abdel-Aty is an Otolaryngologist Head and Neck Surgeon who received additional training in the treatment of voice, airway, and swallowing disorders. She is currently practicing at the University Health General Hospital and is on faculty there.
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        pageTitle:
+          description: |-
+            SEO title. title tag content. String visible in the browser's tab
+
+            @example
+            ```"Zahidul Islam Chowdhury, MD - Seattle, WA"```
+
+            scope - `OmniData`
+          example: Zahidul Islam Chowdhury, MD - Seattle, WA
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        phone:
+          $ref: '#/components/schemas/phoneNumberFastPages'
+          nullable: true
+        profileUrls:
+          description: |-
+            Clinician detail page URL(s)
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          items:
+            description: Clinician detail page URL
+            properties:
+              brandName:
+                description: |-
+                  Brand associated with the department.
+
+                  @example
+                  ```"University Health"```
+
+                  scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+                example: University Health
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+              url:
+                description: |-
+                  Clinician's webpage URL. Full url with production origin. Mixed-case urls are supported. Pages will be 301 redirected if browser path characters match but the casing doesn't.
+
+                  @example
+                  ```"https://www.universityhealth.com/provider/Jane+Scot+Doe/389345"```
+
+                  scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+                example: https://www.universityhealth.com/provider/Jane+Scot+Doe/389345
+                format: uri
+                type: string
+            required:
+              - url
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        resultType:
+          const: clinician
+          description: |-
+            Result type is a clinician 
+
+            scope - `OmniSearch` `OmniSearchNested`
+          tags:
+            - omni
+            - fastPages
+          type: string
+        reviews:
+          description: |-
+            Clincian Reviews - OmniSearch and OmniData API return a different subset of properties.
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          items:
+            $ref: '#/components/schemas/reviewsFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        specialty:
+          description: '**Deprecated** Use `specialties` instead'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        specialties:
+          description: |-
+            Primary specialties associated with clinician.
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          items:
+            $ref: '#/components/schemas/specialtyFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        subSpecialties:
+          description: |-
+            Secondary specialties associated with clinician.
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          items:
+            $ref: '#/components/schemas/specialtyFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        tier:
+          description: |-
+
+            Used as a weight for the clinician search algorithm. 1 ranks higher than 2.
+
+            example:
+            ```1```
+
+            scope - `OmniSearch`
+          example: 1
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        videoUrl:
+          description: |-
+            URL where the clinician's video bio is stored. Full url with production origin.
+
+            @example
+            ```"https://www.universityhealth.com/videos/Jane+Scot+Doe/389345"```
+
+            scope - `OmniData`
+          example: https://www.universityhealth.com/videos/Jane+Scot+Doe/389345
+          format: uri
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 4.16.0
+      required:
+        - id
+        - profileUrls
+        - resultType
+      title: clinicianFastPages
+      type: object
+      unevaluatedProperties: false
+    cmsContent:
+      $id: https://dexcarehealth.com/schemas/fastPages/cmsContentFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: |-
+        Content Management System Sections 
+
+        scope - `OmniSearch` `OmniData`
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        pageId:
+          description: |-
+            Content Management System Page ID
+
+            @example
+            ```"1234abc"``` 
+
+            scope - `OmniSearch` `OmniData`
+          example: 1234abc
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        sections:
+          description: |-
+            Content Management Sections in the order they will be displayed on the page. Supports HTML String format. HTML is sanitized by ingest process. 
+
+            scope - `OmniData`
+          items:
+            properties:
+              body:
+                description: |-
+                  Body of page Section. HTML String.
+
+                  @example
+                  ```"<div class="panel-content"> <div><p><strong>Can I get a COVID-19 test at ..."```
+
+                  scope - `OmniData`
+                example: <div class="panel-content"> <div><p><strong>Can I get a COVID-19 test at ...
+                type: string
+              title:
+                description: |-
+                  Title of page section. HTML String.
+
+                  @example
+                  ```<h3>FAQ: Quick Answers About University Health Clinics</h3>``` 
+
+                  scope - `OmniData`
+                example: '<h3>FAQ: Quick Answers About University Health Clinics</h3>'
+                type: string
+              type:
+                description: |-
+                  Type of page section.
+                  - `accordion` is a collapsable section.
+                  - `crossSell` is a cross sell panel positioned below the primary care tile.
+                  - `section` is a title followed by the body. 
+
+                  @example
+                  ```"accordion"```
+
+                  scope - `OmniData`
+                enum:
+                  - accordion
+                  - crossSell
+                  - section
+                example: accordion
+                type: string
+            required:
+              - type
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        version:
+          type: string
+          const: 2.0.0
+      required:
+        - pageId
+      title: cmsContentFastPages
+      type: object
+      unevaluatedProperties: false
+    businessLineFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/businessLineFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: |-
+        Business Line
+
+        scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        name:
+          description: |-
+            Business Line Name
+
+            @example
+            ```"University Health - Same Day Urgent Care"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: University Health - Same Day Urgent Care
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 2.0.0
+      required:
+        - name
+      title: businessLineFastPages
+      type: object
+      unevaluatedProperties: false
+    businessUnitFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/businessUnitFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: |-
+        Business Unit
+
+        scope - `OmniSearch` `OmniData`
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        name:
+          description: |-
+            Business Unit Name.
+
+            @example
+            ```"University Health"```
+
+            scope - `OmniSearch` `OmniData`
+          example: University Health
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 2.0.0
+      required:
+        - name
+      title: businessUnitFastPages
+      type: object
+      unevaluatedProperties: false
+    emrIdentifierFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/emrIdentifierFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: EMR Identifier
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        emrId:
+          description: |-
+            Identifier within the source EMR system
+
+            @example
+            ```"129878"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: '129878'
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        emrIdType:
+          description: |-
+            Type of identifier within the source EMR system
+
+            @example
+            ```"EXTERNAL"```
+
+            scope - `none`
+          example: EXTERNAL
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        emrSystemId:
+          description: |-
+            Name of source EMR system
+
+            @example
+            ```"universityhealth.epic"``` 
+
+            scope - `OmniSearch` `OmniData`
+          example: universityhealth.epic
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 2.0.0
+      required:
+        - emrId
+        - emrIdType
+        - emrSystemId
+      title: emrIdentifierFastPages
+      type: object
+      unevaluatedProperties: false
+    hoursDayFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/hoursDayFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: |-
+        Hours by day 
+
+        scope - `OmniSearch` `OmniData` `OmniDataNested`
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        close:
+          description: |-
+            Closing hour for department. Format is in military time.
+
+            @example
+            ```"19:00"```
+
+            scope - `OmniSearch` `OmniData` `OmniDataNested`
+          example: '19:00'
+          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+          type: string
+        custom:
+          description: |-
+            Custom text that can be used to provide additional insight into the hours. Displayed in addition to open, close, or open24Hours properties.
+
+            @example
+            ```"Closed from 12-12:30 for lunch."```
+
+            scope - `OmniSearch` `OmniData` `OmniDataNested`
+          example: Closed from 12-12:30 for lunch.
+          type: string
+        open:
+          description: |-
+            Opening hour for department. Format is in military time.
+
+            @example
+            ```"07:00"```
+
+            scope - `OmniSearch` `OmniData` `OmniDataNested`
+          example: '07:00'
+          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+          type: string
+        open24Hours:
+          description: |-
+            Flag to determine if a department is open 24 hours. Overrides open and close properties.
+
+            scope - `OmniSearch` `OmniData` `OmniDataNested`
+          example: false
+          type: boolean
+        version:
+          type: string
+          const: 4.0.0
+      title: hoursDayFastPages
+      type: object
+      unevaluatedProperties: false
+    departmentFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/departmentFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Fast Pages Department
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        '@search.distance':
+          description: "This provides details regarding how far the user is from the department.\n\n@example\n```\n{\n\t miles: 12.199344228250027, \n\t type: \"absolute\"\n}\n```\n\nscope - `OmniSearch` `OmniData`"
+          properties:
+            miles:
+              description: |-
+                The distance in miles the user is from the department
+
+                @example
+                `12.199344228250027`
+
+                scope - `OmniSearch` `OmniData`
+              example: 12.199344228250027
+              type: number
+            type:
+              description: |-
+                The type of distance measurement.
+
+                 Values:
+
+                `"absolute"` - the exact amount of miles from the user
+
+                `"neighborhood, city, county, zip"` - determines the geographical distance from the user. ex: `"zip"` is returned, the location result is within the same postal code
+
+                @example
+                `"absolute"`
+
+                scope - `OmniSearch` `OmniData`
+              example: absolute
+              type: string
+          tags:
+            - fastPages
+          type: object
+        '@search.features':
+          description: "This provides more detail about the relevance score at the field level associated with the returned result.\n\n @link: https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring#featuresmode-parameter-preview \n\n@example\n ```\n {\n\t specialties.name: {\n\t\tuniqueTokenMatches: 2, \n\t\tsimilarityScore: 13.0041493, \n\t\ttermFrequency: 2\n\t}\n}\n``` \n\nscope - `OmniSearch`"
+          properties:
+            uniqueTokenMatches:
+              description: Number of unique tokens found in the field
+              example: 2
+              type: number
+            similarityScore:
+              description: Similarity score, or a measure of how similar the content of the field is, relative to the query term
+              example: 13.0041493
+              type: number
+            termFrequency:
+              description: Term frequency, or the number of times the query term was found in the field
+              example: 2
+              type: number
+          tags:
+            - fastPages
+          type: object
+        '@search.highlights':
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: "This includes bolded matches to the search.\n\n @link: https://learn.microsoft.com/en-us/azure/search/search-pagination-page-layout#hit-highlighting \n\n@example\n ```\n{\n\t specialties.name: [\n\t\t '<strong>Family Medicine</strong>',\n\t\t '<strong>Internal Medicine</strong>'\n\t ]\n}\n``` \n\nscope - `OmniSearch`"
+          example:
+            specialties.name:
+              - <strong>Family Medicine</strong>
+              - <strong>Internal Medicine</strong>
+          tags:
+            - fastPages
+          type: object
+        '@search.score':
+          description: |-
+            This is the relevance score associated with the returned result.
+
+             @link: https://learn.microsoft.com/en-us/azure/search/search-query-odata-search-score-function 
+
+            @example
+             `4360.5723` 
+
+            scope - `OmniSearch`
+          example: '4360.5723'
+          tags:
+            - fastPages
+          type: string
+        accreditations:
+          description: |-
+            Accreditations or accolades associated with the department.
+
+            @example
+            ```"<a href=\"https://www.intersocietal.org/vascular/\" class=\"link\"><img style=\"height: 175px; width: 175px;\" src=\"https://www.universityhealth.com/UHealth/media/Images/Awards%20and%20Logos/Wisconsin/vascular-testing-accredited-facility.jpg?ext=.jpg\"></a>"```
+
+            scope - `OmniData`
+          example: '<a href="https://www.intersocietal.org/vascular/" class="link"><img style="height: 175px; width: 175px;" src="https://www.universityhealth.com/UHealth/media/Images/Awards%20and%20Logos/Wisconsin/vascular-testing-accredited-facility.jpg?ext=.jpg"></a>'
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        address:
+          description: |-
+            Department Address 
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          properties:
+            addressLine1:
+              description: |-
+                Street number where the department resides.
+
+                @example
+                ```"822 Industrial Boulevard"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: 822 Industrial Boulevard
+              pattern: ^.+$
+              type: string
+            addressLine2:
+              description: |-
+                Secondary street number where the department resides. Such as units, apt, suite, etc.
+
+                @example
+                ```"Suite 100"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: Suite 100
+              type: string
+            city:
+              description: |-
+                City where the department resides.
+
+                @example
+                ```"Ellijay"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: Ellijay
+              pattern: ^.+$
+              type: string
+            country:
+              description: |-
+                Country where the department resides.
+
+                @example
+                ```"US"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: US
+              pattern: ^.+$
+              type: string
+            county:
+              description: |-
+                County where the department resides.
+
+                @example
+                ```"Gilmer County"```
+
+                scope - `OmniSearch` `OmniSearchNested`
+              example: Gilmer County
+              pattern: ^.+$
+              type: string
+            latitude:
+              description: |-
+                Latitude of the department
+
+                @example
+                ```33.79267```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: 33.79267
+              type: number
+            longitude:
+              description: |-
+                Longitude of the department.
+
+                @example
+                ```-84.39556```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: -84.39556
+              type: number
+            postalCode:
+              description: |-
+                Postal Code or Zip code where the department resides.
+
+                @example
+                ```"30540"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: '30540'
+              type: string
+            state:
+              description: |-
+                Region or state where the department resides. This is alpha codes such as 'WI' for Wisconsin.
+
+                @example
+                ```"GA"```
+
+                scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+              example: GA
+              pattern: ^.+$
+              type: string
+          required:
+            - addressLine1
+            - city
+            - country
+            - postalCode
+            - state
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        adhoc:
+          description: |-
+            Adhoc properties for the clinician. These will be key/value pairs of strings. ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        badges:
+          description: |-
+            Badges for displaying applied facet filters on search page department cards.
+
+            @example
+
+            ```
+            [
+                "Gender: Male",
+                "Languages: English",
+                "Specialties: Orthopedic Surgery"
+            ]
+            ```
+
+            scope - `OmniSearch`
+          example:
+            - 'Gender: Male'
+            - 'Languages: English'
+            - 'Specialties: Orthopedic Surgery'
+          items:
+            type: string
+          tags:
+            - omni
+            - fastPages
+          type: array
+        banner:
+          description: |-
+            Banner to display on the top of a department's web page.
+
+            @example
+            ```"<div>marketing banner for this page</div>"```
+
+            scope - `OmniData`
+          example: <div>marketing banner for this page</div>
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        brandName:
+          description: |-
+            Brand associated with the department.
+
+            @example
+            ```"University Health"```
+
+            scope - `OmniSearch` `OmniData`
+          example: University Health
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        businessLine:
+          $ref: '#/components/schemas/businessLineFastPages'
+          tags:
+            - omni
+            - fastPages
+        businessUnit:
+          $ref: '#/components/schemas/businessUnitFastPages'
+          tags:
+            - omni
+            - fastPages
+        clinicians:
+          description: |-
+            Clinicians that work at the department
+
+            scope - `OmniSearch` `OmniData`
+          items:
+            $ref: '#/components/schemas/clinicianFastPages'
+          tags:
+            - omni
+            - fastPages
+          type: array
+        clockwise:
+          description: |-
+            Clockwise Care Tile integration data 
+
+            scope - `OmniSearch` `OmniData`
+          properties:
+            clockwiseDeptId:
+              description: |-
+                Clockwise Department ID.
+
+                @example
+                ```"4388"``` 
+
+                scope - `OmniSearch` `OmniData`
+              example: '4388'
+              type: string
+          required: []
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        cmsContent:
+          $ref: '#/components/schemas/cmsContent'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        conditionsTreated:
+          description: |-
+            List of conditions treated at a department
+
+            @example
+            ```
+            [
+                "Cold and Flu",
+                "COVID-19",
+                "Ear Infections"
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - Cold and Flu
+            - COVID-19
+            - Ear Infections
+          items:
+            description: condition treated
+            example: Cold and Flu
+            type: string
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        description:
+          description: |-
+            Description of department.
+
+            @example
+            ```"<h2>Ear, Nose and Throat (ENT) Care in Seattle</h2>\r\n\r\n<p>Located in Seattle, WA, University Physicians ENT Seattle is a specialty practice dedicated to helping you get better - and stay well.</p>"```
+
+            scope - `OmniSearch` `OmniData`
+          example: "<h2>Ear, Nose and Throat (ENT) Care in Seattle</h2>\r\n\r\n<p>Located in Seattle, WA, University Physicians ENT Seattle is a specialty practice dedicated to helping you get better - and stay well.</p>"
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        dexcareBuildsPage:
+          description: |-
+            Flag to determine if DexCare should build a page for this department.
+
+            @example
+            ```true```
+
+            scope - `OmniData`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        displayName:
+          description: |-
+            Display name of the department.
+
+            @example
+            ```"University Health Urgent Care Summerhill"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: University Health Urgent Care Summerhill
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        distance:
+          description: |-
+            Distance of department from end-user.
+
+            @example
+            ```2.925616929429825```
+
+            scope - `OmniSearch` `OmniSearchNested`
+          example: 2.925616929429825
+          tags:
+            - omni
+            - fastPages
+          type: number
+        emrIdentifier:
+          $ref: '#/components/schemas/emrIdentifierFastPages'
+          description: |-
+            EMR Identifier 
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        extended:
+          description: |-
+            Extended properties for the clinician. These will be described by a customer defined schema. ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        fax:
+          description: |-
+            Fax number associated with the department.
+
+            @example
+            ```"+16175551212"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: '+16175551212'
+          nullable: true
+          pattern: ^\+?[1-9][0-9]{1,14}$
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        googlePlaceUrl:
+          description: |-
+            Google Maps department URL. Provides a better view of the department in Google Maps.
+
+            @example
+            ```"https://www.google.com/maps/place/University+Health+Medical+Group/@42.9202749,-89.2107675,17z/data=!....."```
+
+            scope - `OmniData` `OmniDataNested`
+          example: https://www.google.com/maps/place/University+Health+Medical+Group/@42.9202749,-89.2107675,17z/data=!.....
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        hours:
+          description: |-
+
+            Opening and closing times for a week    
+
+            @examples    
+            ```
+            // M-F Primary Care Clinic    
+            {    
+                mon: {    
+                    open: "07:00",    
+                    close: "18:00",    
+                },    
+                tue: {... same as mon},    
+                wed: {... same as mon},    
+                thu: {... same as mon},    
+                fri: {    
+                    open: "07:00",    
+                    close: "14:00",    
+                }    
+            }        
+                
+            // ER    
+            {
+                "custom": "Closed on Christmas",
+                "fri": {
+                    "open24Hours": true
+                },
+                "mon": {
+                    "open24Hours": true
+                },
+                "sat": {
+                    "open24Hours": true
+                },
+                "sun": {
+                    "open24Hours": true
+                },
+                "thu": {
+                    "open24Hours": true
+                },
+                "tue": {
+                    "open24Hours": true
+                },
+                "wed": {
+                    "open24Hours": true
+                }
+            }        
+                
+            // Custom Message    
+            {    
+                custom: "By appointment only.",    
+            }    
+            ```
+
+            scope - `OmniSearch` `OmniData` `OmniDataNested`
+          properties:
+            custom:
+              description: |-
+                Field to populate during holidays or inclement weather as needed, eg. 'Closed on Christmas' or 'Office closure on Jan 16th due to extreme weather'.
+
+                @example
+                ```"Closed on Christmas"``` 
+
+                scope - `OmniSearch` `OmniData` `OmniDataNested`
+              example: Closed on Christmas
+              type: string
+            fri:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            mon:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            sat:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            sun:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            thu:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            tue:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            wed:
+              $ref: '#/components/schemas/hoursDayFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        id:
+          description: |-
+            Unique identifier for the department 
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: 123456abcd
+          pattern: ^(TEMP-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+          tags:
+            - omni
+            - fastPages
+          type: string
+        imageUrl:
+          description: |-
+            URL where the department's image is stored. Full url with production origin.
+
+            @example
+            ```"https://www.universityhealth.com/photos/200/location-2-1023458890.jpg"```
+
+            scope - `OmniSearch` `OmniData`
+          example: https://www.universityhealth.com/photos/200/location-2-1023458890.jpg
+          format: uri
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        insurances:
+          description: |-
+            Insurances a department is accepting. 
+
+            scope - `OmniData`
+          items:
+            description: Insurance name a department is accepting.
+            properties:
+              isNewPatientEnabled:
+                description: |-
+                  insurance accepts new patients. If not provided, defaults to yes
+
+                  @example
+                  ```true``` 
+
+                  scope - `OmniData`
+                example: true
+                type: boolean
+              isReturningPatientEnabled:
+                description: |-
+                  insurance accepts returning patients. If not provided, defaults to yes
+
+                  scope - `OmniData`
+                example: false
+                type: boolean
+              name:
+                description: |-
+                  insurance name
+
+                  @example
+                  ```"Aetna"```
+
+                  scope - `OmniData`
+                example: Aetna
+                type: string
+            type: object
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        isAcceptingNewPatients:
+          description: |-
+            Whether the department is accepting new patients.
+             Used for search & sort in Location Search.
+             Used to show new patient care tiles.
+
+            @example
+            ```true``` 
+
+            scope - `OmniSearch` `OmniData`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isBookableOnline:
+          description: |-
+            Whether the department is bookable online
+
+            @example
+            ```true``` 
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isBookablePhone:
+          description: |-
+            Whether the department is bookable by calling a phone number
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isBookableVirtual:
+          description: |-
+            Whether the department accepts virtual care appointments
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isNewPatientEnabled:
+          description: |-
+            Flag to determine if a department accepts new patients (open scheduling in epic).
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isReturningPatientEnabled:
+          description: |-
+            Flag to determine if a department accepts returning patients (direct scheduling in epic).
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        location:
+          description: |-
+            location that the department is associated with.
+
+            scope - `OmniSearch` `OmniData`
+          $ref: '#/components/schemas/locationFastPages'
+          tags:
+            - fastPages
+        pageDescription:
+          description: |-
+            SEO page description. meta[name='description'] tag content
+
+            @example
+            ```"Ear, Nose and Throat (ENT) Clinic in Seattle. ENT is a specialty practice dedicated to helping you get better and stay well"```
+
+            scope - `OmniSearch` `OmniData`
+          example: Ear, Nose and Throat (ENT) Clinic in Seattle. ENT is a specialty practice dedicated to helping you get better and stay well
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        pageTitle:
+          description: |-
+            SEO title. title tag content. String visible in the browser's tab
+
+            @example
+            ```"Ear, Nose and Throat (ENT) Clinic in Seattle"```
+
+            scope - `OmniData`
+          example: Ear, Nose and Throat (ENT) Clinic in Seattle
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        phone:
+          $ref: '#/components/schemas/phoneNumberFastPages'
+        phoneNumber:
+          $deprecated: true
+          description: |-
+            (Deprecated) Phone number associated with the department.
+
+            @example
+            ```"+16175551212"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: '+16175551212'
+          nullable: true
+          pattern: ^\+?[1-9][0-9]{1,14}$
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        policies:
+          description: |-
+            List of department's policy documents or resource links
+
+            @example
+            ```
+            [
+                {
+                    "name": "Over-the-Counter (OTC) Medication Prescription Request Form",
+                    "url": "https://www.universityhealth.com/UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf"
+                }
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - name: Over-the-Counter (OTC) Medication Prescription Request Form
+              url: https://www.universityhealth.com/UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf
+          items:
+            properties:
+              name:
+                description: |-
+                  Pre-visit forms such as consent forms.
+
+                  @example
+                  ```"Over-the-Counter (OTC) Medication Prescription Request Form"```
+
+                  scope - `OmniData`
+                example: Over-the-Counter (OTC) Medication Prescription Request Form
+                type: string
+              url:
+                description: |-
+                  URL where the form lives.
+
+                  @example
+                  ```"/UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf"```
+
+                  scope - `OmniData`
+                example: /UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf
+                type: string
+            required:
+              - name
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        resultType:
+          const: department
+          description: |-
+            Result type is a department 
+
+            scope - `OmniSearch` `OmniSearchNested`
+          tags:
+            - omni
+            - fastPages
+          type: string
+        services:
+          description: |-
+            Services offered at the department.
+
+            @example
+            ```
+            [
+                {
+                    "name": "Optometry",
+                    "url": "https://www.universityhealth.com/services/eye-care/optometry"
+                }
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - name: Optometry
+              url: https://www.universityhealth.com/services/eye-care/optometry
+          items:
+            properties:
+              name:
+                description: |-
+                  Name of service practiced at this department.
+
+                  @example
+                  ```"Optometry"```
+
+                  scope - `OmniData`
+                example: Optometry
+                type: string
+              url:
+                description: |-
+                  URL where more information on the service can be found.
+
+                  @example
+                  ```"https://www.universityhealth.com/services/eye-care/optometry"```
+
+                  scope - `OmniData`
+                example: https://www.universityhealth.com/services/eye-care/optometry
+                type: string
+            required:
+              - name
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        specialties:
+          description: |-
+            Specialties available at the department
+
+            scope - `OmniSearch` `OmniData`
+          items:
+            $ref: '#/components/schemas/specialtyFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        tier:
+          description: |-
+
+            Used as a weight for the clinician search algorithm. 1 ranks higher than 2.
+
+            example:
+            ```1```
+
+            scope - `OmniSearch`
+          example: 1
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        timezone:
+          description: |-
+            Timezone the department is located in. - IANA/Olson format
+            @examples
+            "America/Adak",
+            "America/Anchorage",
+            "America/Boise",
+            "America/Chicago",
+            "America/Denver",
+            "America/Detroit",
+            "America/Indiana/Indianapolis",
+            "America/Indiana/Knox",
+            "America/Indiana/Marengo",
+            "America/Indiana/Petersburg",
+            "America/Indiana/Tell_City",
+            "America/Indiana/Vevay",
+            "America/Indiana/Vincennes",
+            "America/Indiana/Winamac",
+            "America/Juneau",
+            "America/Kentucky/Louisville",
+            "America/Kentucky/Monticello",
+            "America/Los_Angeles",
+            "America/Menominee",
+            "America/Metlakatla",
+            "America/New_York",
+            "America/Nome",
+            "America/North_Dakota/Beulah",
+            "America/North_Dakota/Center",
+            "America/North_Dakota/New_Salem"
+
+            @example
+            ```"America/Los_Angeles"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: America/Los_Angeles
+          nullable: true
+          pattern: ^\w[\w_\-\+/]+$
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        url:
+          description: |-
+            URL where the department's page is stored. Full url with production origin. 
+             Mixed-case urls are supported. Pages will be 301 redirected if browser path characters match but the casing doesn't.
+
+            @example
+            ```"https://www.universityhealth.com/Locations/urgent-care-teasley-denton"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: https://www.universityhealth.com/Locations/urgent-care-teasley-denton
+          format: uri
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        urlName:
+          description: |-
+            Dexcare timeslot booking ID. Dexcare Generated
+
+            @example
+            ```"PiedmontOrthopedicsOrthoAtlantaPiedmontWest"```
+
+            scope - `OmniSearch` `OmniData`
+          example: PiedmontOrthopedicsOrthoAtlantaPiedmontWest
+          nullable: true
+          tags:
+            - omni
+            - fastPages
+          type: string
+        visitTypes:
+          description: |-
+            department visitTypes. Core visitTypes with department-level visitType overrides applied to them.
+
+            scope - `none`
+          items:
+            $ref: '#/components/schemas/visitTypeFastPages'
+          tags:
+            - omni
+            - fastPages
+          type: array
+        walkInsWelcome:
+          description: |-
+            Flag to determine if a department should allow walk-ins if no timeslots are available.
+
+            @example
+            ```true```
+
+            scope - `OmniSearch` `OmniData`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        version:
+          type: string
+          const: 6.9.0
+      required:
+        - address
+        - brandName
+        - dexcareBuildsPage
+        - displayName
+        - emrIdentifier
+        - id
+        - isDeleted
+        - resultType
+        - url
+      title: departmentFastPages
+      type: object
+      unevaluatedProperties: false
+    phoneNumberFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/phoneNumberFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: |-
+        Phone Number 
+
+        scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        phoneNumber:
+          type: string
+          pattern: ^\+?[1-9][0-9]{1,14}$
+          nullable: true
+          $comment: |-
+            Phone number associated with the result.
+
+            @example
+            ```"+16175551212"```
+          description: |-
+            Phone number associated with the result.
+
+            @example
+            ```"+16175551212"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: '+16175551212'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        vanityNumber:
+          description: |-
+            user-facing vanity number 
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          type: string
+          nullable: true
+          $comment: user-facing vanity number
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        extension:
+          description: |-
+            phone number extension
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          type: string
+          nullable: true
+          $comment: phone number extension
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        version:
+          type: string
+          const: 2.1.0
+      required: []
+      title: phoneNumberFastPages
+      type: object
+      unevaluatedProperties: false
+    locationFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/locationFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Fast Pages Location
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        '@search.distance':
+          description: "This provides details regarding how far the user is from the location.\n\n@example\n```\n{\n\t miles: 12.199344228250027, \n\t type: \"absolute\"\n}\n```\n\nscope - `OmniSearch` `OmniData`"
+          properties:
+            miles:
+              description: |-
+                The distance in miles the user is from the location
+
+                @example
+                `12.199344228250027`
+
+                scope - `OmniSearch` `OmniData`
+              example: 12.199344228250027
+              type: number
+            type:
+              description: |-
+                The type of distance measurement.
+
+                 Values:
+
+                `"absolute"` - the exact amount of miles from the user
+
+                `"neighborhood, city, county, zip"` - determines the geographical distance from the user. ex: `"zip"` is returned, the location result is within the same postal code
+
+                @example
+                `"absolute"`
+
+                scope - `OmniSearch` `OmniData`
+              example: absolute
+              type: string
+          tags:
+            - fastPages
+          type: object
+        '@search.features':
+          description: "This provides more detail about the relevance score at the field level associated with the returned result.\n\n @link: https://learn.microsoft.com/en-us/azure/search/index-similarity-and-scoring#featuresmode-parameter-preview \n\n@example\n ```\n {\n\t specialties.name: {\n\t\tuniqueTokenMatches: 2, \n\t\tsimilarityScore: 13.0041493, \n\t\ttermFrequency: 2\n\t}\n}\n``` \n\nscope - `OmniSearch`"
+          properties:
+            uniqueTokenMatches:
+              description: Number of unique tokens found in the field
+              example: 2
+              type: number
+            similarityScore:
+              description: Similarity score, or a measure of how similar the content of the field is, relative to the query term
+              example: 13.0041493
+              type: number
+            termFrequency:
+              description: Term frequency, or the number of times the query term was found in the field
+              example: 2
+              type: number
+          tags:
+            - fastPages
+          type: object
+        '@search.highlights':
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          description: "This includes bolded matches to the search.\n\n @link: https://learn.microsoft.com/en-us/azure/search/search-pagination-page-layout#hit-highlighting \n\n@example\n ```\n{\n\t specialties.name: [\n\t\t '<strong>Family Medicine</strong>',\n\t\t '<strong>Internal Medicine</strong>'\n\t ]\n}\n``` \n\nscope - `OmniSearch`"
+          example:
+            specialties.name:
+              - <strong>Family Medicine</strong>
+              - <strong>Internal Medicine</strong>
+          tags:
+            - fastPages
+          type: object
+        '@search.score':
+          description: |-
+            This is the relevance score associated with the returned result.
+
+             @link: https://learn.microsoft.com/en-us/azure/search/search-query-odata-search-score-function 
+
+            @example
+             `4360.5723` 
+
+            scope - `OmniSearch`
+          example: '4360.5723'
+          tags:
+            - fastPages
+          type: string
+        address:
+          description: |-
+            Location Address 
+
+            scope - `OmniSearch` `OmniData`
+          properties:
+            addressLine1:
+              description: |-
+                Street number where the location resides.
+
+                @example
+                ```"822 Industrial Boulevard"```
+
+                scope - `OmniSearch` `OmniData`
+              example: 822 Industrial Boulevard
+              pattern: ^.+$
+              type: string
+            addressLine2:
+              description: |-
+                Secondary street number where the location resides. Such as units, apt, suite, etc.
+
+                @example
+                ```"Suite 100"```
+
+                scope - `OmniSearch` `OmniData`
+              example: Suite 100
+              type: string
+            city:
+              description: |-
+                City where the location resides.
+
+                @example
+                ```"Ellijay"```
+
+                scope - `OmniSearch` `OmniData`
+              example: Ellijay
+              pattern: ^.+$
+              type: string
+            country:
+              description: |-
+                Country where the location resides.
+
+                @example
+                ```"US"```
+
+                scope - `OmniSearch` `OmniData`
+              example: US
+              pattern: ^.+$
+              type: string
+            county:
+              description: |-
+                County where the location resides.
+
+                @example
+                ```"Gilmer County"```
+
+                scope - `OmniSearch`
+              example: Gilmer County
+              pattern: ^.+$
+              type: string
+            latitude:
+              description: |-
+                Latitude of the location
+
+                @example
+                ```33.79267```
+
+                scope - `OmniSearch` `OmniData`
+              example: 33.79267
+              type: number
+            longitude:
+              description: |-
+                Longitude of the location.
+
+                @example
+                ```-84.39556```
+
+                scope - `OmniSearch` `OmniData`
+              example: -84.39556
+              type: number
+            postalCode:
+              description: |-
+                Postal Code or Zip code where the location resides.
+
+                @example
+                ```"30540"```
+
+                scope - `OmniSearch` `OmniData`
+              example: '30540'
+              type: string
+            state:
+              description: |-
+                Region or state where the location resides. This is alpha codes such as 'WI' for Wisconsin.
+
+                @example
+                ```"GA"```
+
+                scope - `OmniSearch` `OmniData`
+              example: GA
+              pattern: ^.+$
+              type: string
+          required:
+            - addressLine1
+            - city
+            - country
+            - postalCode
+            - state
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        adhoc:
+          description: |-
+            Adhoc properties for the clinician. These will be key/value pairs of string. ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        brandName:
+          description: |-
+            Brand associated with the location.
+
+            @example
+            ```"University Health"```
+
+            scope - `OmniSearch` `OmniData`
+          example: University Health
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        cmsContent:
+          $ref: '#/components/schemas/cmsContent'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        departments:
+          description: |-
+            departments that a location is associated with.
+
+            scope - `OmniData`
+          items:
+            $ref: '#/components/schemas/departmentFastPages'
+          tags:
+            - ingest
+            - fastPages
+          type: array
+        description:
+          description: |-
+            Description of location.
+
+            @example
+            ```"<h2>Ear, Nose and Throat (ENT) Care in Seattle</h2>\r\n\r\n<p>Located in Seattle, WA, University Physicians ENT Seattle is a specialty practice dedicated to helping you get better - and stay well.</p>"```
+
+            scope - `OmniSearch` `OmniData`
+          example: "<h2>Ear, Nose and Throat (ENT) Care in Seattle</h2>\r\n\r\n<p>Located in Seattle, WA, University Physicians ENT Seattle is a specialty practice dedicated to helping you get better - and stay well.</p>"
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        dexcareBuildsPage:
+          description: |-
+            Flag to determine if DexCare should build a page for this location.
+
+            @example
+            ```true```
+
+            scope - `OmniData`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        displayName:
+          description: |-
+            Display name of the location.
+
+            @example
+            ```"University Health Medical Pavillion"```
+
+            scope - `OmniSearch` `OmniData`
+          example: University Health Medical Pavillion
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        extended:
+          description: |-
+            Extended properties for the clinician. These will be described by a customer defined schema. ```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        fax:
+          description: |-
+            Fax number associated with the location.
+
+            @example
+            ```"+16175551212"```
+
+            scope - `OmniSearch` `OmniData`
+          example: '+16175551212'
+          nullable: true
+          pattern: ^\+?[1-9][0-9]{1,14}$
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        googlePlaceUrl:
+          description: |-
+            Google Maps location URL. Provides a better view of the location in Google Maps.
+
+            @example
+            ```"https://www.google.com/maps/place/University+Health+Medical+Group/@42.9202749,-89.2107675,17z/data=!....."```
+
+            scope - `OmniData`
+          example: https://www.google.com/maps/place/University+Health+Medical+Group/@42.9202749,-89.2107675,17z/data=!.....
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        hours:
+          description: |-
+
+            Opening and closing times for a week    
+
+            @examples    
+            ```
+            // M-F Primary Care Clinic    
+            {    
+                mon: {    
+                    open: "07:00",    
+                    close: "18:00",    
+                },    
+                tue: {... same as mon},    
+                wed: {... same as mon},    
+                thu: {... same as mon},    
+                fri: {    
+                    open: "07:00",    
+                    close: "14:00",    
+                }    
+            }        
+                
+            // ER    
+            {
+                "custom": "Closed on Christmas",
+                "fri": {
+                    "open24Hours": true
+                },
+                "mon": {
+                    "open24Hours": true
+                },
+                "sat": {
+                    "open24Hours": true
+                },
+                "sun": {
+                    "open24Hours": true
+                },
+                "thu": {
+                    "open24Hours": true
+                },
+                "tue": {
+                    "open24Hours": true
+                },
+                "wed": {
+                    "open24Hours": true
+                }
+            }        
+                
+            // Custom Message    
+            {    
+                custom: "By appointment only.",    
+            }    
+            ```
+
+            scope - `OmniSearch` `OmniData`
+          properties:
+            custom:
+              description: |-
+                Field to populate during holidays or inclement weather as needed, eg. 'Closed on Christmas' or 'Office closure on Jan 16th due to extreme weather'.
+
+                @example
+                ```"Closed on Christmas"``` 
+
+                scope - `OmniSearch` `OmniData`
+              example: Closed on Christmas
+              type: string
+            fri:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            mon:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            sat:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            sun:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            thu:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            tue:
+              $ref: '#/components/schemas/hoursDayFastPages'
+            wed:
+              $ref: '#/components/schemas/hoursDayFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: object
+        id:
+          description: |-
+            Unique identifier for the location 
+
+            scope - `OmniSearch` `OmniData`
+          example: 123456abcd
+          pattern: ^(TEMP-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+          tags:
+            - omni
+            - fastPages
+          type: string
+        imageUrl:
+          description: |-
+            URL where the location's image is stored. Full url with production origin.
+
+            @example
+            ```"https://www.universityhealth.com/photos/200/location-2-1023458890.jpg"```
+
+            scope - `OmniSearch` `OmniData`
+          example: https://www.universityhealth.com/photos/200/location-2-1023458890.jpg
+          format: uri
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        pageDescription:
+          description: |-
+            SEO page description. meta[name='description'] tag content
+
+            @example
+            ```"Ear, Nose and Throat (ENT) Clinic in Seattle. ENT is a specialty practice dedicated to helping you get better and stay well"```
+
+            scope - `OmniSearch` `OmniData`
+          example: Ear, Nose and Throat (ENT) Clinic in Seattle. ENT is a specialty practice dedicated to helping you get better and stay well
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        pageTitle:
+          description: |-
+            SEO title. title tag content. String visible in the browser's tab
+
+            @example
+            ```"Ear, Nose and Throat (ENT) Clinic in Seattle"```
+
+            scope - `OmniData`
+          example: Ear, Nose and Throat (ENT) Clinic in Seattle
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        phone:
+          $ref: '#/components/schemas/phoneNumberFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        policies:
+          description: |-
+            List of location's policy documents or resource links
+
+            @example
+            ```
+            [
+                {
+                    "name": "Over-the-Counter (OTC) Medication Prescription Request Form",
+                    "url": "https://www.universityhealth.com/UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf"
+                }
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - name: Over-the-Counter (OTC) Medication Prescription Request Form
+              url: https://www.universityhealth.com/UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf
+          items:
+            properties:
+              name:
+                description: |-
+                  Pre-visit forms such as consent forms.
+
+                  @example
+                  ```"Over-the-Counter (OTC) Medication Prescription Request Form"```
+
+                  scope - `OmniData`
+                example: Over-the-Counter (OTC) Medication Prescription Request Form
+                type: string
+              url:
+                description: |-
+                  URL where the form lives.
+
+                  @example
+                  ```"/UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf"```
+
+                  scope - `OmniData`
+                example: /UHealth/media/Documents/Locations/Non-Hospital/otc-medication-prescription-form.pdf
+                type: string
+            required:
+              - name
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        resultType:
+          const: location
+          description: |-
+            Result type is a location 
+
+            scope - `OmniSearch` `OmniData`
+          tags:
+            - omni
+            - fastPages
+          type: string
+        services:
+          description: |-
+            Services offered at the location.
+
+            @example
+            ```
+            [
+                {
+                    "name": "Optometry",
+                    "url": "https://www.universityhealth.com/services/eye-care/optometry"
+                }
+            ]
+            ```
+
+            scope - `OmniData`
+          example:
+            - name: Optometry
+              url: https://www.universityhealth.com/services/eye-care/optometry
+          items:
+            properties:
+              name:
+                description: |-
+                  Name of service practiced at this location.
+
+                  @example
+                  ```"Optometry"```
+
+                  scope - `OmniData`
+                example: Optometry
+                type: string
+              url:
+                description: |-
+                  URL where more information on the service can be found.
+
+                  @example
+                  ```"https://www.universityhealth.com/services/eye-care/optometry"```
+
+                  scope - `OmniData`
+                example: https://www.universityhealth.com/services/eye-care/optometry
+                type: string
+            required:
+              - name
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        tier:
+          description: |-
+            Used as a weight for the location search algorithm. 1 ranks higher than 2.
+
+            @example
+            ```1```
+          example: 1
+          default: 1
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        timezone:
+          description: |-
+            Timezone the location is located in. - IANA/Olson format
+            @examples
+            "America/Adak",
+            "America/Anchorage",
+            "America/Boise",
+            "America/Chicago",
+            "America/Denver",
+            "America/Detroit",
+            "America/Indiana/Indianapolis",
+            "America/Indiana/Knox",
+            "America/Indiana/Marengo",
+            "America/Indiana/Petersburg",
+            "America/Indiana/Tell_City",
+            "America/Indiana/Vevay",
+            "America/Indiana/Vincennes",
+            "America/Indiana/Winamac",
+            "America/Juneau",
+            "America/Kentucky/Louisville",
+            "America/Kentucky/Monticello",
+            "America/Los_Angeles",
+            "America/Menominee",
+            "America/Metlakatla",
+            "America/New_York",
+            "America/Nome",
+            "America/North_Dakota/Beulah",
+            "America/North_Dakota/Center",
+            "America/North_Dakota/New_Salem"
+
+            @example
+            ```"America/Los_Angeles"```
+
+            scope - `OmniSearch` `OmniData`
+          example: America/Los_Angeles
+          nullable: true
+          pattern: ^\w[\w_\-\+/]+$
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        url:
+          description: |-
+            URL where the location's page is stored. Full url with production origin. 
+             Mixed-case urls are supported. Pages will be 301 redirected if browser path characters match but the casing doesn't.
+
+            @example
+            ```"https://www.universityhealth.com/Locations/urgent-care-teasley-denton"```
+
+            scope - `OmniSearch` `OmniData`
+          example: https://www.universityhealth.com/Locations/urgent-care-teasley-denton
+          format: uri
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 5.3.0
+      required:
+        - address
+        - brandName
+        - dexcareBuildsPage
+        - displayName
+        - id
+        - resultType
+        - url
+      tags:
+        - ingest
+        - omni
+        - fastPages
+      title: locationFastPages
+      type: object
+      unevaluatedProperties: false
+    specialtyFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/specialtyFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Medical Specialty
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        name:
+          description: |-
+            medical specialty name
+
+            @example
+            ```"Family Medicine"```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: Family Medicine
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 2.0.0
+      required:
+        - name
+      tags:
+        - ingest
+        - omni
+        - fastPages
+      title: specialtyFastPages
+      type: object
+      unevaluatedProperties: false
+    visitTypeFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/visitTypeFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Visit Type
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        ageUnit:
+          description: |-
+            Unit used for interpreting min and max age.
+
+            @example
+            ```"YEAR"```
+
+            scope - `none`
+          enum:
+            - YEAR
+            - MONTH
+            - DAY
+            - null
+          example: YEAR
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        dateRangeLookAhead:
+          description: |-
+            Maximum number of days from now that a patient can book a Visit Type
+
+            @example
+            ```90```
+
+            scope - `none`
+          example: 90
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        dateRangeStartBuffer:
+          description: |-
+            Buffer days from now indicating when a Visit Type can be booked
+
+            @example
+            ```2```
+
+            scope - `none`
+          example: 2
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        description:
+          description: |-
+            Supporting visit type information.
+
+            @example
+            ```"This visit type is for patients who have had a visit with this clinician in the past 3 years."```
+
+            scope - `none`
+          example: This visit type is for patients who have had a visit with this clinician in the past 3 years.
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        displayName:
+          description: |-
+            Visit type title.
+
+            @example
+            ```"Illness / Minor Injury"```
+
+            scope - `none`
+          example: Illness / Minor Injury
+          tags: []
+          type: string
+        duration:
+          description: |-
+            Visit Type Duration
+
+            @example
+            ```30```
+
+            scope - `none`
+          example: 30
+          nullable: true
+          tags: []
+          type: integer
+        emrIdentifier:
+          $ref: '#/components/schemas/emrIdentifierFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+        id:
+          description: |-
+            The unique identifier for the visit type. Database primary key.
+
+            @example
+            ```"5692b762-3289-496e-9784-55943c6ccb5f"```
+
+            scope - `none`
+          example: 5692b762-3289-496e-9784-55943c6ccb5f
+          pattern: ^(TEMP-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+          tags:
+            - omni
+          type: string
+        isBookableOnline:
+          description: |-
+            Indicates if this visit type is bookable online. If it is not bookable, the care tile should ask the customer to call.
+
+            @example
+            ```true```
+
+            scope - `none`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isEstablishedPatient:
+          description: |-
+            Whether the visit type is for returning patients.
+
+            @example
+            ```true```
+
+            scope - `none`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        isNewPatient:
+          description: |-
+            Whether the visit type is for new patients
+
+            @example
+            ```true```
+
+            scope - `none`
+          example: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: boolean
+        maxAge:
+          description: |-
+            Maximum age a visit type accepts respective of ageUnit
+
+            @example
+            ```130```
+
+            scope - `none`
+          example: 130
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        minAge:
+          description: |-
+            Minimum age a visit type accepts respective of ageUnit
+
+            @example
+            ```18```
+
+            scope - `none`
+          example: 18
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        modality:
+          description: |-
+            Modality of a Visit Type
+
+            @example
+            ```"VIDEO"```
+
+            scope - `none`
+          enum:
+            - IN_CLINIC
+            - PHONE
+            - VIDEO
+            - CHAT
+            - AT_HOME
+            - null
+          example: VIDEO
+          nullable: true
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        urlName:
+          description: |-
+            Short Name for a Visit Type for use in URL paths
+
+            @example
+            ```"NewPatient"```
+
+            scope - `none`
+          example: NewPatient
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: string
+        version:
+          type: string
+          const: 2.1.0
+      required:
+        - dateRangeLookAhead
+        - dateRangeStartBuffer
+        - displayName
+        - emrIdentifier
+        - id
+        - isEstablishedPatient
+        - isNewPatient
+        - maxAge
+        - minAge
+        - urlName
+      title: visitTypeFastPages
+      type: object
+      unevaluatedProperties: false
+    ratingDistributionFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/ratingDistributionFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Rating Distribution
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        count:
+          description: |-
+            The number of ratings that match this rating
+
+            @example
+            ```143```
+
+            scope - `OmniData`
+          example: 143
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        percentage:
+          description: |-
+            The percentage of ratings that match this rating
+
+            @example
+            ```90.51``` 
+
+            scope - `OmniData`
+          example: 90.51
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: number
+        rating:
+          description: |-
+            The rating number
+
+            @example
+            ```5``` 
+
+            scope - `OmniData`
+          example: 5
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        version:
+          type: string
+          const: 2.0.0
+      required: []
+      tags:
+        - ingest
+        - omni
+        - fastPages
+      title: RatingDistributionFastPages
+      type: object
+      unevaluatedProperties: false
+    reviewsFastPages:
+      $id: https://dexcarehealth.com/schemas/fastPages/reviewsFastPages
+      $schema: https://json-schema.org/draft/2020-12/schema
+      description: Reviews. Entire object required in OmniData response.
+      dexProcessingDirectives:
+        - typescript
+      properties:
+        commentCount:
+          description: |-
+            Number of reviews with comments for the clinician. Required in OmniSearch response.
+
+            @example
+            ```512```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: 512
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        commentDistribution:
+          description: |-
+            Breakdown of the comments by each rating number out of 5
+
+            scope - `OmniData`
+          items:
+            $ref: '#/components/schemas/ratingDistributionFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        comments:
+          description: |-
+            The review comments for the clinician. First 5 comments required in OmniData response. 
+
+            scope - `OmniData`
+          items:
+            properties:
+              comment:
+                description: |-
+                  Text for the comment
+
+                  @example
+                  ```"He is a great doctor."```
+
+                  scope - `OmniData`
+                example: He is a great doctor.
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+              rating:
+                description: |-
+                  Rating for the review comment
+
+                  @example
+                  ```4.7``` 
+
+                  scope - `OmniData`
+                example: 4.7
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: number
+              reviewer:
+                description: |-
+                  Name of the reviewer
+
+                  @example
+                  ```"Frodo Baggins"```
+
+                  scope - `none`
+                example: Frodo Baggins
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+              reviewSourceDisplayName:
+                description: |-
+                  Brand source for the review comment - display version
+
+                  @example
+                  ```"Ratings Company"```
+
+                  scope - `none`
+                example: Ratings Company
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+              reviewSourceIcon:
+                description: |-
+                  Brand source image for the review comment
+
+                  @example
+                  ```"https://cdn.ratingcompany.com/images/20x20/ratings.png"```
+
+                  scope - `none`
+                example: https://cdn.ratingcompany.com/images/20x20/ratings.png
+                format: uri
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+              reviewSourceId:
+                description: |-
+                  Source for the review comment - less formatted version
+
+                  @example
+                  ```"ratingsCompany"```
+
+                  scope - `none`
+                example: ratingsCompany
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+              reviewTimestamp:
+                description: |-
+                  Date timestamp for when the review comment was made
+
+                  @example
+                  ```"2020-04-12T23:38:03-04:00"```
+
+                  scope - `OmniData`
+                example: '2020-04-12T23:38:03-04:00'
+                tags:
+                  - ingest
+                  - omni
+                  - fastPages
+                type: string
+            tags:
+              - ingest
+              - omni
+              - fastPages
+            type: object
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        rating:
+          description: |-
+            Average rating for the clinician. Required in OmniSearch response.
+
+            @example
+            ```4.79166667```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: 4.79166667
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: number
+        ratingCount:
+          description: |-
+            Number of ratings for the clinician. Required in OmniSearch response.
+
+            @example
+            ```2089```
+
+            scope - `OmniSearch` `OmniData` `OmniSearchNested` `OmniDataNested`
+          example: 2089
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: integer
+        ratingDistribution:
+          description: |-
+            Breakdown of the ratings by each rating number out of 5
+
+            scope - `none`
+          items:
+            $ref: '#/components/schemas/ratingDistributionFastPages'
+          tags:
+            - ingest
+            - omni
+            - fastPages
+          type: array
+        version:
+          type: string
+          const: 2.0.0
+      required: []
+      title: reviewsFastPage
+      type: object
+      unevaluatedProperties: false
+    OmniDataSuccessResponse:
+      anyOf:
+        - items:
+            $ref: '#/components/schemas/clinicianFastPages'
+          type: array
+        - items:
+            $ref: '#/components/schemas/departmentFastPages'
+          type: array
+        - items:
+            $ref: '#/components/schemas/locationFastPages'
+          type: array
+        - $ref: '#/components/schemas/clinicianFastPages'
+        - $ref: '#/components/schemas/departmentFastPages'
+        - $ref: '#/components/schemas/locationFastPages'
+    acceptingNewPatients:
+      default: false
+      description: When set to true, orders clinician results by those accepting new patients
+      type: boolean
+    childBrand:
+      description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
+      type: string
+    cid:
+      description: The client id that will be sent to GA for tracking.
+      type: string
+    clinicians:
+      description: True if clinicians should be searched.
+      type: boolean
+    clinicVisits:
+      default: false
+      description: When set to true, orders results by new clinic visits.
+      type: boolean
+    days:
+      description: A list of days to filter by new clinic visits, entered as comma separated integers with 0 as Sunday through 6 as Saturday.
+      type: string
+      enum:
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+    departments:
+      description: True if departments should be searched.
+      type: boolean
+    distance:
+      default: 0
+      description: The maximum distance to search, in miles.
+      type: number
+    endDate:
+      description: End of a date range to search for timeslots in the format YYYY-MM-DD. Also see related property startDate.
+      type: string
+      format: date
+    highlightPostTag:
+      default: </strong>
+      description: The string to put after each highlight.
+      type: string
+    highlightPreTag:
+      default: <strong>
+      description: The string to put before each highlight.
+      type: string
+    includeFallbackResults:
+      default: true
+      description: If no matching documents are found, loosens the query to match anything instead of everything. If nothing is still found, return the default search.
+      type: boolean
+    inferLocationFromSearch:
+      default: true
+      description: When set to true, will try to detect locations in the search string and update the location if one is found.
+      type: boolean
+    latitude:
+      default: 0
+      description: The user's latitude, must be combined with longitude.
+      type: number
+    location:
+      default: {}
+      description: The plaintext name of the user's location to pass to google maps. Should not be used with latitude or longitude.
+      type: string
+    locations:
+      default: false
+      description: Set to true if locations should be searched.
+      type: boolean
+    longitude:
+      default: 0
+      description: The user's longitude, must be combined with latitude.
+      type: number
+    practiceGroup:
+      description: Filters provider by practice group.
+      type: string
+    search:
+      default: {}
+      description: A plaintext search to match.
+      type: string
+    skip:
+      description: 'Offsets for the results array, entered as comma separated numbers: (# of clinicians),(# of departments).'
+      type: string
+    soonest:
+      default: false
+      description: When set to true, orders results by soonest new clinic visit.
+      type: boolean
+    startDate:
+      description: Start of a date range to search for timeslots in the format YYYY-MM-DD. If no startDate date is specified, results will not be filtered by timeslot availability. Note that startDate can be specified without an endDate but if endDate is passed, a startDate must be passed as well.
+      type: string
+      format: date
+    time:
+      default: {}
+      description: The time of day to filter by new clinic visits.
+      enum:
+        - afternoon
+        - any
+        - morning
+      type: string
+    top:
+      default: 1
+      description: The number of results to return from the result array.
+      type: number
+    type:
+      description: The type of search to peform.
+      enum:
+        - autocomplete
+        - search
+      type: string
+    videoVisits:
+      default: false
+      description: When set to true, orders results by new video visits.
+      type: boolean
+    virtualCare:
+      default: false
+      description: When set to true, orders results by virtual care.
+      type: boolean
+    GeoIP:
+      properties:
+        city:
+          type: string
+        coordinates:
+          properties:
+            lat:
+              type: number
+            lng:
+              type: number
+          required:
+            - lat
+            - lng
+          type: object
+        county:
+          type: string
+        disclaimer:
+          type: string
+        error:
+          type: string
+        ip:
+          type: string
+        neighborhood:
+          type: string
+        state:
+          type: string
+        success:
+          type: boolean
+        type:
+          type: string
+        zip:
+          type: string
+      required:
+        - city
+        - coordinates
+        - county
+        - ip
+        - neighborhood
+        - state
+        - success
+        - type
+        - zip
+      type: object
+    SearchInfoFacets:
+      additionalProperties:
+        additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      type: object
+    SearchFilter:
+      properties:
+        auto:
+          type: boolean
+        facet:
+          type: string
+        facets:
+          items:
+            properties:
+              name:
+                type: string
+              value:
+                type: string
+            required:
+              - name
+              - value
+            type: object
+          type: array
+        text:
+          type: string
+        value:
+          type: string
+      required:
+        - facets
+        - value
+      type: object
+    InfoLocations:
+      properties:
+        distance:
+          type: number
+        name:
+          type: string
+      required:
+        - distance
+        - name
+      type: object
+    SearchInfo:
+      properties:
+        any:
+          type: boolean
+        facets:
+          $ref: '#/components/schemas/SearchInfoFacets'
+        filters:
+          items:
+            $ref: '#/components/schemas/SearchFilter'
+          type: array
+        locations:
+          items:
+            $ref: '#/components/schemas/InfoLocations'
+          type: array
+        search:
+          type: string
+        some:
+          type: boolean
+        type:
+          items:
+            type: string
+          type: array
+      required:
+        - any
+        - facets
+        - filters
+        - locations
+        - search
+        - some
+        - type
+      type: object
+    OmniSearchSuccessResponse:
+      properties:
+        cliniciansCount:
+          type: number
+        departmentsCount:
+          type: number
+        locationsCount:
+          type: number
+        geoip:
+          $ref: '#/components/schemas/GeoIP'
+        info:
+          $ref: '#/components/schemas/SearchInfo'
+        results:
+          anyOf:
+            - items:
+                $ref: '#/components/schemas/clinicianFastPages'
+              type: array
+            - items:
+                $ref: '#/components/schemas/departmentFastPages'
+              type: array
+            - items:
+                $ref: '#/components/schemas/locationFastPages'
+              type: array
+        skip:
+          type: string
+      required:
+        - geoip
+        - info
+        - results
+        - skip
+      type: object
+    count:
+      default: false
+      description: Whether to include counts for each facet value
+      type: boolean
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+        - clinicians
+        - departments
+        - locations
+      title: DataTag
+      tsEnumNames:
+        - Clinicians
+        - Departments
+        - Locations
+      type: string
+    stringvalues:
+      default: true
+      description: Whether to limit results to only string value type facets
+      type: boolean
+    Facets:
+      anyOf:
+        - additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        - additionalProperties:
+            items:
+              properties:
+                count:
+                  type: number
+                value:
+                  type: string
+              required:
+                - count
+                - value
+              type: object
+            type: array
+          type: object
+        - additionalProperties:
+            items:
+              type:
+                - string
+                - number
+                - boolean
+            type: array
+          type: object
+        - additionalProperties:
+            items:
+              properties:
+                count:
+                  type: number
+                value:
+                  items:
+                    type:
+                      - string
+                      - number
+                      - boolean
+                  type: array
+              required:
+                - count
+                - value
+              type: object
+            type: array
+          type: object
+      description: Facets
+    OmniSearchFacetsSuccessResponse:
+      properties:
+        facets:
+          $ref: '#/components/schemas/Facets'
+      required:
+        - facets
+      type: object
+    debug:
+      default: false
+      description: Set to true to include debug information in the response.
+      type: boolean
+    dh:
+      description: (Ignored) - The document hostname is automatically determined based on brand.
+      type: string
+    event_name:
+      description: Name of event for GA.
+      type: string
+    tid:
+      default: UA-1508202-16
+      description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
+      type: string
+    uip:
+      description: (Ignored) - The IP address of the user is stripped from the request if included.
+      type: string
+    v:
+      description: (Ignored) - The protocol version is hardcoded to 1.
+      type: string
+    OmniAnalyticsSuccessResponse:
+      description: Analytics response from GA
+      properties:
+        data:
+          additionalProperties: true
+          description: |-
+            Raw response data from GA.
+            This is only included in the response when param `debug=true` is set, but never in production.
+          properties: {}
+          type: object
+        url:
+          description: |-
+            The final generated GA request URL.
+            This is only included in the response when param `debug=true` is set, but never in production.
+          type: string
+      type: object
+    properties-cid:
+      description: Client ID (unique user ID).
+      type: string
+    dp:
+      description: Namespace. Either 'path' or 'dp' must be specified.
+      type: string
+    path:
+      description: Document path, i.e. the path portion of the page URL. Either 'path' or 'dp' must be specified.
+      type: string
+    OmniSearchAnalyticsSuccessResponse:
+      properties:
+        cid:
+          type: string
+        ga:
+          additionalProperties: true
+          description: |-
+            Raw response data from GA.
+            This is only included in the response when param `debug=true` is set, but never in production.
+          properties: {}
+          type: object
+        url:
+          description: |-
+            The final generated GA request URL.
+            This is only included in the response when param `debug=true` is set, but never in production.
+          type: string
+      required:
+        - cid
+      type: object
+    properties-search:
+      description: A single search term to look up synonyms for.
+      type: string
+    OmniSynonymsSuccessResponse:
+      properties:
+        synonyms:
+          description: Synonyms for the search term/phrase
+          items:
+            type: string
+          type: array
+      required:
+        - synonyms
+      type: object
+    OmniSitemapSuccessResponse:
+      properties:
+        urls:
+          items:
+            type: string
+          type: array
+      type: object
+    name:
+      description: Slug name.
+      type: string
+    OmniSlugsSuccessResponse:
+      properties:
+        location:
+          description: City for location corresponding to slug
+          type: string
+        name:
+          description: Slug name
+          type: string
+        searchTerms:
+          description: Relevant search terms for slug
+          type: string
+        text:
+          description: Full name corresponding to slug
+          type: string
+      required:
+        - location
+        - name
+        - searchTerms
+        - text
+      type: object
+  parameters:
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'

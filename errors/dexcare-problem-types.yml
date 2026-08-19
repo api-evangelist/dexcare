@@ -1,20 +1,104 @@
-generated: '2026-07-18'
+generated: '2026-08-15'
 method: searched
-source: https://developers.dexcarehealth.com/api/patient/
-format: http-status
+source: https://developers.dexcarehealth.com/api/reporting
+specs:
+  - openapi/dexcare-visit-service-openapi.yml
+  - openapi/dexcare-care-options-openapi.yml
+  - openapi/dexcare-slots-availability-openapi.yml
+  - openapi/dexcare-visit-booking-openapi.yml
+  - openapi/dexcare-provider-data-management-openapi.yml
+  - openapi/dexcare-omni-search-openapi.yml
+format: bare-json-object
+rfc9457: false
 note: >-
-  DexCare signals errors with standard HTTP status codes. No RFC 9457
-  application/problem+json envelope is documented in the public REST reference.
-  The entries below are the status codes explicitly documented on the API
-  reference pages.
+  DexCare does not use RFC 9457 application/problem+json. Error meaning is carried by
+  the HTTP status code and the body is a bare JSON object. The body KEY is not
+  consistent across services — {"error": "..."} in Reporting and Care Options,
+  {"message": "..."} on authorization failures and at the tenant gateway, {"msg": ...}
+  on one Reporting operation, a named ApiError schema in Provider Data Management and
+  an ErrorResponse schema in Omni Search. A single client-side error parser cannot
+  cover the platform. Entries below combine the response codes declared across the six
+  published OpenAPI definitions with the example bodies published on the REST API
+  reference.
+envelopes:
+  - shape: '{"error": "<message>"}'
+    seen_in: [Reporting, Care Options]
+    source: https://developers.dexcarehealth.com/api/reporting
+  - shape: '{"message": "<message>"}'
+    seen_in: [Reporting (403), tenant gateway]
+    source: https://developers.dexcarehealth.com/api/reporting
+  - shape: '{"msg": "<message>"}'
+    seen_in: [Reporting getAvrReportStatus 400]
+    source: https://developers.dexcarehealth.com/api/reporting
+  - shape: '{"message": "<message>", "request_id": "<id>"}'
+    seen_in: [Kong tenant gateway, unrouted paths]
+    source: probed https://ecvapi.demo-uat.dex.care/api/9/modalities (404)
+  - shape: ApiError schema
+    seen_in: [Provider Data Management]
+    source: openapi/dexcare-provider-data-management-openapi.yml
+  - shape: ErrorResponse schema
+    seen_in: [Omni Search]
+    source: openapi/dexcare-omni-search-openapi.yml
 problems:
   - status: 400
     title: Bad Request
-    meaning: The request was malformed or contained invalid parameters.
-    source_operation: POST /v1/patient/other
+    meaning: Malformed request, missing required field, or an invalid enum/format value.
+    examples:
+      - '{"error": "''type'' is required"}'
+      - '{"error": "''type'' must be one of [retail, virtual]"}'
+      - '{"error": "''reportId'' must be a valid GUID"}'
+      - '{"msg": "getAvrQueryStatus bad request'', <reportId>, <err>"}'
+    remediation: Fix the request. Do not retry unchanged.
+    declared_on: [availableProvidersV1, aggregatedSlotsV1, getAggregatedSlotsV1, getSingleProviderTimeslots, getSlotsAvailability, slotReleased, slotTaken, createVisitV9, getEstimatedVirtualVisitWaitTime, createQueuedGuestVisit, batchFindEntitiesByType, Get_Data, Omni_Search, Facet_Search, Submit_Analytics_Events, Search_Analytics, Synonym_Search, Sitemap, Get_Slugs]
   - status: 401
     title: Unauthorized
+    meaning: Missing or invalid credential — absent x-api-key, or an absent/expired JWT bearer token.
+    remediation: Re-issue the credential. Do not retry with the same token.
+    declared_on: [getSingleProviderTimeslots, getSlotsAvailability, createVisitV9, getEstimatedVirtualVisitWaitTime, visitSummaryV9, updateAcceptTerms, createQueuedGuestVisit, batchFindEntitiesByType, getPdmEntitySchema]
+  - status: 403
+    title: Forbidden
     meaning: >-
-      Missing or invalid authentication. A valid JWT bearer token is required
-      for endpoints that access PHI/PII.
-    source_operation: POST /v1/patient/other
+      The credential was recognised but is not authorised for this operation. On the
+      Reporting API this is specifically a bad service token.
+    examples:
+      - '{"message": "Authorization failed: bad service token"}'
+    remediation: Confirm the correct credential class (patient vs staff JWT, or the right service key) with DexCare.
+    declared_on: [availableProvidersV1, aggregatedSlotsV1, createVisitV9, Reporting startAvrReport, Reporting getAvrReportStatus, Reporting getAvrResultCsv]
+  - status: 404
+    title: Not Found
+    meaning: >-
+      The addressed resource does not exist on this tenant — an unknown department
+      urlName, visitId, provider NPI, PDM namespace/name, or report execution.
+    examples:
+      - 'The department with the given "urlName" was not found'
+      - '{"error": "QueryExecution Not Found"}'
+    remediation: Verify the identifier and the tenant host. Do not retry.
+    declared_on: [getSingleProviderTimeslots, getSlotsAvailability, getEstimatedVirtualVisitWaitTime, visitSummaryV9, updateAcceptTerms, batchFindEntitiesByType, getPdmEntitySchema, Get_Slugs]
+    defect: >-
+      In openapi/dexcare-provider-data-management-openapi.yml, getPdmEntitySchema wires
+      its 404 response to #/components/responses/400, so a not-found schema lookup can
+      describe itself as a bad request. Key handling on the HTTP status, not the body.
+  - status: 409
+    title: Conflict
+    meaning: >-
+      Conflicting visit state — a visit already exists for this patient, or terms were
+      already accepted. This is the only duplicate-write guard DexCare publishes, and
+      it exists only on the Visit Service.
+    remediation: Reconcile the existing visit rather than retrying the create.
+    declared_on: [createVisitV9, updateAcceptTerms]
+  - status: 500
+    title: Internal Server Error
+    meaning: DexCare-side failure.
+    examples:
+      - '{"error": "Unknown error"}'
+    remediation: Retry with exponential backoff, reusing the same correlation-id so DexCare can trace it.
+    declared_on: [availableProvidersV1, aggregatedSlotsV1, getAggregatedSlotsV1, getSingleProviderTimeslots, getSlotsAvailability, slotReleased, slotTaken, visitSummaryV9, updateAcceptTerms, createQueuedGuestVisit, batchFindEntitiesByType, getPdmEntitySchema, Facet_Search, Submit_Analytics_Events, Search_Analytics, Synonym_Search, Sitemap, Get_Slugs]
+  - status: 501
+    title: Not Implemented
+    meaning: Sitemap generation is not enabled for this Omni Search brand.
+    declared_on: [Sitemap]
+absent:
+  - status: 429
+    note: >-
+      No operation in any published specification declares a 429, and no rate-limit
+      header was observed on a live response. Clients get no throttling signal.

@@ -1,36 +1,95 @@
-generated: '2026-07-18'
+generated: '2026-08-15'
 method: searched
 source: https://developers.dexcarehealth.com/mobilesdk/installation
+note: >-
+  DexCare distributes no client library through a public package registry. Both mobile
+  SDKs are first-party and real, but neither is installable anonymously: the iOS pod is
+  fetched straight from the GitHub source repository (it is not on the CocoaPods trunk,
+  which returns 404 for DexcareSDK), and the Android artifact lives in GitHub Packages,
+  which DexCare notes "still requires authentication" even though the package is public.
+  Nothing named dexcare exists on npm. Version and published dates below are read from
+  the GitHub Releases API, the only dated registry metadata available for these
+  packages.
 packages:
   - language: swift
     platform: ios
-    registry: cocoapods
+    registry: github-source
     name: DexcareSDK
+    version: 9.8.0
+    published: '2026-04-20'
     url: https://github.com/DexCare/DexCareSDK-iOS
-    install: "pod 'DexcareSDK', :git => 'https://github.com/DexCare/DexCareSDK-iOS.git'"
+    docs: https://developers.dexcarehealth.com/ios/latest/
+    install: "pod 'DexcareSDK', :git => 'https://github.com/Dexcare/DexcareSDK-iOS.git'"
+    install_pinned: "pod 'DexcareSDK', :git => 'https://github.com/Dexcare/DexcareSDK-iOS.git', :tag => '9.8.0'"
     official: true
-    notes: Distributed via CocoaPods from the DexCare-hosted GitHub source repository.
+    version_source: https://api.github.com/repos/DexCare/DexCareSDK-iOS/releases
+    notes: >-
+      Distributed via CocoaPods but sourced from the DexCare GitHub repository, not the
+      CocoaPods trunk (https://trunk.cocoapods.org/api/v1/pods/DexcareSDK returns 404),
+      so `pod search` will not find it and the podfile line must carry the :git source.
+      Built as an .xcframework since 6.0 and requires Xcode 12+. Recent releases:
+      9.8.0 (2026-04-20), 9.7.0 (2026-03-24), 9.6.0 (2025-11-13).
   - language: kotlin
     platform: android
     registry: maven-github-packages
     name: org.dexcare:dexcare
     version: 9.1.0
+    published: null
     url: https://github.com/DexCare/DexCareSDK-Android
+    docs: https://developers.dexcarehealth.com/android/latest/
     maven_repo: https://maven.pkg.github.com/DexCare/DexCareSDK-Android/
-    install: "implementation \"org.dexcare:dexcare:9.1.0\""
+    install: 'implementation "org.dexcare:dexcare:9.1.0"'
     official: true
-    notes: Requires GitHub Packages auth (DEXCARE_MAVEN_ACCOUNT / DEXCARE_MAVEN_TOKEN).
+    version_source: https://developers.dexcarehealth.com/mobilesdk/installation
+    notes: >-
+      version is the coordinate DexCare's own installation guide pins today; published
+      is null because GitHub Packages Maven serves no anonymous metadata endpoint and
+      the source repository publishes NO releases and NO tags. The repository itself was
+      last pushed 2023-01-04, so no dated evidence of the Android line exists after that
+      date even though the docs advertise a 9.x coordinate. Requires GitHub credentials
+      in DEXCARE_MAVEN_ACCOUNT / DEXCARE_MAVEN_TOKEN plus the jitpack.io repository for
+      the rxpermissions transitive dependency.
   - language: javascript
     registry: npm-github-packages
     name: dexcare-javascript-sdk
+    version: null
+    published: null
     url: https://developers.dexcarehealth.com/jssdk/index
     official: false
+    version_source: null
     notes: >-
-      Published as an npm module in DexCare's GitHub Packages registry. Documented
-      as a working example wrapping the DexCare REST API, explicitly not among the
-      supported products of DexCare. No public npm registry coordinates published.
+      version and published are null because no public coordinates exist to query:
+      registry.npmjs.org returns 404 for dexcare, @dexcare/sdk and
+      dexcare-javascript-sdk, and the package is described only as an npm module in
+      DexCare's GitHub Packages registry with no repository named in the DexCare GitHub
+      organization. DexCare documents it as a working example wrapping the REST API and
+      states it is explicitly NOT among the supported products of DexCare, so it is not
+      marked official.
+registries_checked:
+  - registry: npm
+    result: no first-party package (dexcare, @dexcare/sdk, dexcare-javascript-sdk all 404)
+  - registry: cocoapods-trunk
+    result: 404 for DexcareSDK; the pod is git-sourced only
+  - registry: maven-central
+    result: not published; the Android artifact is GitHub Packages only
+  - registry: pypi
+    result: no package
+  - registry: nuget
+    result: no package
 sample_apps:
   - url: https://github.com/DexCare/DexCareSDK.iOS.SampleApp
     language: swift
+    latest_tag: 9.7.0
+    published: '2026-03-24'
   - url: https://github.com/DexCare/DexCareSDK.Android.SampleApp
     language: kotlin
+    latest_tag: null
+    published: null
+    note: No tags or releases published; repository last pushed 2026-04-20.
+github_organization:
+  url: https://github.com/DexCare
+  public_repos: 8
+  note: >-
+    Two SDKs, two sample apps, one SRE interview exercise, and three archived JavaScript
+    utilities unrelated to the API (simple-web-worker, promise-file-reader,
+    i18next-axios-backend, all archived 2022).

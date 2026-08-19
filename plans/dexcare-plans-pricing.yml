@@ -1,0 +1,30 @@
+generated: '2026-08-15'
+method: searched
+source: https://dexcare.com/
+docs: https://dexcare.com/request-a-demo/
+plan_count: 0
+currency: null
+note: >-
+  DexCare publishes no pricing, plans, or tiers of any kind. It sells an enterprise
+  platform to health systems under negotiated contracts — the only commercial path
+  on the site is "Request a demo", which routes to a sales form. There is no
+  self-serve signup, no free tier, no published rate card and no machine-readable
+  pricing endpoint. API access is provisioned per health system as part of that
+  contract, which is also why the developer portal publishes no credentials flow.
+plans: []
+evidence:
+  - url: https://dexcare.com/pricing/
+    status: 404
+  - url: https://dexcare.com/plans/
+    status: 404
+  - url: https://dexcare.com/request-a-demo/
+    status: 200
+    note: Sales-contact form; the only commercial call to action published.
+  - url: https://dexcare.com/contact-info/
+    status: 200
+  - url: https://developers.dexcarehealth.com/api/
+    status: 200
+    note: >-
+      "Developers working with the APIs for care booking must consult with each
+      individual healthcare system to obtain application keys and secrets" —
+      DexCare's own REST API reference, confirming contracted provisioning.

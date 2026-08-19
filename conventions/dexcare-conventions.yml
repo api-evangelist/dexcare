@@ -1,44 +1,148 @@
-generated: '2026-07-18'
+generated: '2026-08-15'
 method: searched
 source: https://developers.dexcarehealth.com/api/
+specs:
+  - openapi/dexcare-visit-service-openapi.yml
+  - openapi/dexcare-care-options-openapi.yml
+  - openapi/dexcare-slots-availability-openapi.yml
+  - openapi/dexcare-visit-booking-openapi.yml
+  - openapi/dexcare-provider-data-management-openapi.yml
+  - openapi/dexcare-omni-search-openapi.yml
 authentication:
-  style: bearer-jwt
+  style: split
   detail: >-
-    JWT bearer token in Authorization header for PHI/PII endpoints; OAuth 2.0
-    authorization code grant to obtain the token; public directory endpoints
-    require no auth. See authentication/dexcare-authentication.yml.
+    Two families: an x-api-key header for server-to-server services, and an
+    OAuth-2-issued JWT bearer token (patient or staff) for PHI/PII operations. Public
+    directory and availability reads need neither. The Reporting API uses a third
+    form, `Authorization: dc-token <SECRET_TOKEN>`. See
+    authentication/dexcare-authentication.yml.
 versioning:
-  style: uri-path
-  example: /v1/patient
+  style: mixed
+  detail: >-
+    DexCare versions in the URI path but with no single scheme across services. The
+    Visit Service pins the major into the server URL (`.../api/9`); Care Options,
+    Visit Booking and PDM pin it in the server path (`/v1`); Slots Availability uses
+    `/v5`; Omni Search puts the full semantic version in a path PARAMETER
+    (`/api/OmniSearch/{version}`, currently 2.21.0) which is optional but silently
+    downgrades the caller to 1.x behaviour when omitted. Native SDKs use semver;
+    the current line is 9.x on both iOS and Android.
+  examples: ['/v1/patient', '/api/9/visits', '/v5/slots/search', '/api/OmniSearch/2.21.0']
+tenancy:
+  model: per-customer-host
+  detail: >-
+    There is no shared DexCare base URL. Each customer is provisioned a UAT and a
+    production tier on its own domain, and the published specs reflect this with
+    templated servers — https://api.{customerShorthand}.dexcare.io/v1,
+    https://entities-service.{hostname}/v1, https://${brand}omni.azurewebsites.net —
+    or with lists of specific health-system hosts. A caller must substitute the host
+    their health system was issued. This is the single most important convention to
+    understand before writing any client.
 common_parameters:
   - name: product
     location: query
-    required: false
+    required: conditional
     description: >-
-      Identifier related to the client provided by DexCare, used to scope
-      analytics and use-case-specific features/behavior.
+      Client/use-case identifier provided by DexCare, used to scope analytics and
+      use-case behaviour (e.g. product=findadoctor, product=flushot). Optional on most
+      reads; REQUIRED on createQueuedGuestVisit.
   - name: domain
     location: header
     required: false
-    description: Identifier related to the patient's identity provider (IdP).
+    description: Identifier for the patient's identity provider; varies when a health system has multiple IdP sources.
+  - name: correlation-id
+    location: header
+    required: false
+    description: >-
+      Caller-supplied request correlation identifier, declared as an optional header
+      parameter on the Visit Service, Care Options and Visit Booking operations.
 idempotency:
   supported: false
-  note: No idempotency key header or contract is documented.
+  note: >-
+    No idempotency key header, no idempotent-retry contract, and no operation declares
+    one in any of the six published specifications. createVisitV9 answers 409 on a
+    conflicting visit, which is the only guard against a duplicate create; a retried
+    createQueuedGuestVisit has no such guard. Callers must reconcile before retrying
+    any write.
 pagination:
-  supported: unknown
-  note: No cross-cutting pagination convention documented in the public API reference.
-request_tracing:
-  supported: unknown
-  note: No documented request-id/correlation header convention.
-error_envelope:
-  format: http-status
+  supported: partial
+  styles:
+    - style: offset-limit-in-body
+      params: [offset, limit]
+      applies_to: [batchFindEntitiesByType]
+      source: openapi/dexcare-provider-data-management-openapi.yml
+      note: PDM batch queries page with numeric offset and limit inside the JSON request body.
+    - style: offset-limit-in-body
+      params: [offset, limit]
+      applies_to: [All Providers Report (/v1/reporting/providerhistories)]
+      source: https://developers.dexcarehealth.com/api/reporting
+      note: >-
+        Responses are wrapped in a result set object carrying `count` (total matching
+        records) and `data` (the page).
+    - style: top-skip
+      params: [top, skip]
+      applies_to: [Omni_Search]
+      source: openapi/dexcare-omni-search-openapi.yml
+  note: >-
+    There is no single cross-cutting pagination convention. Availability and slot
+    searches are bounded by date range and daysOfSlots rather than paged.
+field_selection:
+  supported: partial
   detail: >-
-    Errors are signaled with standard HTTP status codes (e.g. 400 Bad Request,
-    401 Unauthorized). No RFC 9457 application/problem+json envelope is
-    documented. See errors/dexcare-problem-types.yml.
+    Omni Search Get_Data accepts a `select` parameter to trim returned fields. PDM
+    batch queries accept `refs` (name the related entity types to include) or
+    `resolveAllRefs: true` to expand every reference in one call — the expansion
+    control that avoids N+1 reads across a provider directory.
+filtering:
+  detail: >-
+    PDM exposes a structured filter grammar: filters[] of {field, value, operator}
+    where field supports dot notation into related entities (businessLine.name) and
+    operator is one of EQUAL, LIKE, GT, LT, BETWEEN, NOT BETWEEN, IS NULL,
+    IS NOT NULL, CONTAINS, ANY. Omni Search filters are generated from NLP plus any
+    facet-able field passed as a query parameter, and the response echoes which
+    filters were inferred (auto: true) versus supplied.
+request_tracing:
+  supported: true
+  header: correlation-id
+  detail: >-
+    correlation-id is declared as an optional request header on Visit Service, Care
+    Options and Visit Booking operations, and the tenant gateway returns a
+    correlation-id header on every response (observed shape: <uuid>#<sequence>).
+    Gateway-level errors also carry a request_id in the body. Neither is described in
+    the prose documentation — this convention is only visible in the specifications
+    and on the wire.
+  observed: 'correlation-id: a44bcc89-1957-4a2f-9ce9-104df9160d88#396741'
+error_envelope:
+  format: bare-json-object
+  detail: >-
+    Not RFC 9457. Meaning is carried by the HTTP status; the body is a bare JSON
+    object whose key differs by service — {"error": "..."} on Reporting and Care
+    Options, {"message": "..."} on authorization failures and at the gateway,
+    {"msg": "..."} on one Reporting status call, and an ApiError/ErrorResponse schema
+    in PDM and Omni Search. A client cannot parse DexCare errors with one shape. See
+    errors/dexcare-problem-types.yml.
 rate_limiting:
-  signaled: unknown
+  signaled: false
+  detail: >-
+    No published limits, no RateLimit-*/X-RateLimit-*/Retry-After headers observed,
+    and no 429 declared on any of the 27 published operations. See
+    rate-limits/dexcare-rate-limits.yml.
+event_surface:
+  outbound_webhooks: false
+  detail: >-
+    DexCare publishes no outbound webhook catalog and no AsyncAPI. The event-shaped
+    operations in the specs are INBOUND receivers: slotTaken and slotReleased are
+    endpoints a health system calls to tell DexCare its schedule changed, and
+    processTokboxSessionEvents receives virtual-visit session events from the
+    Vonage/TokBox video platform. No customer-facing subscription surface exists.
+security_headers_observed:
+  - 'strict-transport-security: max-age=31536000; includeSubDomains'
+  - 'x-content-type-options: nosniff'
+  - 'referrer-policy: same-origin'
+  - 'vary: Origin'
 cross_links:
   authentication: authentication/dexcare-authentication.yml
   errors: errors/dexcare-problem-types.yml
   lifecycle: lifecycle/dexcare-lifecycle.yml
+  rate_limits: rate-limits/dexcare-rate-limits.yml
+  data_model: data-model/dexcare-data-model.yml
+  sandbox: sandbox/dexcare-sandbox.yml

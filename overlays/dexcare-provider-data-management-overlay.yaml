@@ -1,0 +1,54 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — DexCare Provider Data Management (Entities) API
+  version: 1.0.0
+extends: dexcare-provider-data-management-openapi.yml
+x-generated: '2026-08-15'
+x-method: generated
+x-source: https://developers.dexcarehealth.com/assets/files/pdmapi-swagger.yaml
+x-note: Overlay of API Evangelist enrichment metadata onto the DexCare-published specification. The original
+  document under openapi/ and openapi/_original/ is never mutated. Every value asserted here is read from
+  DexCare's own developer portal or from the specification itself.
+actions:
+- target: $.info
+  description: Add contact, documentation and provenance metadata absent from the published document.
+  update:
+    x-api-evangelist:
+      provider: DexCare
+      slug: dexcare
+      documentation: https://developers.dexcarehealth.com/api/pdm/
+      reference: https://developers.dexcarehealth.com/api/oas/pdm
+      source: https://developers.dexcarehealth.com/assets/files/pdmapi-swagger.yaml
+      harvested: '2026-08-15'
+      harvest-method: searched
+    x-logo:
+      url: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/dexcare.png
+      altText: DexCare
+- target: $.info
+  description: 'Record the tenancy model the servers[] block implies: DexCare provisions a per-health-system
+    host, so no single public base URL exists.'
+  update:
+    x-tenancy:
+      model: per-customer-host
+      evidence: https://developers.dexcarehealth.com/api/
+      note: Each DexCare customer is provisioned a UAT and a production tier on its own domain. The servers[]
+        entries in the published specification are templated or name specific health-system tenants; a
+        caller must substitute the host their health system was given.
+- target: $.info
+  description: Record the regulatory posture that governs every PHI/PII-bearing operation.
+  update:
+    x-compliance:
+      hipaa: business-associate
+      evidence: https://dexcare.com/privacy-policy/
+      note: DexCare processes protected health information as a HIPAA business associate.
+- target: $.info
+  description: Cross-link the derived artifacts in the API Evangelist profile for this API.
+  update:
+    x-artifacts:
+      authentication: authentication/dexcare-authentication.yml
+      conventions: conventions/dexcare-conventions.yml
+      errors: errors/dexcare-problem-types.yml
+      lifecycle: lifecycle/dexcare-lifecycle.yml
+      data-model: data-model/dexcare-data-model.yml
+      rate-limits: rate-limits/dexcare-rate-limits.yml
+      sandbox: sandbox/dexcare-sandbox.yml

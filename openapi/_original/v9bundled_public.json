@@ -1,0 +1,2715 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Visit Service",
+    "version": "9.2.0",
+    "description": "Visit Service external API v9",
+    "contact": {
+      "name": "DexCare Engineering",
+      "email": "engineering@dexcarehealth.com"
+    }
+  },
+  "security": [],
+  "servers": [
+    {
+      "url": "https://ecvapi.frosh.dex.care/api/9",
+      "description": "DC DEV External Ingress"
+    },
+    {
+      "url": "https://ecvapi.care-uat.ecommunity.com/api/9",
+      "description": "CHN UAT External Ingress"
+    },
+    {
+      "url": "https://ecvapi.care-uat.froedtert.com/api/9",
+      "description": "FHI UAT External Ingress"
+    },
+    {
+      "url": "https://ecvapi.care-uat.psjhealth.org/api/9",
+      "description": "PSJH UAT External Ingress"
+    },
+    {
+      "url": "https://ecvapi.kp-uat.dex.care/api/9",
+      "description": "KP UAT External Ingress"
+    },
+    {
+      "url": "https://ecvapi.uat.houstonmethodistcare.org/api/9",
+      "description": "HM UAT External Ingress"
+    },
+    {
+      "url": "https://ecvapi.demo-uat.dex.care/api/9",
+      "description": "UH UAT External Ingress"
+    }
+  ],
+  "tags": [
+    {
+      "name": "external"
+    },
+    {
+      "name": "practices"
+    },
+    {
+      "name": "waittimes"
+    },
+    {
+      "name": "assignmentqualifiers"
+    },
+    {
+      "name": "modalities"
+    },
+    {
+      "name": "visits"
+    }
+  ],
+  "paths": {
+    "/visits": {
+      "post": {
+        "description": "creates a new virtual or phone visit for a patient, optionally via a patient proxy (aka an actor)",
+        "operationId": "createVisitV9",
+        "security": [
+          {
+            "PatientJWT": []
+          }
+        ],
+        "summary": "request visit",
+        "tags": [
+          "visits",
+          "external"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "patient",
+                  "billingInfo",
+                  "visitDetails"
+                ],
+                "properties": {
+                  "patient": {
+                    "description": "either a DexCare patient linked to an EHR record or an EHR patient identifer and identifer type\n",
+                    "oneOf": [
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "general patient fields",
+                            "required": [
+                              "firstName",
+                              "lastName",
+                              "gender",
+                              "dateOfBirth",
+                              "phone",
+                              "email",
+                              "address"
+                            ],
+                            "properties": {
+                              "firstName": {
+                                "type": "string",
+                                "description": "patient first name"
+                              },
+                              "lastName": {
+                                "type": "string",
+                                "description": "patient last name"
+                              },
+                              "gender": {
+                                "type": "string",
+                                "description": "patient gender — note that not all EHR systems support all these values",
+                                "enum": [
+                                  "male",
+                                  "female",
+                                  "other",
+                                  "unknown",
+                                  "nonbinary"
+                                ]
+                              },
+                              "dateOfBirth": {
+                                "type": "string",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                "description": "patient date of birth in YYYY-MM-DD format"
+                              },
+                              "phone": {
+                                "type": "string",
+                                "description": "contact phone number for patient. For phone visits, provide number for provider to call patient\n"
+                              },
+                              "email": {
+                                "type": "string",
+                                "description": "patient email address",
+                                "maxLength": 320
+                              },
+                              "address": {
+                                "type": "object",
+                                "description": "patient mailing address",
+                                "properties": {
+                                  "line1": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                  },
+                                  "line2": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                  },
+                                  "city": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "maxLength": 30
+                                  },
+                                  "postalCode": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "line1",
+                                  "city",
+                                  "state",
+                                  "postalCode"
+                                ]
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "Home market if applicable"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "description": "DexCare patient record\n",
+                            "required": [
+                              "patientGuid"
+                            ],
+                            "properties": {
+                              "patientGuid": {
+                                "type": "string",
+                                "description": "unique DexCare patient identifier"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "general patient fields",
+                            "required": [
+                              "firstName",
+                              "lastName",
+                              "gender",
+                              "dateOfBirth",
+                              "phone",
+                              "email",
+                              "address"
+                            ],
+                            "properties": {
+                              "firstName": {
+                                "type": "string",
+                                "description": "patient first name"
+                              },
+                              "lastName": {
+                                "type": "string",
+                                "description": "patient last name"
+                              },
+                              "gender": {
+                                "type": "string",
+                                "description": "patient gender — note that not all EHR systems support all these values",
+                                "enum": [
+                                  "male",
+                                  "female",
+                                  "other",
+                                  "unknown",
+                                  "nonbinary"
+                                ]
+                              },
+                              "dateOfBirth": {
+                                "type": "string",
+                                "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                                "description": "patient date of birth in YYYY-MM-DD format"
+                              },
+                              "phone": {
+                                "type": "string",
+                                "description": "contact phone number for patient. For phone visits, provide number for provider to call patient\n"
+                              },
+                              "email": {
+                                "type": "string",
+                                "description": "patient email address",
+                                "maxLength": 320
+                              },
+                              "address": {
+                                "type": "object",
+                                "description": "patient mailing address",
+                                "properties": {
+                                  "line1": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                  },
+                                  "line2": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                  },
+                                  "city": {
+                                    "type": "string",
+                                    "maxLength": 100
+                                  },
+                                  "state": {
+                                    "type": "string",
+                                    "maxLength": 30
+                                  },
+                                  "postalCode": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "line1",
+                                  "city",
+                                  "state",
+                                  "postalCode"
+                                ]
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "Home market if applicable"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "description": "existing patient in EHR\n",
+                            "required": [
+                              "ehrIdentifier",
+                              "ehrIdentifierType",
+                              "homeEhr"
+                            ],
+                            "properties": {
+                              "ehrIdentifier": {
+                                "type": "string",
+                                "description": "patient identifier, e.g. MRN"
+                              },
+                              "ehrIdentifierType": {
+                                "type": "string",
+                                "description": "EHR Identifier type for lookup"
+                              },
+                              "homeEhr": {
+                                "type": "string",
+                                "description": "code for the EHR system to which patient records belong"
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "home market if applicable"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "actor": {
+                    "type": "object",
+                    "description": "individual acting as a Patient proxy - i.e. a guardian or helper to the patient; required when visitDetails declaration is 'other'",
+                    "properties": {
+                      "firstName": {
+                        "type": "string",
+                        "description": "actor first name"
+                      },
+                      "lastName": {
+                        "type": "string",
+                        "description": "actor last name"
+                      },
+                      "middleName": {
+                        "type": "string",
+                        "description": "actor middle name"
+                      },
+                      "nameSuffix": {
+                        "type": "string",
+                        "description": "actor name suffix"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "description": "actor phone number"
+                      },
+                      "relationshipToPatient": {
+                        "type": "string",
+                        "description": "customer provided list of options describing how the actor is realted to the patient"
+                      },
+                      "gender": {
+                        "type": "string",
+                        "description": "actor gender - note that that not all values maybe supported by an EHR system",
+                        "enum": [
+                          "male",
+                          "female",
+                          "other",
+                          "unknown",
+                          "nonbinary"
+                        ]
+                      },
+                      "dateOfBirth": {
+                        "type": "string",
+                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                        "description": "actor date of birth in YYYY-MM-DD format"
+                      },
+                      "email": {
+                        "type": "string",
+                        "description": "email address at which the actor can be reached"
+                      },
+                      "ehrIdentifier": {
+                        "type": "string",
+                        "description": "actor EHR identifier, e.g. MRN"
+                      },
+                      "ehrIdentifierType": {
+                        "type": "string",
+                        "description": "actor EHR Identifier type for lookup"
+                      },
+                      "homeEhr": {
+                        "type": "string",
+                        "description": "actor home EHR code"
+                      }
+                    },
+                    "required": [
+                      "firstName",
+                      "lastName",
+                      "phone",
+                      "gender",
+                      "dateOfBirth"
+                    ]
+                  },
+                  "billingInfo": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "description": "billing info other for insurance",
+                        "properties": {
+                          "paymentMethod": {
+                            "description": "discriminator for insurance billing info",
+                            "type": "string",
+                            "enum": [
+                              "insurance"
+                            ]
+                          },
+                          "declaration": {
+                            "description": "discriminator for guarantor being other than the patient",
+                            "type": "string",
+                            "enum": [
+                              "other"
+                            ]
+                          },
+                          "insuranceType": {
+                            "description": "discriminator for insurance type being maunally entered",
+                            "type": "string",
+                            "enum": [
+                              "manual"
+                            ]
+                          },
+                          "insuranceProviderId": {
+                            "description": "Either the key for the selected insurance provider when using the `insuranceissuers` list, or the insurance name entered by the user",
+                            "type": "string"
+                          },
+                          "insuranceMemberId": {
+                            "description": "The patient's member number",
+                            "type": "string"
+                          },
+                          "insuranceGroupNumber": {
+                            "description": "the guarantor's group number",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 256
+                          },
+                          "insurancePayorId": {
+                            "description": "EMR system payor id",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 100
+                          },
+                          "insurancePayorName": {
+                            "description": "Display name for the payor",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 100
+                          },
+                          "insuranceSubscriberId": {
+                            "description": "The guarantor's subscribor id",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 100
+                          },
+                          "firstName": {
+                            "description": "The guarantor's first name",
+                            "type": "string"
+                          },
+                          "lastName": {
+                            "description": "The guarantor's last name",
+                            "type": "string"
+                          },
+                          "gender": {
+                            "description": "the guarantor's gender",
+                            "type": "string",
+                            "enum": [
+                              "male",
+                              "female",
+                              "other",
+                              "unknown",
+                              "nonbinary"
+                            ]
+                          },
+                          "dateOfBirth": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                            "description": "the guarantor's date of birth in YYYY-MM-DD format"
+                          }
+                        },
+                        "required": [
+                          "paymentMethod",
+                          "declaration",
+                          "insuranceType",
+                          "insuranceProviderId",
+                          "insuranceMemberId",
+                          "firstName",
+                          "lastName",
+                          "gender",
+                          "dateOfBirth"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "description": "billing info self for insurance",
+                        "properties": {
+                          "paymentMethod": {
+                            "description": "discriminator for insurance billing info",
+                            "type": "string",
+                            "enum": [
+                              "insurance"
+                            ]
+                          },
+                          "declaration": {
+                            "description": "discriminator for guarantor being the patient",
+                            "type": "string",
+                            "enum": [
+                              "self"
+                            ]
+                          },
+                          "insuranceType": {
+                            "description": "discriminator for insurance type being maunally entered",
+                            "type": "string",
+                            "enum": [
+                              "manual"
+                            ]
+                          },
+                          "insuranceProviderId": {
+                            "description": "Either the key for the selected insurance provider when using the `insuranceissuers` list, or the insurance name entered by the user",
+                            "type": "string"
+                          },
+                          "insuranceMemberId": {
+                            "description": "The patient's member number",
+                            "type": "string"
+                          },
+                          "insuranceGroupNumber": {
+                            "description": "the patient's member number",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 256
+                          },
+                          "insurancePayorId": {
+                            "description": "EMR system payor id",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 100
+                          },
+                          "insurancePayorName": {
+                            "description": "Display name for the payor",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 100
+                          },
+                          "insuranceSubscriberId": {
+                            "description": "null for self",
+                            "type": "string",
+                            "nullable": true,
+                            "maxLength": 100
+                          }
+                        },
+                        "required": [
+                          "paymentMethod",
+                          "declaration",
+                          "insuranceType",
+                          "insuranceProviderId",
+                          "insuranceMemberId"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "description": "billing info credit card",
+                        "properties": {
+                          "paymentMethod": {
+                            "type": "string",
+                            "enum": [
+                              "creditcard"
+                            ]
+                          },
+                          "stripeToken": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "paymentMethod",
+                          "stripeToken"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "description": "billing info coupon code",
+                        "properties": {
+                          "paymentMethod": {
+                            "type": "string",
+                            "enum": [
+                              "couponcode"
+                            ]
+                          },
+                          "couponCode": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "paymentMethod",
+                          "couponCode"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "description": "billing info external self pay",
+                        "properties": {
+                          "paymentMethod": {
+                            "type": "string",
+                            "enum": [
+                              "external-self-pay"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "paymentMethod"
+                        ]
+                      }
+                    ]
+                  },
+                  "visitDetails": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "required": [
+                      "visitReason",
+                      "stateLicensure",
+                      "declaration",
+                      "acceptedTerms"
+                    ],
+                    "properties": {
+                      "acceptedTerms": {
+                        "description": "patient has accepted terms of service",
+                        "type": "boolean"
+                      },
+                      "assessmentToolUsed": {
+                        "description": "if patient has done preassessment, which tool was used",
+                        "type": "string",
+                        "example": "ada"
+                      },
+                      "assignmentQualifiers": {
+                        "description": "qualifications to assign visit to a provider",
+                        "type": "array",
+                        "items": {
+                          "example": "pediatric",
+                          "type": "string",
+                          "enum": [
+                            "adult",
+                            "pediatric"
+                          ]
+                        }
+                      },
+                      "appointmentId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "nullable": true
+                      },
+                      "appointmentTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                      },
+                      "attributionIds": {
+                        "type": "string",
+                        "description": "tracking IDs used for analytics sent by the health system"
+                      },
+                      "brand": {
+                        "type": "string",
+                        "description": "brand for visit, will use default for customer if none provided"
+                      },
+                      "declaration": {
+                        "description": "is this visit being submitted by the patient or by a proxy (other)",
+                        "enum": [
+                          "self",
+                          "other"
+                        ],
+                        "type": "string"
+                      },
+                      "interpreterLanguage": {
+                        "description": "optional language requested if interpreter services are available; ISO 639-3 Individual Language codes\n",
+                        "type": "string",
+                        "example": "ase"
+                      },
+                      "stateLicensure": {
+                        "description": "state licensure required for provider to see patient",
+                        "type": "string",
+                        "example": "WA"
+                      },
+                      "practiceId": {
+                        "description": "if not provided, default practice will be used",
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "preTriageTags": {
+                        "type": "array",
+                        "description": "array of pre-triage values/tags",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "scheduledDepartment": {
+                        "description": "specify a department in which to schedule the appointment. If not provided,\nEHR and departmentId will be determined by stateLicensure and patient's address\nas determined by customer patient catchment rules\n",
+                        "properties": {
+                          "scheduledDepartmentId": {
+                            "description": "generic provider departmentId in specified EHR to create appointment",
+                            "type": "string"
+                          },
+                          "scheduledEhr": {
+                            "description": "EHR in which to schedule appointment",
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "traveling": {
+                        "description": "should the patient be considered traveling",
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "requiresRegistration": {
+                        "description": "does the patient need to register before scheduling a visit",
+                        "type": "boolean",
+                        "default": false
+                      },
+                      "origin": {
+                        "description": "filter for visits that originated from a specific source (i.e. agent/call center)",
+                        "type": "string",
+                        "x-independent": true,
+                        "enum": [
+                          "agent",
+                          "patient",
+                          "provider",
+                          "other"
+                        ]
+                      },
+                      "urgency": {
+                        "description": "urgency rating; 0 for default urgency",
+                        "type": "number"
+                      },
+                      "visitReason": {
+                        "description": "patient's reason for visit",
+                        "maxLength": 500,
+                        "type": "string"
+                      },
+                      "visitTypeName": {
+                        "description": "visit type being requested",
+                        "type": "string",
+                        "default": "virtual",
+                        "enum": [
+                          "virtual",
+                          "phone"
+                        ]
+                      },
+                      "initialStatus": {
+                        "description": "initial status of the visit being created",
+                        "type": "string",
+                        "default": "requested",
+                        "enum": [
+                          "requested",
+                          "waitoffline"
+                        ]
+                      },
+                      "detectedLanguage": {
+                        "description": "patient's primary browser language",
+                        "type": "string",
+                        "default": "en-US"
+                      },
+                      "userType": {
+                        "description": "indicates whether patient is signed in or guest",
+                        "type": "string",
+                        "enum": [
+                          "member",
+                          "guest"
+                        ],
+                        "default": "member"
+                      },
+                      "documents": {
+                        "description": "document links to be attached to the visit",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "description": "a reference link to a document to be attached to the visit",
+                          "required": [
+                            "documentType",
+                            "face",
+                            "uri",
+                            "mimeType"
+                          ],
+                          "properties": {
+                            "documentType": {
+                              "type": "string",
+                              "description": "document type (e.g. insurance_card, photo_identification, reason_for_visit)",
+                              "enum": [
+                                "insurance_card",
+                                "photo_identification",
+                                "reason_for_visit"
+                              ]
+                            },
+                            "face": {
+                              "type": "string",
+                              "description": "document face(front by default or back)",
+                              "default": "front",
+                              "enum": [
+                                "front",
+                                "back"
+                              ]
+                            },
+                            "uri": {
+                              "type": "string",
+                              "description": "document URI"
+                            },
+                            "mimeType": {
+                              "type": "string",
+                              "description": "document MIME type"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "additionalDetails": {
+                    "type": "array",
+                    "description": "customer defined data for display and reporting purposes",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "required": [
+                        "key",
+                        "value"
+                      ],
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "description": "property name"
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "property value"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "adult-insurance-ehr": {
+                  "summary": "request a virtual visit with an EHR patient",
+                  "value": {
+                    "billingInfo": {
+                      "paymentMethod": "insurance",
+                      "declaration": "self",
+                      "insuranceType": "manual",
+                      "insuranceProviderId": "kpvirtual",
+                      "insuranceMemberId": "internal"
+                    },
+                    "patient": {
+                      "firstName": "Sinjoro",
+                      "lastName": "Ajnulo",
+                      "gender": "male",
+                      "dateOfBirth": "1970-01-13",
+                      "phone": "202-555-1212",
+                      "email": "sinjoro.anjulo@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101"
+                      },
+                      "ehrIdentifier": "M123456",
+                      "ehrIdentifierType": "MRN",
+                      "homeEhr": "MAM",
+                      "homeMarket": "MAS"
+                    },
+                    "visitDetails": {
+                      "acceptedTerms": true,
+                      "assignmentQualifiers": [
+                        "adult"
+                      ],
+                      "declaration": "self",
+                      "stateLicensure": "WA",
+                      "visitReason": "Example virtual visit of an adult requesting for self"
+                    }
+                  }
+                },
+                "proxy-insurance-ehr": {
+                  "summary": "request a virtual visit as a proxy with an EHR patient",
+                  "value": {
+                    "actor": {
+                      "firstName": "Actor",
+                      "lastName": "Proxy",
+                      "gender": "female",
+                      "dateOfBirth": "1970-01-13",
+                      "phone": "202-555-1212",
+                      "email": "actor.proxy@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101"
+                      },
+                      "ehrIdentifier": "M123456",
+                      "ehrIdentifierType": "MRN",
+                      "homeEhr": "MAM"
+                    },
+                    "billingInfo": {
+                      "paymentMethod": "insurance",
+                      "declaration": "other",
+                      "insuranceType": "manual",
+                      "insuranceProviderId": "kpvirtual",
+                      "insuranceMemberId": "internal",
+                      "firstName": "Insurance",
+                      "lastName": "Member",
+                      "gender": "female",
+                      "dateOfBirth": "1971-03-15"
+                    },
+                    "patient": {
+                      "firstName": "Sinjoro",
+                      "lastName": "Ajnulo",
+                      "gender": "male",
+                      "dateOfBirth": "2010-02-14",
+                      "phone": "202-555-1212",
+                      "email": "sinjoro.anjulo@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101"
+                      },
+                      "ehrIdentifier": "M123456",
+                      "ehrIdentifierType": "MRN",
+                      "homeEhr": "MAM",
+                      "homeMarket": "MAS"
+                    },
+                    "visitDetails": {
+                      "acceptedTerms": true,
+                      "assignmentQualifiers": [
+                        "pediatric"
+                      ],
+                      "declaration": "other",
+                      "stateLicensure": "WA",
+                      "visitReason": "Example visit of a proxy submitting visit for a child"
+                    }
+                  }
+                },
+                "phone-visit": {
+                  "summary": "request a phone visit",
+                  "value": {
+                    "billingInfo": {
+                      "paymentMethod": "insurance",
+                      "declaration": "self",
+                      "insuranceType": "manual",
+                      "insuranceProviderId": "kpvirtual",
+                      "insuranceMemberId": "internal"
+                    },
+                    "patient": {
+                      "firstName": "Sinjoro",
+                      "lastName": "Ajnulo",
+                      "gender": "male",
+                      "dateOfBirth": "1970-01-13",
+                      "phone": "202-555-1212",
+                      "email": "sinjoro.anjulo@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101"
+                      },
+                      "ehrIdentifier": "M123456",
+                      "ehrIdentifierType": "MRN",
+                      "homeEhr": "MAM",
+                      "homeMarket": "MAS"
+                    },
+                    "visitDetails": {
+                      "acceptedTerms": true,
+                      "assignmentQualifiers": [
+                        "adult"
+                      ],
+                      "declaration": "self",
+                      "stateLicensure": "WA",
+                      "visitReason": "Example request for a phone visit",
+                      "visitTypeName": "phone"
+                    }
+                  }
+                },
+                "virtual-creditcard": {
+                  "summary": "request a virtual visit with a DexCare patient and credit card payment",
+                  "value": {
+                    "billingInfo": {
+                      "paymentMethod": "creditcard",
+                      "stripeToken": "tok_stripecardtoken"
+                    },
+                    "patient": {
+                      "firstName": "Sinjoro",
+                      "lastName": "Ajnulo",
+                      "gender": "male",
+                      "dateOfBirth": "1970-01-13",
+                      "phone": "202-555-1212",
+                      "email": "sinjoro.anjulo@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101-3405"
+                      },
+                      "patientGuid": "00000000-0000-0000-0000-000000000000"
+                    },
+                    "visitDetails": {
+                      "acceptedTerms": true,
+                      "assignmentQualifiers": [
+                        "adult"
+                      ],
+                      "declaration": "self",
+                      "stateLicensure": "WA",
+                      "visitReason": "Example virtual visit of an existing DexCare patient requesting for self with credit card payment"
+                    }
+                  }
+                },
+                "additional-details": {
+                  "summary": "request a virtual visit as a proxy with an EHR patient and additional details",
+                  "value": {
+                    "actor": {
+                      "firstName": "Actor",
+                      "lastName": "Proxy",
+                      "gender": "female",
+                      "dateOfBirth": "1970-01-13",
+                      "phone": "202-555-1212",
+                      "email": "actor.proxy@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101"
+                      },
+                      "ehrIdentifier": "M123456",
+                      "ehrIdentifierType": "MRN",
+                      "homeEhr": "MAM"
+                    },
+                    "billingInfo": {
+                      "paymentMethod": "insurance",
+                      "declaration": "other",
+                      "insuranceType": "manual",
+                      "insuranceProviderId": "virtual",
+                      "insuranceMemberId": "internal",
+                      "firstName": "Insurance",
+                      "lastName": "Member",
+                      "gender": "female",
+                      "dateOfBirth": "1971-03-15"
+                    },
+                    "patient": {
+                      "firstName": "Sinjoro",
+                      "lastName": "Ajnulo",
+                      "gender": "male",
+                      "dateOfBirth": "2010-02-14",
+                      "phone": "202-555-1212",
+                      "email": "sinjoro.anjulo@example.com",
+                      "address": {
+                        "line1": "123 Main Street",
+                        "city": "Seattle",
+                        "state": "WA",
+                        "postalCode": "98101"
+                      },
+                      "ehrIdentifier": "M123456",
+                      "ehrIdentifierType": "MRN",
+                      "homeEhr": "MAM",
+                      "homeMarket": "MAS"
+                    },
+                    "visitDetails": {
+                      "acceptedTerms": true,
+                      "assignmentQualifiers": [
+                        "pediatric"
+                      ],
+                      "declaration": "other",
+                      "stateLicensure": "WA",
+                      "visitReason": "Example visit of a proxy submitting visit for a child with additional details",
+                      "medicaidMember": true
+                    },
+                    "additionalDetails": [
+                      {
+                        "key": "symptomDurationDays",
+                        "value": "2"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "visit response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "create virtual visit response",
+                  "required": [
+                    "visitId",
+                    "patientGuid"
+                  ],
+                  "properties": {
+                    "visitId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "visit identifier"
+                    },
+                    "patientGuid": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "DexCare patient identifier"
+                    },
+                    "visitRedirectUrl": {
+                      "type": "string",
+                      "description": "URL to Blissey for the patient"
+                    },
+                    "tokBoxVisit": {
+                      "type": "object",
+                      "description": "TokBox visit details",
+                      "properties": {
+                        "waitingRoomSession": {
+                          "type": "object",
+                          "properties": {
+                            "sessionId": {
+                              "type": "string",
+                              "description": "identifier of waiting room session"
+                            }
+                          }
+                        },
+                        "videoConferenceSession": {
+                          "type": "object",
+                          "properties": {
+                            "sessionId": {
+                              "type": "string",
+                              "description": "identifier of a video conference session"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request; See response for info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "create virtual visit error",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Error message"
+                    },
+                    "code": {
+                      "type": "string",
+                      "description": "Error code",
+                      "enum": [
+                        "PATIENT_RECORD_NOT_FOUND",
+                        "MISSING_VISIT_REASON"
+                      ]
+                    }
+                  }
+                },
+                "examples": {
+                  "missing-parameter": {
+                    "summary": "request missing a required parameters",
+                    "value": {
+                      "error": "visitReason is required",
+                      "code": "PATIENT_RECORD_NOT_FOUND"
+                    }
+                  },
+                  "patient-not-found": {
+                    "summary": "Patient Record not found",
+                    "value": {
+                      "error": "Patient record not found with supplied identifier",
+                      "code": "PATIENT_RECORD_NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "missing or invalid authentication"
+          },
+          "403": {
+            "description": "forbidden - not authorized"
+          },
+          "409": {
+            "description": "conflict — no provider available for visit at this time\n"
+          }
+        }
+      }
+    },
+    "/visits/{visitId}/waittime": {
+      "get": {
+        "description": "Returns the wait time for a virtual visit if active.\n",
+        "operationId": "getEstimatedVirtualVisitWaitTime",
+        "security": [
+          {
+            "PatientJWT": []
+          }
+        ],
+        "summary": "get virtual visit wait time",
+        "tags": [
+          "visits",
+          "external"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "visitId",
+            "description": "ID of visit to get wait time for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "estimatedWaitTimeSeconds": {
+                      "type": "number"
+                    },
+                    "estimateGeneratedAt": {
+                      "type": "string"
+                    },
+                    "estimatedWaitTimeMessage": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "waitTimeLocalizationInfo": {
+                      "type": "object",
+                      "properties": {
+                        "waitTimeMapKey": {
+                          "type": "string"
+                        },
+                        "timeMinSeconds": {
+                          "type": "number",
+                          "nullable": true
+                        },
+                        "timeMaxSeconds": {
+                          "type": "number",
+                          "nullable": true
+                        },
+                        "modality": {
+                          "type": "string"
+                        }
+                      },
+                      "nullable": true
+                    }
+                  }
+                },
+                "example": {
+                  "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                  "estimatedWaitTimeSeconds": 33,
+                  "estimatedWaitTimeMessage": "You're next! One of our healthcare providers will meet you here in a few minutes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Visit not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/visits/{visitId}/summary": {
+      "get": {
+        "description": "Returns a summarized visit, with minimum data needed for the virtual visit waiting room application\n",
+        "operationId": "visitSummaryV9",
+        "security": [
+          {
+            "StaffJWT": []
+          }
+        ],
+        "summary": "Returns a summarized visit",
+        "tags": [
+          "visits",
+          "external"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "visitId",
+            "description": "ID of visit to get wait time for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "200",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Summary Details of a Visit",
+                  "required": [
+                    "visitId",
+                    "patientGuid",
+                    "status",
+                    "type",
+                    "modality",
+                    "assignmentQualifiers",
+                    "isHighPriority",
+                    "stateLicensure",
+                    "practiceId",
+                    "homeMarket",
+                    "integrations",
+                    "tokBoxVisit",
+                    "acceptTerms",
+                    "deviceModel"
+                  ],
+                  "properties": {
+                    "visitId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Internal Visit ID"
+                    },
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "User ID"
+                    },
+                    "patientGuid": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "Patient Guid"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Visit Status of the conference - cancelled, waitingroom, etc"
+                    },
+                    "type": {
+                      "type": "string",
+                      "description": "type of virtual visit"
+                    },
+                    "modality": {
+                      "type": "string",
+                      "description": "The modality of the visit"
+                    },
+                    "assignmentQualifiers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "description": "Assignment qualifier for the visit"
+                      }
+                    },
+                    "isHighPriority": {
+                      "type": "boolean",
+                      "description": "Flag showing high-priority"
+                    },
+                    "stateLicensure": {
+                      "description": "state licensure required for provider to see patient",
+                      "type": "string",
+                      "example": "WA"
+                    },
+                    "practiceId": {
+                      "description": "Practice Identifer used in the visit\"",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "providerId": {
+                      "description": "Provider Identifer used in the visit\"",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "homeMarket": {
+                      "type": "string",
+                      "description": "home market for patient"
+                    },
+                    "assessmentToolUsed": {
+                      "description": "if patient has done preassessment, which tool was used",
+                      "type": "string",
+                      "example": "ada"
+                    },
+                    "integrations": {
+                      "description": "Any 3rd Party integrations associated with this visit",
+                      "type": "object",
+                      "required": [
+                        "tytoCare"
+                      ],
+                      "properties": {
+                        "tytoCare": {
+                          "type": "object",
+                          "required": [
+                            "enabled"
+                          ],
+                          "properties": {
+                            "enabled": {
+                              "type": "boolean"
+                            },
+                            "account": {
+                              "type": "object",
+                              "properties": {
+                                "accountId": {
+                                  "type": "string"
+                                },
+                                "isActive": {
+                                  "type": "boolean"
+                                },
+                                "isDeviceOnline": {
+                                  "type": "boolean"
+                                },
+                                "devicePairingStatus": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "tokBoxVisit": {
+                      "description": "TokBox Visit details",
+                      "type": "object",
+                      "properties": {
+                        "apiKey": {
+                          "type": "string",
+                          "description": "API key required for joining tokbox session"
+                        },
+                        "waitingRoomSession": {
+                          "type": "object",
+                          "properties": {
+                            "sessionId": {
+                              "type": "string",
+                              "description": "Id of waiting room session"
+                            }
+                          }
+                        },
+                        "videoConferenceSession": {
+                          "type": "object",
+                          "properties": {
+                            "sessionId": {
+                              "type": "string",
+                              "description": "Id of video conference session"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "acceptTerms": {
+                      "type": "boolean",
+                      "description": "whether patient accepted terms for virtual visit"
+                    },
+                    "timestamps": {
+                      "type": "object",
+                      "description": "timestamps for visit statuses",
+                      "properties": {
+                        "created": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of creation"
+                        },
+                        "requested": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of requested status"
+                        },
+                        "waitingroom": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of waitingroom status"
+                        },
+                        "invisit": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of invisit status"
+                        },
+                        "done": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of done status"
+                        },
+                        "staffdeclined": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of staffdeclined status"
+                        },
+                        "cancelled": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of cancelled status"
+                        },
+                        "waitoffline": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of waitoffline status"
+                        },
+                        "caregiverassigned": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "timestamp of caregiverassigned status"
+                        }
+                      }
+                    },
+                    "brand": {
+                      "type": "string",
+                      "description": "Brand of the visit",
+                      "example": "providence"
+                    },
+                    "deviceModel": {
+                      "type": "string",
+                      "description": "Device model used to create the visit"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Visit not found"
+          },
+          "500": {
+            "description": "500"
+          }
+        }
+      }
+    },
+    "/regions/{regionCode}/waittimes": {
+      "get": {
+        "description": "returns availability and wait times for provider queues for one region. Use query parameters to filter requested pools\n",
+        "operationId": "getRegionAvailabilityAndWaitTimes",
+        "security": [],
+        "summary": "get availability and wait times for region",
+        "tags": [
+          "waittimes",
+          "external"
+        ],
+        "parameters": [
+          {
+            "name": "regionCode",
+            "in": "path",
+            "description": "regionCode for the region.\n",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "assignmentQualifiers",
+            "description": "additional assignment qualifiers to filter provider queue",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "allowReserved": false
+          },
+          {
+            "in": "query",
+            "name": "visitTypeNames",
+            "description": "visit types to get wait time and availability for",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "virtual"
+            ],
+            "style": "form",
+            "explode": true,
+            "allowReserved": false
+          },
+          {
+            "in": "query",
+            "name": "practiceId",
+            "description": "specific practiceId to use; if not included, default will be used",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "homeMarket",
+            "description": "home market for patient",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "Wait time and availability for region and visit type",
+                            "properties": {
+                              "available": {
+                                "type": "boolean",
+                                "description": "indicates if the region can accept new visit requests or not"
+                              },
+                              "estimateGeneratedAt": {
+                                "type": "string",
+                                "description": "time the estimate was made in UTC format"
+                              },
+                              "regionCode": {
+                                "type": "string",
+                                "description": "regionCode for wait time and availability"
+                              },
+                              "visitTypeName": {
+                                "type": "string",
+                                "description": "visit type name"
+                              },
+                              "practiceId": {
+                                "type": "string",
+                                "description": "practiceId for wait time"
+                              },
+                              "assignmentQualifiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "qualifiers limiting this provider pool; can be an empty list; does not include specialties"
+                                }
+                              },
+                              "specialties": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "specialties limiting this provider pool; can be an empty list"
+                                }
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "home market for patient"
+                              }
+                            },
+                            "required": [
+                              "available",
+                              "estimateGeneratedAt",
+                              "regionCode",
+                              "visitTypeName",
+                              "assignmentQualifiers",
+                              "practiceId"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "description": "wait time for region and visit type when available",
+                            "properties": {
+                              "estimatedWaitTimeSeconds": {
+                                "type": "integer",
+                                "description": "estimated time in seconds as calculated by the system"
+                              }
+                            },
+                            "required": [
+                              "estimatedWaitTimeSeconds"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "Wait time and availability for region and visit type",
+                            "properties": {
+                              "available": {
+                                "type": "boolean",
+                                "description": "indicates if the region can accept new visit requests or not"
+                              },
+                              "estimateGeneratedAt": {
+                                "type": "string",
+                                "description": "time the estimate was made in UTC format"
+                              },
+                              "regionCode": {
+                                "type": "string",
+                                "description": "regionCode for wait time and availability"
+                              },
+                              "visitTypeName": {
+                                "type": "string",
+                                "description": "visit type name"
+                              },
+                              "practiceId": {
+                                "type": "string",
+                                "description": "practiceId for wait time"
+                              },
+                              "assignmentQualifiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "qualifiers limiting this provider pool; can be an empty list; does not include specialties"
+                                }
+                              },
+                              "specialties": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "specialties limiting this provider pool; can be an empty list"
+                                }
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "home market for patient"
+                              }
+                            },
+                            "required": [
+                              "available",
+                              "estimateGeneratedAt",
+                              "regionCode",
+                              "visitTypeName",
+                              "assignmentQualifiers",
+                              "practiceId"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "description": "wait time for region and visit type when unavailable",
+                            "properties": {
+                              "reason": {
+                                "type": "string",
+                                "description": "explanation for region being unavailable",
+                                "enum": [
+                                  "NO_ONCALL_PROVIDERS",
+                                  "REGION_BUSY",
+                                  "OFF_HOURS",
+                                  "NO_REGIONS_FOUND"
+                                ]
+                              },
+                              "busyMessage": {
+                                "type": "string",
+                                "description": "message to display only when region is busy, i.e. reason is REGION_BUSY"
+                              }
+                            },
+                            "required": [
+                              "reason"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "example": [
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 33,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 33,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [],
+                    "specialties": []
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [],
+                    "specialties": []
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/regions/waittimes": {
+      "get": {
+        "description": "returns availability and wait times for all provider queues. Use query parameters to filter requested pools\n",
+        "operationId": "getAvailabilityAndWaitTimes",
+        "security": [],
+        "summary": "get availability and wait times",
+        "tags": [
+          "waittimes",
+          "external"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "regionCodes",
+            "description": "region codes to filter results",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "allowReserved": false
+          },
+          {
+            "in": "query",
+            "name": "assignmentQualifiers",
+            "description": "additional assignment qualifiers to filter provider queue",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true,
+            "allowReserved": false
+          },
+          {
+            "in": "query",
+            "name": "visitTypeNames",
+            "description": "visit types to get wait time and availability for",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": [
+              "virtual"
+            ],
+            "style": "form",
+            "explode": true,
+            "allowReserved": false
+          },
+          {
+            "in": "query",
+            "name": "practiceId",
+            "description": "specific practiceId to use; if not included, default will be used",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "homeMarket",
+            "description": "home market for patient",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "Wait time and availability for region and visit type",
+                            "properties": {
+                              "available": {
+                                "type": "boolean",
+                                "description": "indicates if the region can accept new visit requests or not"
+                              },
+                              "estimateGeneratedAt": {
+                                "type": "string",
+                                "description": "time the estimate was made in UTC format"
+                              },
+                              "regionCode": {
+                                "type": "string",
+                                "description": "regionCode for wait time and availability"
+                              },
+                              "visitTypeName": {
+                                "type": "string",
+                                "description": "visit type name"
+                              },
+                              "practiceId": {
+                                "type": "string",
+                                "description": "practiceId for wait time"
+                              },
+                              "assignmentQualifiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "qualifiers limiting this provider pool; can be an empty list; does not include specialties"
+                                }
+                              },
+                              "specialties": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "specialties limiting this provider pool; can be an empty list"
+                                }
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "home market for patient"
+                              }
+                            },
+                            "required": [
+                              "available",
+                              "estimateGeneratedAt",
+                              "regionCode",
+                              "visitTypeName",
+                              "assignmentQualifiers",
+                              "practiceId"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "description": "wait time for region and visit type when available",
+                            "properties": {
+                              "estimatedWaitTimeSeconds": {
+                                "type": "integer",
+                                "description": "estimated time in seconds as calculated by the system"
+                              }
+                            },
+                            "required": [
+                              "estimatedWaitTimeSeconds"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "allOf": [
+                          {
+                            "type": "object",
+                            "description": "Wait time and availability for region and visit type",
+                            "properties": {
+                              "available": {
+                                "type": "boolean",
+                                "description": "indicates if the region can accept new visit requests or not"
+                              },
+                              "estimateGeneratedAt": {
+                                "type": "string",
+                                "description": "time the estimate was made in UTC format"
+                              },
+                              "regionCode": {
+                                "type": "string",
+                                "description": "regionCode for wait time and availability"
+                              },
+                              "visitTypeName": {
+                                "type": "string",
+                                "description": "visit type name"
+                              },
+                              "practiceId": {
+                                "type": "string",
+                                "description": "practiceId for wait time"
+                              },
+                              "assignmentQualifiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "qualifiers limiting this provider pool; can be an empty list; does not include specialties"
+                                }
+                              },
+                              "specialties": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "description": "specialties limiting this provider pool; can be an empty list"
+                                }
+                              },
+                              "homeMarket": {
+                                "type": "string",
+                                "description": "home market for patient"
+                              }
+                            },
+                            "required": [
+                              "available",
+                              "estimateGeneratedAt",
+                              "regionCode",
+                              "visitTypeName",
+                              "assignmentQualifiers",
+                              "practiceId"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "description": "wait time for region and visit type when unavailable",
+                            "properties": {
+                              "reason": {
+                                "type": "string",
+                                "description": "explanation for region being unavailable",
+                                "enum": [
+                                  "NO_ONCALL_PROVIDERS",
+                                  "REGION_BUSY",
+                                  "OFF_HOURS",
+                                  "NO_REGIONS_FOUND"
+                                ]
+                              },
+                              "busyMessage": {
+                                "type": "string",
+                                "description": "message to display only when region is busy, i.e. reason is REGION_BUSY"
+                              }
+                            },
+                            "required": [
+                              "reason"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "example": [
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 33,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 33,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "virtual",
+                    "assignmentQualifiers": [],
+                    "specialties": []
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "pediatric"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "ID",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": false,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "reason": "NO_ONCALL_PROVIDERS",
+                    "regionCode": "ID",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [
+                      "adult"
+                    ],
+                    "specialties": []
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [],
+                    "specialties": [
+                      "dermatology"
+                    ]
+                  },
+                  {
+                    "available": true,
+                    "estimateGeneratedAt": "2021-09-30T23:04:25.114Z",
+                    "estimatedWaitTimeSeconds": 55,
+                    "regionCode": "WA",
+                    "practiceId": "00000000-0000-0000-0000-000000000000",
+                    "visitTypeName": "phone",
+                    "assignmentQualifiers": [],
+                    "specialties": []
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assignmentqualifiers": {
+      "get": {
+        "description": "returns all assigment qualifiers",
+        "operationId": "getAssignmentQualifiers",
+        "security": [],
+        "summary": "get assignment qualifiers",
+        "tags": [
+          "assignmentqualifiers",
+          "external"
+        ],
+        "parameters": [
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "include archived assignment qualifiers",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "assignment qualifiers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "an assignment qualifier",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "identifier of the assignment qualifier"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "name value for assignment qualifier"
+                      },
+                      "group": {
+                        "type": "string",
+                        "description": "group value for assignment qualifier"
+                      },
+                      "version": {
+                        "type": "integer",
+                        "description": "version of database record"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "date and time of creation"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "date and time updated"
+                      },
+                      "deletedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "date and time deleted"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modalities": {
+      "get": {
+        "description": "get all modalities",
+        "operationId": "getModalities",
+        "security": [],
+        "summary": "get all modalities",
+        "tags": [
+          "modalities",
+          "external"
+        ],
+        "parameters": [
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "include archived modalities",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "modalities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "description": "a modality",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "the modality id"
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "name value for modality"
+                      },
+                      "version": {
+                        "type": "integer",
+                        "description": "version of database record"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "date and time of creation"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "date and time updated"
+                      },
+                      "deletedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "date and time deleted"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tokbox-events": {
+      "post": {
+        "description": "Send an update for the virtual visit via webhook configured in Tokbox",
+        "operationId": "processTokboxSessionEvents",
+        "security": [],
+        "tags": [
+          "tokbox",
+          "external"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sessionId": {
+                        "type": "string"
+                      },
+                      "projectId": {
+                        "type": "string"
+                      },
+                      "event": {
+                        "type": "string"
+                      },
+                      "timestamp": {
+                        "type": "integer"
+                      },
+                      "connection": {
+                        "type": "object",
+                        "description": "Tokbox Connection object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "connectionId"
+                          },
+                          "createdAt": {
+                            "type": "integer"
+                          },
+                          "data": {
+                            "type": "string",
+                            "description": "User connection data, usually stringified JSON"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sessionId": {
+                        "type": "string"
+                      },
+                      "projectId": {
+                        "type": "string"
+                      },
+                      "event": {
+                        "type": "string"
+                      },
+                      "timestamp": {
+                        "type": "integer"
+                      },
+                      "stream": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "connection": {
+                            "type": "object",
+                            "description": "Tokbox Connection object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "connectionId"
+                              },
+                              "createdAt": {
+                                "type": "integer"
+                              },
+                              "data": {
+                                "type": "string",
+                                "description": "User connection data, usually stringified JSON"
+                              }
+                            }
+                          },
+                          "createdAt": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "videoType": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "accepted request with no response body"
+          }
+        }
+      }
+    },
+    "/visits/{visitId}/acceptTerms": {
+      "put": {
+        "description": "Update whether patient accept terms for a visit",
+        "operationId": "updateAcceptTerms",
+        "security": [
+          {
+            "PatientJWT": []
+          }
+        ],
+        "tags": [
+          "virtual-visits"
+        ],
+        "summary": "Update whether patient accept terms for a visit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "visitId",
+            "description": "ID of visit to update patient accept terms",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "correlation-id",
+            "description": "Unique id to correlate call logs between our microservices",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Visit not found"
+          },
+          "409": {
+            "description": "Visit not in allowed status"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "PatientJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "[Patient] Bearer token format `Bearer {KEY}`"
+      },
+      "StaffJWT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "[Staff] Bearer token format `Bearer {KEY}`"
+      }
+    }
+  }
+}

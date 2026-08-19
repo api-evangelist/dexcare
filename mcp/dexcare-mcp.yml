@@ -1,0 +1,132 @@
+generated: '2026-08-15'
+method: derived
+source: openapi/dexcare-visit-service-openapi.yml, openapi/dexcare-care-options-openapi.yml, openapi/dexcare-slots-availability-openapi.yml, openapi/dexcare-visit-booking-openapi.yml, openapi/dexcare-provider-data-management-openapi.yml, openapi/dexcare-omni-search-openapi.yml
+status: candidate
+name: DexCare (candidate MCP server)
+description: >-
+  DexCare publishes no Model Context Protocol server. Searched the DexCare
+  developer portal (developers.dexcarehealth.com), dexcare.com, the DexCare GitHub
+  organization (8 public repos, none MCP-related) and the npm registry; no hosted
+  endpoint and no stdio package exists. The tools below are DERIVED from the six
+  OpenAPI definitions DexCare publishes on its own developer portal, as a candidate
+  surface only. Nothing here is an endpoint an agent can call today.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: searched
+searched:
+  - url: https://developers.dexcarehealth.com/
+    status: 200
+    result: no MCP server documented
+  - url: https://api.github.com/orgs/DexCare/repos
+    status: 200
+    result: 8 public repos (iOS/Android SDKs + sample apps + 3 archived JS utilities); no MCP server
+  - url: https://registry.npmjs.org/dexcare
+    status: 404
+    result: no first-party npm package
+tools:
+  - name: search_care_options
+    rest: getAggregatedSlotsV1
+    spec: openapi/dexcare-care-options-openapi.yml
+    description: Retrieve aggregated in-person and virtual appointment slots via GET /availability/slots.
+    auth: x-api-key
+  - name: search_care_options_advanced
+    rest: aggregatedSlotsV1
+    spec: openapi/dexcare-care-options-openapi.yml
+    description: Retrieve aggregated availability with a filter body via POST /availability/slots.
+    auth: x-api-key
+  - name: find_available_providers
+    rest: availableProvidersV1
+    spec: openapi/dexcare-care-options-openapi.yml
+    description: Find providers with availability matching the supplied criteria via POST /availability/providers.
+    auth: x-api-key
+  - name: get_provider_timeslots
+    rest: getSingleProviderTimeslots
+    spec: openapi/dexcare-slots-availability-openapi.yml
+    description: Retrieve open timeslots for a single provider by NPI via GET /providers/{npid}/timeslots.
+    auth: x-api-key
+  - name: search_slots
+    rest: getSlotsAvailability
+    spec: openapi/dexcare-slots-availability-openapi.yml
+    description: Search slot availability across departments and visit types via POST /slots/search.
+    auth: x-api-key
+  - name: create_visit
+    rest: createVisitV9
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: Create a virtual visit via POST /visits. Requires a patient JWT.
+    auth: PatientJWT
+  - name: get_visit_wait_time
+    rest: getEstimatedVirtualVisitWaitTime
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: Get the estimated wait time for an existing virtual visit via GET /visits/{visitId}/waittime.
+    auth: PatientJWT
+  - name: get_visit_summary
+    rest: visitSummaryV9
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: Retrieve a visit summary via GET /visits/{visitId}/summary. Requires a staff JWT.
+    auth: StaffJWT
+  - name: get_region_wait_times
+    rest: getAvailabilityAndWaitTimes
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: Retrieve virtual-care availability and wait times for all regions via GET /regions/waittimes.
+    auth: none
+  - name: get_region_wait_times_by_code
+    rest: getRegionAvailabilityAndWaitTimes
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: Retrieve availability and wait times for one region via GET /regions/{regionCode}/waittimes.
+    auth: none
+  - name: list_modalities
+    rest: getModalities
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: List supported visit modalities via GET /modalities.
+    auth: none
+  - name: list_assignment_qualifiers
+    rest: getAssignmentQualifiers
+    spec: openapi/dexcare-visit-service-openapi.yml
+    description: List provider assignment qualifiers via GET /assignmentqualifiers.
+    auth: none
+  - name: create_queued_guest_visit
+    rest: createQueuedGuestVisit
+    spec: openapi/dexcare-visit-booking-openapi.yml
+    description: Book a queued guest visit via POST /booking/queued-guest-visit.
+    auth: x-api-key
+  - name: query_provider_entities
+    rest: batchFindEntitiesByType
+    spec: openapi/dexcare-provider-data-management-openapi.yml
+    description: Batch-query provider data management entities by type via POST /pdm/batch.
+    auth: x-api-key
+  - name: get_provider_entity_schema
+    rest: getPdmEntitySchema
+    spec: openapi/dexcare-provider-data-management-openapi.yml
+    description: Retrieve the JSON Schema for a PDM entity via GET /pdm/schema/{namespace}/{name}.
+    auth: x-api-key
+  - name: omni_search
+    rest: Omni_Search
+    spec: openapi/dexcare-omni-search-openapi.yml
+    description: Execute a natural-language care search via GET /api/OmniSearch/{version}.
+    auth: none
+  - name: omni_get_data
+    rest: Get_Data
+    spec: openapi/dexcare-omni-search-openapi.yml
+    description: Retrieve clinician or department records by identifier via GET /api/OmniData/{version}.
+    auth: none
+  - name: omni_search_facets
+    rest: Facet_Search
+    spec: openapi/dexcare-omni-search-openapi.yml
+    description: Retrieve available search facets via GET /api/OmniSearchFacets.
+    auth: none
+  - name: omni_synonyms
+    rest: Synonym_Search
+    spec: openapi/dexcare-omni-search-openapi.yml
+    description: Retrieve clinical synonyms for a keyword via GET /api/OmniSynonyms.
+    auth: none
+excluded:
+  - rest: processTokboxSessionEvents
+    reason: Inbound webhook receiver for Vonage/TokBox session events; not an agent-callable action.
+  - rest: slotTaken
+    reason: Inbound notification endpoint a health system calls to tell DexCare a slot was taken.
+  - rest: slotReleased
+    reason: Inbound notification endpoint a health system calls to tell DexCare a slot was released.

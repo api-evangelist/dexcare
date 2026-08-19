@@ -1,31 +1,59 @@
 # DexCare
 
-> DexCare is a healthcare navigation and care-orchestration platform that connects patients to available care across fragmented health systems and helps providers fill capacity. Its REST API and native SDKs power search-and-schedule, virtual care, patient management, provider data, and care-options discovery for health systems. This is an API Evangelist enrichment profile generated from DexCare's public developer surface.
+> DexCare is a healthcare navigation and care-orchestration platform that connects patients to available care across fragmented health systems and helps providers fill capacity. Its REST APIs and native SDKs power search-and-schedule, virtual care, patient management, provider data management, and natural-language care discovery for health systems. This is an API Evangelist enrichment profile generated from DexCare's public developer surface. DexCare also publishes its own llms.txt at https://dexcare.com/llms.txt, saved verbatim alongside this file as dexcare-published-llms.txt; that one is a marketing sitemap and covers none of the API surface below.
+
+## Important: there is no shared base URL
+
+DexCare provisions every health system its own UAT and production hosts. The published specifications use templated servers (`https://api.{customerShorthand}.dexcare.io/v1`, `https://entities-service.{hostname}/v1`, `https://${brand}omni.azurewebsites.net`) or list named health-system tenants. Substitute the host your health system was issued. The demo host used throughout the documentation, api.care.dexcarehealth.com, no longer resolves in DNS.
 
 ## APIs
 
-- [DexCare REST API](https://developers.dexcarehealth.com/api/): RESTful service for accessing business information and performing actions against DexCare-managed healthcare environments (Virtual Care, Care Options, Booking, Patient, Provider Data Management, Omni Search, Reporting). Base hosts: api.care.dexcarehealth.com (production), api.care-uat.dexcarehealth.com (UAT), provisioned per health system.
+- [DexCare Visit Service API](https://developers.dexcarehealth.com/api/visits/): Create and follow on-demand virtual visits; read regional availability and wait times. OpenAPI 3.0.3, version 9.2.0, 9 operations. Spec: https://developers.dexcarehealth.com/assets/files/v9bundled_public.json
+- [DexCare Care Options API](https://developers.dexcarehealth.com/api/careoptions/): Aggregated in-person and virtual timeslot discovery across a health system. OpenAPI 3.0.3, version 1.0.0, 3 operations. Spec: https://developers.dexcarehealth.com/assets/files/CareOptionsAPI.json
+- [DexCare Slots Availability API](https://developers.dexcarehealth.com/api/provider_timeslots/): Provider- and department-level timeslot search plus slot-taken/slot-released notification. OpenAPI 3.0.3, version 5.0.0, 4 operations. Spec: https://developers.dexcarehealth.com/assets/files/forq-availabilityBundled.json
+- [DexCare Visit Booking API](https://developers.dexcarehealth.com/api/booking/): Book an in-person appointment once a slot is selected. OpenAPI 3.0.3, version 1.2.0, 1 operation. Spec: https://developers.dexcarehealth.com/assets/files/visit-booking.json
+- [DexCare Omni Search API](https://developers.dexcarehealth.com/api/omnisearch/): Natural-language care search over clinicians and clinics, with synonyms, facets, spelling tolerance and intent detection. OpenAPI 3.1.0, version 2.21.0, 8 operations. Spec: https://developers.dexcarehealth.com/assets/files/OmniSearchBundled.yaml
+- [DexCare Provider Data Management (Entities) API](https://developers.dexcarehealth.com/api/pdm/): Schema-driven export and query of the provider/department golden record. OpenAPI 3.1.0, version 1.0.0, 2 operations. Spec: https://developers.dexcarehealth.com/assets/files/pdmapi-swagger.yaml
+- [DexCare Patient API](https://developers.dexcarehealth.com/api/patient/): Retrieve the signed-in patient, or find/create a patient record when booking on someone else's behalf. Documented in prose; no OpenAPI published.
+- [DexCare Reporting API](https://developers.dexcarehealth.com/api/reporting): All Visits Report and All Providers Report. Uses a separate `Authorization: dc-token` service key. Documented in prose; no OpenAPI published.
 
 ## Docs
 
-- [Developer Portal](https://developers.dexcarehealth.com/): DexCare SDK and API documentation home.
-- [REST API Reference](https://developers.dexcarehealth.com/api/): Endpoint reference for the REST API.
-- [Patient API](https://developers.dexcarehealth.com/api/patient/): Retrieving and creating patient information.
-- [Care Options API](https://developers.dexcarehealth.com/api/careoptions/): Aggregated in-person and virtual timeslot discovery.
-- [Virtual Care API](https://developers.dexcarehealth.com/api/visits/): Programmatic virtual visit booking.
-- [Reporting API](https://developers.dexcarehealth.com/api/reporting): Reporting endpoints (require a reporting service key).
-- [Platform Concepts](https://developers.dexcarehealth.com/): Recommended starting point before the REST API or native SDKs.
-- [Release Notes](https://developers.dexcarehealth.com/home/releasenotes): Per-platform, per-version release notes.
-
-## SDKs
-
-- [iOS SDK (DexcareSDK)](https://developers.dexcarehealth.com/ios/): CocoaPods, source at https://github.com/DexCare/DexCareSDK-iOS
-- [Android SDK](https://developers.dexcarehealth.com/android/): Gradle org.dexcare:dexcare via GitHub Packages Maven, source at https://github.com/DexCare/DexCareSDK-Android
-- [JavaScript SDK](https://developers.dexcarehealth.com/jssdk/index): npm module in GitHub Packages (unsupported working example wrapping the REST API).
+- [Developer Portal](https://developers.dexcarehealth.com/): DexCare API and SDK documentation home.
+- [REST API Reference](https://developers.dexcarehealth.com/api/): Domains, authentication, the product parameter, and the in-clinic vs virtual booking models.
+- [Deprecated APIs](https://developers.dexcarehealth.com/api/deprecated/): Visits v8 and Timeslots v4.
+- [Support and Deprecation Policy](https://developers.dexcarehealth.com/home/support): End of Support is 90 days after the release of a newer version, unless a customer contract says otherwise.
+- [Release Notes](https://developers.dexcarehealth.com/home/releasenotes): Per-platform, per-version, behind a client-side selector.
 
 ## Authentication
 
-- OAuth 2.0 Authorization Code Grant to obtain a JWT bearer token, passed in the Authorization header for PHI/PII endpoints. Public directory endpoints require no authentication. Credentials and IdP are health-system specific.
+- `x-api-key` header for server-to-server services (Care Options, Slots Availability, Visit Booking, Provider Data Management). Issued by DexCare to the customer.
+- `Authorization: Bearer <JWT>` for PHI/PII operations. The Visit Service declares two separate, non-interchangeable schemes: PatientJWT and StaffJWT. Tokens come from the health system's own identity provider via an OAuth 2 authorization-code flow; there is no global authorization server, no discovery document and no published scope vocabulary.
+- `Authorization: dc-token <SECRET_TOKEN>` for the Reporting API. Server-side only.
+- No authentication at all on public reads: Omni Search entirely, plus regional wait times, modalities, assignment qualifiers and GET aggregated slots.
+
+## Conventions an agent needs
+
+- Optional `correlation-id` request header; the gateway returns one on every response. It is the only tracing handle and it is not documented in prose.
+- Optional `product` query parameter tags the calling use case; it is REQUIRED on createQueuedGuestVisit.
+- No idempotency key exists on any write. createVisitV9 answers 409 on a conflicting visit; queued guest booking has no such guard.
+- No published rate limits, no RateLimit-*/Retry-After headers, no 429 declared anywhere.
+- Errors are bare JSON objects, not RFC 9457, and the body key varies by service: `error`, `message`, `msg`, ApiError, ErrorResponse.
+- Pagination is not platform-wide: offset/limit in the request body for PDM and the providers report, top/skip for Omni Search, date-bounded for availability.
+
+## SDKs
+
+- [iOS SDK (DexcareSDK)](https://developers.dexcarehealth.com/ios/latest/): 9.8.0, released 2026-04-20. CocoaPods via the git source at https://github.com/DexCare/DexCareSDK-iOS; not on the CocoaPods trunk.
+- [Android SDK](https://developers.dexcarehealth.com/android/latest/): `org.dexcare:dexcare:9.1.0` from GitHub Packages Maven, which requires authentication. Source at https://github.com/DexCare/DexCareSDK-Android.
+- [JavaScript SDK](https://developers.dexcarehealth.com/jssdk/index): npm module in GitHub Packages. DexCare documents it as an unsupported working example wrapping the REST API; it is not on the public npm registry.
+
+## What DexCare does not publish
+
+- No MCP server, no A2A agent card, no GraphQL, no AsyncAPI and no outbound webhook catalog.
+- No /.well-known/ documents on any host; every conventional path returns 404.
+- No pricing or plans. The only commercial path is https://dexcare.com/request-a-demo/.
+- No status page and no SLA.
+- No trust center or named certification; the only published compliance claim is HIPAA business associate posture.
 
 ## Legal
 

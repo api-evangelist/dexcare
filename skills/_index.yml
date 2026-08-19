@@ -1,0 +1,36 @@
+generated: '2026-08-15'
+method: generated
+source: openapi/ (six DexCare-published OpenAPI definitions harvested from developers.dexcarehealth.com)
+note: >-
+  Packaged Agent Skills for the DexCare platform. Every operationId referenced in these
+  skills is grounded in a specification DexCare publishes on its own developer portal —
+  none is invented. DexCare publishes no skills or AGENTS.md of its own; searched
+  developers.dexcarehealth.com and the DexCare GitHub organization before generating.
+skills:
+  - name: dexcare-find-and-book-in-person-care
+    file: dexcare-find-and-book-in-person-care.md
+    description: Find open in-person appointment slots across a health system's clinics and book one.
+    apis: [DexCare Care Options API, DexCare Slots Availability API, DexCare Visit Booking API]
+    operations: [getAggregatedSlotsV1, aggregatedSlotsV1, availableProvidersV1, getSlotsAvailability, getSingleProviderTimeslots, createQueuedGuestVisit, slotTaken]
+  - name: dexcare-create-virtual-visit
+    file: dexcare-create-virtual-visit.md
+    description: Check virtual care wait times, create an on-demand virtual visit, and follow it to the waiting room.
+    apis: [DexCare Visit Service API]
+    operations: [getAvailabilityAndWaitTimes, getRegionAvailabilityAndWaitTimes, getModalities, getAssignmentQualifiers, createVisitV9, updateAcceptTerms, getEstimatedVirtualVisitWaitTime, visitSummaryV9]
+  - name: dexcare-omni-search-care
+    file: dexcare-omni-search-care.md
+    description: Run a natural-language care search across clinicians and clinics and hydrate the results.
+    apis: [DexCare Omni Search API]
+    operations: [Omni_Search, Get_Data, Facet_Search, Synonym_Search, Get_Slugs, Sitemap, Submit_Analytics_Events]
+  - name: dexcare-export-provider-data
+    file: dexcare-export-provider-data.md
+    description: Discover a PDM entity schema and page through matching provider/department records.
+    apis: [DexCare Provider Data Management (Entities) API]
+    operations: [getPdmEntitySchema, batchFindEntitiesByType]
+cross_cutting:
+  authentication: authentication/dexcare-authentication.yml
+  conventions: conventions/dexcare-conventions.yml
+  errors: errors/dexcare-problem-types.yml
+  lifecycle: lifecycle/dexcare-lifecycle.yml
+  rate_limits: rate-limits/dexcare-rate-limits.yml
+  data_model: data-model/dexcare-data-model.yml

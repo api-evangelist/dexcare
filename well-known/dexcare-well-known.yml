@@ -1,0 +1,103 @@
+generated: '2026-08-15'
+method: probed
+source: live HTTP probes of every DexCare host named in apis.yml and in the harvested OpenAPI servers[]
+note: >-
+  Every conventional /.well-known/ path was probed on all three DexCare-controlled
+  web hosts and every one returned 404. dexcare.com and dexcarehealth.com answer
+  404 with the WordPress HTML 404 page; developers.dexcarehealth.com is a static
+  MkDocs site on GitHub Pages and answers 404 with the site 404 shell. No document
+  was served on any path, so NO WellKnown or SecurityTxt pointer is wired into
+  apis.yml — this file records a verified absence, not a presence.
+hosts:
+  - host: dexcare.com
+    probes:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: dexcarehealth.com
+    probes:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: developers.dexcarehealth.com
+    probes:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+adjacent_findings:
+  - path: /llms.txt
+    host: dexcare.com
+    status: 200
+    content_type: text/plain
+    note: >-
+      DexCare does publish an llms.txt at the site root (Yoast SEO generated). Saved
+      verbatim to llms/dexcare-published-llms.txt. It is a marketing sitemap, not an
+      API surface, and every link in it points at the WP Engine staging host
+      dexcaredev.wpengine.com rather than dexcare.com.
+  - path: /llms.txt
+    host: developers.dexcarehealth.com
+    status: 404
+    note: The developer documentation host does not publish an llms.txt.

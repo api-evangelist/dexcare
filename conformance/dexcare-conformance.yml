@@ -1,31 +1,125 @@
-generated: '2026-07-18'
+generated: '2026-08-15'
 method: searched
 source: https://developers.dexcarehealth.com/api/
+specs:
+  - openapi/dexcare-visit-service-openapi.yml
+  - openapi/dexcare-care-options-openapi.yml
+  - openapi/dexcare-slots-availability-openapi.yml
+  - openapi/dexcare-visit-booking-openapi.yml
+  - openapi/dexcare-provider-data-management-openapi.yml
+  - openapi/dexcare-omni-search-openapi.yml
 standards:
+  - id: openapi
+    conforms: true
+    versions: ['3.0.3', '3.1.0']
+    evidence: >-
+      DexCare publishes six OpenAPI definitions on its own developer portal and renders
+      them there: Omni Search (3.1.0, 8 operations), Provider Data Management (3.1.0, 2),
+      Visit Service (3.0.3, 9), Care Options (3.0.3, 3), Slots Availability (3.0.3, 4)
+      and Visit Booking (3.0.3, 1). All six parse and all are harvested to openapi/.
+    source: https://developers.dexcarehealth.com/api/oas/omnisearch
   - id: rest
     conforms: true
-    evidence: RESTful service over HTTPS with URI-path versioning (/v1/...).
+    evidence: RESTful services over HTTPS with the major version in the URI path.
   - id: oauth2
-    conforms: true
+    conforms: partial
     evidence: >-
-      OAuth 2.0 Authorization Code Grant documented for obtaining JWT access
-      tokens (developers.dexcarehealth.com/api/).
+      OAuth 2.0 Authorization Code Grant is documented as the way to obtain the JWT
+      access token, but no authorization server metadata, discovery document or scope
+      vocabulary is published, and no oauth2 securityScheme appears in any of the six
+      specifications. The flow is asserted in prose and implemented per health system.
+    source: https://developers.dexcarehealth.com/api/
+  - id: oidc
+    conforms: false
+    evidence: >-
+      No /.well-known/openid-configuration on any DexCare host; every probe returned
+      404. See well-known/dexcare-well-known.yml.
   - id: jwt
     conforms: true
-    evidence: JSON Web Tokens used as bearer credentials for PHI/PII endpoints.
+    evidence: >-
+      The Visit Service declares two http bearer schemes with bearerFormat JWT
+      (PatientJWT, StaffJWT), bound to different operations.
+    source: openapi/dexcare-visit-service-openapi.yml
+  - id: json-schema
+    conforms: true
+    evidence: >-
+      Provider Data Management exposes the JSON Schema of any entity type at runtime
+      via getPdmEntitySchema (GET /pdm/schema/{namespace}/{name}), with a
+      resolveReferences flag to inline referenced schemas. The API is schema-driven
+      rather than schema-documented.
+    source: openapi/dexcare-provider-data-management-openapi.yml
   - id: hipaa
     conforms: true
     evidence: >-
-      DexCare operates as a HIPAA business associate, processing patient
-      protected health information on behalf of clinicians and practices under
-      business associate agreements (dexcare.com/privacy-policy/).
-  - id: rfc9457-problem-details
-    conforms: false
-    evidence: Errors use plain HTTP status codes; no application/problem+json envelope documented.
+      DexCare operates as a HIPAA business associate, processing patient protected
+      health information on behalf of clinicians and practices under business associate
+      agreements.
+    source: https://dexcare.com/privacy-policy/
+  - id: npi
+    conforms: true
+    evidence: >-
+      US National Provider Identifier is a first-class addressing key: timeslots are
+      retrieved at GET /providers/{npid}/timeslots and npi is a required field on the
+      slotTaken notification.
+    source: openapi/dexcare-slots-availability-openapi.yml
   - id: fhir-r4
     conforms: false
-    evidence: No FHIR resource conformance published in the public API reference.
+    evidence: >-
+      No FHIR resource, endpoint or conformance statement is published. DexCare does
+      CARRY FHIR-issued identifiers through its patient record (identifiers[].type
+      values include FHIR and FHIR STU3 alongside mrn, epi, INTERNAL, EXTERNAL, from
+      systems named org.<healthsystem>.epic.<emr_name>), but that is EMR identifier
+      passthrough, not FHIR conformance. A caller cannot make a FHIR request to DexCare.
+    source: https://developers.dexcarehealth.com/api/patient/
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      Errors are bare JSON objects with meaning in the HTTP status, and the body key is
+      inconsistent across services (error / message / msg / ApiError / ErrorResponse).
+      No application/problem+json is served anywhere.
+    source: errors/dexcare-problem-types.yml
+  - id: rfc8594-sunset
+    conforms: false
+    evidence: >-
+      A written 90-day End-of-Support policy exists but is prose-only; no Sunset or
+      Deprecation header is documented or declared.
+    source: https://developers.dexcarehealth.com/home/support
+  - id: idempotency
+    conforms: false
+    evidence: No idempotency key header or retry-safety contract on any write operation.
+    source: conventions/dexcare-conventions.yml
+  - id: pagination
+    conforms: partial
+    evidence: >-
+      Two different styles coexist and neither is platform-wide: offset/limit in the
+      request body (PDM batch, All Providers Report) and top/skip query parameters
+      (Omni Search). Availability searches are date-bounded rather than paged.
+    source: conventions/dexcare-conventions.yml
+  - id: asyncapi
+    conforms: false
+    evidence: >-
+      No AsyncAPI and no outbound webhook catalog. The event-shaped operations are
+      inbound receivers (slotTaken, slotReleased, processTokboxSessionEvents).
+  - id: mcp
+    conforms: false
+    evidence: No Model Context Protocol server is published; see mcp/dexcare-mcp.yml.
+  - id: a2a
+    conforms: false
+    evidence: >-
+      No agent card at /.well-known/agent-card.json or /.well-known/agent.json on any
+      DexCare host; all probes returned 404.
 compliance:
   hipaa:
     posture: business-associate
     source: https://dexcare.com/privacy-policy/
+    detail: >-
+      DexCare states it acts as a HIPAA business associate and relies on the treating
+      healthcare provider to manage protected health information, exchanging PHI and
+      PII only in its role as an intermediary in the care booking process.
+  certifications_published: []
+  certifications_note: >-
+    No trust center and no named certification (SOC 2, ISO 27001, HITRUST, PCI,
+    FedRAMP) is published on any DexCare web property. Probed dexcare.com/security/,
+    dexcare.com/trust/ and trust.dexcare.com; the first two return 404 and the third
+    does not resolve. The only published compliance claim is the HIPAA business
+    associate posture in the privacy policy.

@@ -1,24 +1,73 @@
-generated: '2026-07-18'
+generated: '2026-08-15'
 method: searched
 source: https://developers.dexcarehealth.com/api/
+tiers_documented: [UAT, PRD]
 environments:
   - tier: uat
-    host: https://api.care-uat.dexcarehealth.com
+    host_pattern: https://api.care-uat.dexcarehealth.com
     description: >-
-      User acceptance testing / non-production tier. Each health system is
-      provisioned its own UAT domain; the pattern above is the documented
-      convention.
+      User acceptance testing tier. Each health system is provisioned its own UAT
+      domain; the pattern shown is DexCare's documented convention using its demo
+      health system, "Acme". DexCare notes explicitly that the UAT version of Acme
+      does not exist and is presented as an example only.
+    resolves: false
+    checked: '2026-08-15'
   - tier: production
-    host: https://api.care.dexcarehealth.com
+    host_pattern: https://api.care.dexcarehealth.com
     description: >-
-      Production tier. Each health system is provisioned its own production
-      domain following this pattern.
+      Production tier. The REST API reference states this demo host "can be used to try
+      out the calls", but as of 2026-08-15 it resolves to a CNAME
+      (kong.acme.dexcare.engineering) with no address record, so the documented
+      try-it-out path fails at DNS.
+    resolves: false
+    checked: '2026-08-15'
+  - tier: demo-uat
+    host: https://ecvapi.demo-uat.dex.care/api/9
+    description: >-
+      DexCare's own demo tenant for the Visit Service, taken verbatim from the
+      servers[] block of the published v9 specification. Resolves and terminates TLS
+      on a Kong gateway, but the gateway matches no route.
+    resolves: true
+    http_status: 404
+    checked: '2026-08-15'
+    source: openapi/dexcare-visit-service-openapi.yml
+server_tiers_from_specs:
+  - api: Omni Search
+    tiers: [dev, qa, uat, prod]
+    pattern: 'https://{tier}${brand}omni.azurewebsites.net'
+    note: >-
+      The only DexCare API that publishes a four-tier ladder. Substitute your brand;
+      the prod host drops the tier prefix.
+  - api: Care Options / Visit Booking / Slots Availability
+    pattern: 'https://api.{customerShorthand}.dexcare.io/v1 (and /v5)'
+    note: Single templated server; the tier is expressed in the customer shorthand.
+  - api: Provider Data Management
+    pattern: 'https://entities-service.{hostname}/v1'
+  - api: Visit Service
+    tenants_listed_in_spec: 7
+    note: >-
+      The published v9 document lists named health-system UAT hosts rather than a
+      template, including psjhealth.org, froedtert.com, ecommunity.com,
+      houstonmethodistcare.org, kp-uat.dex.care and demo-uat.dex.care.
+  - api: Reporting
+    pattern: 'https://ecvapi.care.YOUR_DOMAIN.com'
+    source: https://developers.dexcarehealth.com/api/reporting
 test_credentials:
+  published: false
   note: >-
-    DexCare does not publish public/self-serve sandbox credentials or magic
-    test identifiers. Application credentials and UAT access are provisioned
-    per health system through DexCare onboarding; there are no published test
-    tokens, patients, or fixtures to capture verbatim.
+    DexCare publishes no self-serve sandbox, no test keys, no test patients, no magic
+    identifiers, no test clock and no fixture tooling. Application credentials and UAT
+    access are provisioned per health system through DexCare onboarding: "Developers
+    working with the APIs for care booking must consult with each individual healthcare
+    system to obtain application keys and secrets." There are no published values to
+    capture verbatim, and none were invented here.
+test_data_in_docs:
+  note: >-
+    The documentation uses a fictional demo health system, "Acme", with example
+    department urlNames (AcmeC4, Broadway) and example GUIDs. These are illustrative
+    strings in a reference, not working fixtures against a live tier.
 sample_apps:
-  - https://github.com/DexCare/DexCareSDK.iOS.SampleApp
-  - https://github.com/DexCare/DexCareSDK.Android.SampleApp
+  - url: https://github.com/DexCare/DexCareSDK.iOS.SampleApp
+    language: swift
+  - url: https://github.com/DexCare/DexCareSDK.Android.SampleApp
+    language: kotlin

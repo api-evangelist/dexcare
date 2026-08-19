@@ -1,28 +1,115 @@
-generated: '2026-07-18'
+generated: '2026-08-15'
 method: searched
-source: https://developers.dexcarehealth.com/home/releasenotes
+source: https://developers.dexcarehealth.com/home/support
 versioning:
   scheme: uri-path
-  current: v1
+  current: mixed
   docs: https://developers.dexcarehealth.com/api/
+  per_service:
+    - api: Visit Service
+      version: 9.2.0
+      style: major in server path (/api/9)
+      source: openapi/dexcare-visit-service-openapi.yml
+    - api: Visit Booking
+      version: 1.2.0
+      style: major in server path (/v1)
+      source: openapi/dexcare-visit-booking-openapi.yml
+    - api: Care Options
+      version: 1.0.0
+      style: major in server path (/v1)
+      source: openapi/dexcare-care-options-openapi.yml
+    - api: Slots Availability
+      version: 5.0.0
+      style: major in server path (/v5)
+      source: openapi/dexcare-slots-availability-openapi.yml
+    - api: Provider Data Management (Entities Service)
+      version: 1.0.0
+      style: major in server path (/v1)
+      source: openapi/dexcare-provider-data-management-openapi.yml
+    - api: Omni Search
+      version: 2.21.0
+      style: full semantic version as an optional path parameter
+      source: openapi/dexcare-omni-search-openapi.yml
+      risk: >-
+        Omitting the optional {version} path parameter silently pins the caller to 1.x
+        behaviour, so newer functionality disappears without an error.
   note: >-
-    REST resources are versioned in the URI path (e.g. /v1/patient). Native
-    SDKs are versioned with semantic versioning (major.minor.patch); current
-    major line is 9.x for both iOS and Android.
+    Native SDKs are versioned with semver; the current major line is 9.x on both iOS
+    and Android. DexCare states that each minor SDK bump deprecates methods and
+    properties "as best we can", with the specifics in each platform's CHANGELOG.
 release_notes:
   url: https://developers.dexcarehealth.com/home/releasenotes
-  platforms: [Core, Search, Availability, Service Discovery, iOS, Android]
+  platforms: [Core, Search, Availability Service, Discovery, iOS, Android]
   scheme: semver
+  note: >-
+    Release notes are behind a two-step Platform/Version selector rendered client-side;
+    individual dated entries are not statically enumerable from the public page.
 support_policy:
-  url: https://developers.dexcarehealth.com/home/supportpolicy
+  url: https://developers.dexcarehealth.com/home/support
 deprecation:
   documented: true
+  policy_url: https://developers.dexcarehealth.com/home/support
+  reference_url: https://developers.dexcarehealth.com/api/deprecated/
+  trigger: publication of a newer version
+  end_of_support: >-
+    90 days after the release of the latest version of an API or SDK, unless a customer
+    contract carves out an exception.
+  end_of_life: >-
+    The final day of the last remaining customer contracted for support. The EOL date
+    is published in the deprecated functionality's documentation header, and on that
+    date the documentation is removed from the developer portal.
   evidence: >-
-    The REST API reference includes a dedicated "Deprecated" endpoints section,
-    and the SDK docs publish version migration guides (e.g. iOS/Android 7.x ->
-    8.x -> 9.x). No formal RFC 8594 Sunset/Deprecation header policy is
-    published.
-  reference_url: https://developers.dexcarehealth.com/api/
-status_page: null
-sla: null
+    DexCare publishes a written Support and Deprecation Policy with a quantified EOS
+    window: "End of Support (EOS) occurs 90 days after the release of the latest
+    version of an API or SDK unless there is an exception in a customer contract."
+    Deprecated APIs are collected in a dedicated Deprecated section of the reference,
+    and the SDKs publish migration guides across the 7.x -> 8.x -> 9.x lines.
+  rfc8594: false
+  rfc8594_note: >-
+    No Sunset or Deprecation response header is documented, and none is declared in any
+    of the six published OpenAPI definitions. The policy is prose-only, so a machine
+    cannot detect an impending EOS from a response.
+  gap: >-
+    Documentation is REMOVED at EOL rather than archived, so an integrator running an
+    older contracted version loses their reference the day the last other customer
+    leaves it.
+deprecated_surfaces:
+  - name: Visits v8 API
+    url: https://developers.dexcarehealth.com/api/deprecated/
+    note: Superseded by the v9 Visit Service; retained for existing implementations.
+  - name: Timeslots v4 API
+    url: https://developers.dexcarehealth.com/api/deprecated/
+    note: Superseded by the v5 Slots Availability API.
 deprecated_operations: []
+deprecated_operations_note: >-
+  No operation in any of the six published specifications carries `deprecated: true`.
+  Deprecation is expressed by moving a whole API version into the Deprecated section of
+  the documentation, not by marking operations in the contract.
+status_page: null
+status_page_note: >-
+  DexCare publishes no status page. Probed status.dexcare.com, status.dexcarehealth.com
+  and trust.dexcare.com; none resolves.
+sla: null
+support:
+  channel: >-
+    Named DexCare Customer Success Manager or primary contact via email/Slack, or the
+    customer's own Service Desk ticketing system. There is no public support portal and
+    no developer support channel for non-customers.
+  url: https://developers.dexcarehealth.com/home/support
+host_probe:
+  - host: api.care.dexcarehealth.com
+    resolves: false
+    detail: >-
+      The REST API reference presents api.care.dexcarehealth.com as the DexCare demo
+      ("Acme") production tier and states it "can be used to try out the calls". As of
+      2026-08-15 the name resolves to a CNAME, kong.acme.dexcare.engineering, which has
+      no address record, so every documented example call against it fails at DNS.
+    checked: '2026-08-15'
+  - host: ecvapi.demo-uat.dex.care
+    resolves: true
+    http_status: 404
+    detail: >-
+      DexCare's demo tenant from the Visit Service servers[] block resolves and
+      terminates TLS on a Kong gateway, but the gateway matches no route and returns
+      {"message":"no Route matched with those values"}.
+    checked: '2026-08-15'
