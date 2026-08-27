@@ -59,11 +59,11 @@ maintainers:
 apis:
 - name: DexCare REST API
   description: >-
-    RESTful service for accessing business information and performing actions against
-    DexCare-managed healthcare environments. The umbrella reference covering the Patient and
-    Reporting surfaces, which are documented in prose without an OpenAPI, plus the platform-wide
-    domain, authentication and product-parameter conventions. URI-path versioned, OAuth 2.0 + JWT
-    bearer auth for PHI/PII endpoints, with open public directory endpoints.
+    RESTful service for accessing business information and performing actions against DexCare-managed
+    healthcare environments. The umbrella reference covering the Patient and Reporting surfaces, which
+    are documented in prose without an OpenAPI, plus the platform-wide domain, authentication and product-parameter
+    conventions. URI-path versioned, OAuth 2.0 + JWT bearer auth for PHI/PII endpoints, with open public
+    directory endpoints.
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
@@ -86,117 +86,513 @@ apis:
     url: rate-limits/dexcare-rate-limits.yml
   - type: DataModel
     url: data-model/dexcare-data-model.yml
-- name: DexCare Visit Service API
-  description: >-
-    Create and follow on-demand virtual visits, and read regional virtual-care availability and
-    estimated wait times. Declares two distinct bearer schemes, PatientJWT and StaffJWT, bound to
-    different operations. OpenAPI 3.0.3, version 9.2.0, 9 operations.
-  humanURL: https://developers.dexcarehealth.com/api/visits/
-  baseURL: https://ecvapi.demo-uat.dex.care/api/9
+- aid: dexcare:dexcare-assignmentqualifiers-api
+  name: DexCare Assignmentqualifiers API
+  description: The assignmentqualifiers API from DexCare — 1 operation(s) for assignmentqualifiers.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
   tags:
-  - Virtual Care
-  - Telehealth
-  - Scheduling
+  - assignmentqualifiers
   properties:
   - type: OpenAPI
-    url: openapi/dexcare-visit-service-openapi.yml
-  - type: Overlay
-    url: overlays/dexcare-visit-service-overlay.yaml
+    url: openapi/dexcare-assignmentqualifiers-api-openapi.yml
   - type: APIReference
     url: https://developers.dexcarehealth.com/api/oas/visits
   - type: Authentication
     url: authentication/dexcare-authentication.yml
-- name: DexCare Care Options API
-  description: >-
-    Aggregated in-person and virtual appointment discovery across a health system, returning
-    available providers and timeslots filtered by location, specialty, visit type and date range.
-    OpenAPI 3.0.3, version 1.0.0, 3 operations.
-  humanURL: https://developers.dexcarehealth.com/api/careoptions/
-  baseURL: https://api.{customerShorthand}.dexcare.io/v1
-  tags:
-  - Scheduling
-  - Patient Access
-  - Care Navigation
-  properties:
-  - type: OpenAPI
-    url: openapi/dexcare-care-options-openapi.yml
-  - type: Overlay
-    url: overlays/dexcare-care-options-overlay.yaml
   - type: APIReference
     url: https://developers.dexcarehealth.com/api/oas/careoptions
-- name: DexCare Slots Availability API
-  description: >-
-    Provider- and department-level appointment slot search, addressed by National Provider
-    Identifier, plus the slot-taken and slot-released notifications a health system sends DexCare
-    when its own schedule changes. OpenAPI 3.0.3, version 5.0.0, 4 operations.
-  humanURL: https://developers.dexcarehealth.com/api/provider_timeslots/
-  baseURL: https://api.{customerShorthand}.dexcare.io/v5
-  tags:
-  - Scheduling
-  - Provider Data
-  properties:
-  - type: OpenAPI
-    url: openapi/dexcare-slots-availability-openapi.yml
-  - type: Overlay
-    url: overlays/dexcare-slots-availability-overlay.yaml
   - type: APIReference
     url: https://developers.dexcarehealth.com/api/oas/slots
-- name: DexCare Visit Booking API
-  description: >-
-    Books an in-person appointment for a queued guest visit once a timeslot has been selected.
-    OpenAPI 3.0.3, version 1.2.0, 1 operation.
-  humanURL: https://developers.dexcarehealth.com/api/booking/
-  baseURL: https://api.{customerShorthand}.dexcare.io/v1
-  tags:
-  - Scheduling
-  - Patient Access
-  properties:
-  - type: OpenAPI
-    url: openapi/dexcare-visit-booking-openapi.yml
-  - type: Overlay
-    url: overlays/dexcare-visit-booking-overlay.yaml
   - type: APIReference
     url: https://developers.dexcarehealth.com/api/oas/bookingservice
-- name: DexCare Omni Search API
-  description: >-
-    Natural-language care search across a health system's clinicians and clinics. Rules-based NLP
-    tokenizes and stems the query, expands clinical synonyms, tolerates spelling errors and infers
-    intent and location, returning faceted results plus the filters it derived. OpenAPI 3.1.0,
-    version 2.21.0, 8 operations.
-  humanURL: https://developers.dexcarehealth.com/api/omnisearch/
-  baseURL: https://${brand}omni.azurewebsites.net
-  tags:
-  - Search
-  - Care Navigation
-  - Patient Access
-  properties:
-  - type: OpenAPI
-    url: openapi/dexcare-omni-search-openapi.yml
-  - type: Overlay
-    url: overlays/dexcare-omni-search-overlay.yaml
   - type: APIReference
     url: https://developers.dexcarehealth.com/api/oas/omnisearch
-- name: DexCare Provider Data Management API
-  description: >-
-    Schema-driven query and export of the provider, department, location and business-line golden
-    record held in DexCare PDM+. The JSON Schema for any entity type is itself retrievable at
-    runtime, and batch queries support structured field filters, reference expansion and
-    offset/limit paging. OpenAPI 3.1.0, version 1.0.0, 2 operations.
-  humanURL: https://developers.dexcarehealth.com/api/pdm/
-  baseURL: https://entities-service.{hostname}/v1
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-external-api
+  name: DexCare External API
+  description: The external API from DexCare — 2 operation(s) for external.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
   tags:
-  - Provider Data
-  - Health IT
+  - external
   properties:
   - type: OpenAPI
-    url: openapi/dexcare-provider-data-management-openapi.yml
-  - type: Overlay
-    url: overlays/dexcare-provider-data-management-overlay.yaml
+    url: openapi/dexcare-external-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-modalities-api
+  name: DexCare Modalities API
+  description: The modalities API from DexCare — 1 operation(s) for modalities.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - modalities
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-modalities-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnianalytics-api
+  name: DexCare Omni Analytics API
+  description: The OmniAnalytics API from DexCare — 1 operation(s) for omnianalytics.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniAnalytics
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnianalytics-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnidata-api
+  name: DexCare Omni Data API
+  description: The OmniData API from DexCare — 1 operation(s) for omnidata.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniData
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnidata-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnisearch-api
+  name: DexCare Omni Search API
+  description: The OmniSearch API from DexCare — 1 operation(s) for omnisearch.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniSearch
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnisearch-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnisearchanalytics-api
+  name: DexCare Omni Search Analytics API
+  description: The OmniSearchAnalytics API from DexCare — 1 operation(s) for omnisearchanalytics.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniSearchAnalytics
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnisearchanalytics-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnisearchfacets-api
+  name: DexCare Omni Search Facets API
+  description: The OmniSearchFacets API from DexCare — 1 operation(s) for omnisearchfacets.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniSearchFacets
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnisearchfacets-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnisitemap-api
+  name: DexCare Omni Sitemap API
+  description: The OmniSitemap API from DexCare — 1 operation(s) for omnisitemap.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniSitemap
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnisitemap-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnislugs-api
+  name: DexCare Omni Slugs API
+  description: The OmniSlugs API from DexCare — 1 operation(s) for omnislugs.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniSlugs
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnislugs-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-omnisynonyms-api
+  name: DexCare Omni Synonyms API
+  description: The OmniSynonyms API from DexCare — 1 operation(s) for omnisynonyms.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - OmniSynonyms
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-omnisynonyms-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-pdm-api
+  name: DexCare Pdm API
+  description: The Pdm API from DexCare — 2 operation(s) for pdm.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - Pdm
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-pdm-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-providers-api
+  name: DexCare Providers API
+  description: The Providers API from DexCare — 1 operation(s) for providers.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - Providers
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-providers-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-queued-guest-visit-api
+  name: DexCare Queued Guest Visit API
+  description: The queued-guest-visit API from DexCare — 1 operation(s) for queued-guest-visit.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - queued-guest-visit
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-queued-guest-visit-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-slots-api
+  name: DexCare Slots API
+  description: The Slots API from DexCare — 3 operation(s) for slots.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - Slots
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-slots-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-tokbox-api
+  name: DexCare Tokbox API
+  description: The tokbox API from DexCare — 1 operation(s) for tokbox.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - tokbox
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-tokbox-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-virtual-visits-api
+  name: DexCare Virtual Visits API
+  description: The virtual-visits API from DexCare — 1 operation(s) for virtual-visits.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - virtual-visits
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-virtual-visits-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-visits-api
+  name: DexCare Visits API
+  description: The visits API from DexCare — 3 operation(s) for visits.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - visits
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-visits-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/pdm
+  - type: DataModel
+    url: data-model/dexcare-data-model.yml
+- aid: dexcare:dexcare-waittimes-api
+  name: DexCare Waittimes API
+  description: The waittimes API from DexCare — 2 operation(s) for waittimes.
+  humanURL: https://developers.dexcarehealth.com/api/
+  baseURL: https://api.care.dexcarehealth.com
+  tags:
+  - waittimes
+  properties:
+  - type: OpenAPI
+    url: openapi/dexcare-waittimes-api-openapi.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/visits
+  - type: Authentication
+    url: authentication/dexcare-authentication.yml
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/careoptions
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/slots
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/bookingservice
+  - type: APIReference
+    url: https://developers.dexcarehealth.com/api/oas/omnisearch
   - type: APIReference
     url: https://developers.dexcarehealth.com/api/oas/pdm
   - type: DataModel
     url: data-model/dexcare-data-model.yml
 common:
+- type: Overlay
+  url: overlays/dexcare-visit-service-overlay.yaml
+- type: Overlay
+  url: overlays/dexcare-care-options-overlay.yaml
+- type: Overlay
+  url: overlays/dexcare-slots-availability-overlay.yaml
+- type: Overlay
+  url: overlays/dexcare-visit-booking-overlay.yaml
+- type: Overlay
+  url: overlays/dexcare-omni-search-overlay.yaml
+- type: Overlay
+  url: overlays/dexcare-provider-data-management-overlay.yaml
 - type: Website
   url: https://dexcare.com/
 - type: DeveloperPortal
