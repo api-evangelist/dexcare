@@ -1,0 +1,65 @@
+slug: dexcare
+provider: DexCare
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Healthcare Providers
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 5
+edges:
+- tag: Slots
+  spec_file: dexcare-slots-api-openapi.yml
+  capability_id: BC-2800.10
+  capability_id_l1: BC-2800
+  capability_name: Scheduling & Appointment Management
+  confidence: 0.85
+  evidence: POST /slots/search  getSlotsAvailability  slots availability service; POST /slots/slot-taken  slotTaken
+  reason: Searching appointment slot availability and marking slots taken or released is appointment booking
+    and provider-schedule management; no other reading of these operations fits.
+- tag: external
+  spec_file: dexcare-external-api-openapi.yml
+  capability_id: BC-2800.10
+  capability_id_l1: BC-2800
+  capability_name: Scheduling & Appointment Management
+  confidence: 0.85
+  evidence: POST /availability/providers 'get available providers'; GET /availability/slots 'Search aggregated
+    slots by location'
+  reason: The operations expose provider availability and bookable appointment slots across locations
+    — provider/resource scheduling and appointment availability, i.e. Scheduling & Appointment Management
+    within Patient Access.
+- tag: Providers
+  spec_file: dexcare-providers-api-openapi.yml
+  capability_id: BC-2800.10
+  capability_id_l1: BC-2800
+  capability_name: Scheduling & Appointment Management
+  confidence: 0.8
+  evidence: GET /providers/{npid}/timeslots  getSingleProviderTimeslots
+  reason: Retrieves bookable timeslots for an individual provider (keyed by NPI) from DexCare's availability
+    service — provider/resource scheduling and appointment availability, the core of scheduling & appointment
+    management.
+- tag: queued-guest-visit
+  spec_file: dexcare-queued-guest-visit-api-openapi.yml
+  capability_id: BC-2800.10
+  capability_id_l1: BC-2800
+  capability_name: Scheduling & Appointment Management
+  confidence: 0.7
+  evidence: POST /booking/queued-guest-visit 'request a new queued guest visit'
+  reason: Booking service endpoint that requests a queued (on-demand) visit for a guest patient — appointment/queue
+    booking, which is pre-encounter Patient Access scheduling rather than clinical care delivery.
+- tag: visits
+  spec_file: dexcare-visits-api-openapi.yml
+  capability_id: BC-2800.10
+  capability_id_l1: BC-2800
+  capability_name: Scheduling & Appointment Management
+  confidence: 0.7
+  evidence: POST /visits createVisitV9 'request visit'; GET /visits/{visitId}/waittime 'get virtual visit
+    wait time'
+  reason: Operations request/book a visit and report expected wait time and a visit summary — pre-encounter
+    visit booking and queue visibility, i.e. appointment scheduling within Patient Access rather than
+    documentation of care.

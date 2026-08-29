@@ -593,6 +593,9 @@ apis:
   - type: DataModel
     url: data-model/dexcare-data-model.yml
 common:
+- type: CapabilityMap
+  url: capabilities/dexcare-capability-edges.yml
+  name: DexCare Business Capability Map
 - type: Overlay
   url: overlays/dexcare-visit-service-overlay.yaml
 - type: Overlay
