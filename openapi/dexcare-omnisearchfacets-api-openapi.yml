@@ -1,0 +1,172 @@
+openapi: 3.2.0
+info:
+  title: Omni Search Facets API
+  description: API specification for Omni's endpoints. Fast Pages Entities Schema Version - (4.2.2)
+  version: 2.21.0
+  license:
+    name: None
+    url: None
+servers:
+- url: https://dev${brand}omni.azurewebsites.net
+  description: Dev Server
+- url: https://qa${brand}omni.azurewebsites.net
+  description: QA Server
+- url: https://uat${brand}omni.azurewebsites.net
+  description: Test Server
+- url: https://${brand}omni.azurewebsites.net
+  description: Prod Server
+security:
+- {}
+tags:
+- name: OmniSearchFacets
+paths:
+  /api/OmniSearchFacets:
+    get:
+      operationId: Facet_Search
+      summary: Omni Search Facets
+      description: Retrieve properties and their potential values/counts used for 'guided navigation' or 'smart filters' related to clincians and/or departments
+      parameters:
+      - $ref: '#/components/parameters/BrandParam'
+      - name: childBrand
+        in: query
+        schema:
+          $ref: '#/components/schemas/childBrand'
+      - name: count
+        in: query
+        schema:
+          $ref: '#/components/schemas/count'
+      - $ref: '#/components/parameters/DataParam'
+      - name: stringvalues
+        in: query
+        schema:
+          $ref: '#/components/schemas/stringvalues'
+      responses:
+        '200':
+          description: Successful search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSearchFacetsSuccessResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to load facets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: The sin is not in being outmatched, but in failing to recognize it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - OmniSearchFacets
+components:
+  schemas:
+    Facets:
+      anyOf:
+      - additionalProperties:
+          items:
+            type: string
+          type: array
+        type: object
+      - additionalProperties:
+          items:
+            properties:
+              count:
+                type: number
+              value:
+                type: string
+            required:
+            - count
+            - value
+            type: object
+          type: array
+        type: object
+      - additionalProperties:
+          items:
+            type:
+            - string
+            - number
+            - boolean
+          type: array
+        type: object
+      - additionalProperties:
+          items:
+            properties:
+              count:
+                type: number
+              value:
+                items:
+                  type:
+                  - string
+                  - number
+                  - boolean
+                type: array
+            required:
+            - count
+            - value
+            type: object
+          type: array
+        type: object
+      description: Facets
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    OmniSearchFacetsSuccessResponse:
+      properties:
+        facets:
+          $ref: '#/components/schemas/Facets'
+      required:
+      - facets
+      type: object
+    count:
+      default: false
+      description: Whether to include counts for each facet value
+      type: boolean
+    stringvalues:
+      default: true
+      description: Whether to limit results to only string value type facets
+      type: boolean
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+      - clinicians
+      - departments
+      - locations
+      title: DataTag
+      tsEnumNames:
+      - Clinicians
+      - Departments
+      - Locations
+      type: string
+    childBrand:
+      description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
+      type: string
+  parameters:
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string

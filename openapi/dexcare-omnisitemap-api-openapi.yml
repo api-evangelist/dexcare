@@ -1,0 +1,103 @@
+openapi: 3.2.0
+info:
+  title: Omni Sitemap API
+  description: API specification for Omni's endpoints. Fast Pages Entities Schema Version - (4.2.2)
+  version: 2.21.0
+  license:
+    name: None
+    url: None
+servers:
+- url: https://dev${brand}omni.azurewebsites.net
+  description: Dev Server
+- url: https://qa${brand}omni.azurewebsites.net
+  description: QA Server
+- url: https://uat${brand}omni.azurewebsites.net
+  description: Test Server
+- url: https://${brand}omni.azurewebsites.net
+  description: Prod Server
+security:
+- {}
+tags:
+- name: OmniSitemap
+paths:
+  /api/OmniSitemap:
+    get:
+      operationId: Sitemap
+      summary: Omni Sitemap
+      description: Retrieve a list of URLs (typically just pathnames) from the search index for a brand.
+      parameters:
+      - $ref: '#/components/parameters/BrandParam'
+      - $ref: '#/components/parameters/DataParam'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSitemapSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: An internal error occurred in the API application (please notify the developers if you ever encounter this).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '501':
+          description: Sitemap support is not yet implemented for the requested brand/data combination.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - OmniSitemap
+components:
+  schemas:
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    OmniSitemapSuccessResponse:
+      properties:
+        urls:
+          items:
+            type: string
+          type: array
+      type: object
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+      - clinicians
+      - departments
+      - locations
+      title: DataTag
+      tsEnumNames:
+      - Clinicians
+      - Departments
+      - Locations
+      type: string
+  parameters:
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string

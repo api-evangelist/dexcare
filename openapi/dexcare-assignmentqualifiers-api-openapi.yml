@@ -1,0 +1,95 @@
+openapi: 3.2.0
+info:
+  title: Visit Service Assignmentqualifiers API
+  version: 9.2.0
+  description: Visit Service external API v9
+  contact:
+    name: DexCare Engineering
+    email: engineering@dexcarehealth.com
+servers:
+- url: https://ecvapi.frosh.dex.care/api/9
+  description: DC DEV External Ingress
+- url: https://ecvapi.care-uat.ecommunity.com/api/9
+  description: CHN UAT External Ingress
+- url: https://ecvapi.care-uat.froedtert.com/api/9
+  description: FHI UAT External Ingress
+- url: https://ecvapi.care-uat.psjhealth.org/api/9
+  description: PSJH UAT External Ingress
+- url: https://ecvapi.kp-uat.dex.care/api/9
+  description: KP UAT External Ingress
+- url: https://ecvapi.uat.houstonmethodistcare.org/api/9
+  description: HM UAT External Ingress
+- url: https://ecvapi.demo-uat.dex.care/api/9
+  description: UH UAT External Ingress
+security: []
+tags:
+- name: assignmentqualifiers
+paths:
+  /assignmentqualifiers:
+    get:
+      description: returns all assigment qualifiers
+      operationId: getAssignmentQualifiers
+      security: []
+      summary: get assignment qualifiers
+      tags:
+      - assignmentqualifiers
+      parameters:
+      - name: archived
+        in: query
+        description: include archived assignment qualifiers
+        schema:
+          type: boolean
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+          format: uuid
+        required: false
+      responses:
+        '200':
+          description: assignment qualifiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  description: an assignment qualifier
+                  properties:
+                    id:
+                      type: string
+                      description: identifier of the assignment qualifier
+                    name:
+                      type: string
+                      description: name value for assignment qualifier
+                    group:
+                      type: string
+                      description: group value for assignment qualifier
+                    version:
+                      type: integer
+                      description: version of database record
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: date and time of creation
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: date and time updated
+                    deletedAt:
+                      type: string
+                      format: date-time
+                      description: date and time deleted
+components:
+  securitySchemes:
+    PatientJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Patient] Bearer token format `Bearer {KEY}`'
+    StaffJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Staff] Bearer token format `Bearer {KEY}`'

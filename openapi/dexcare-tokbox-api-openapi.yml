@@ -1,0 +1,117 @@
+openapi: 3.2.0
+info:
+  title: Visit Service Tokbox API
+  version: 9.2.0
+  description: Visit Service external API v9
+  contact:
+    name: DexCare Engineering
+    email: engineering@dexcarehealth.com
+servers:
+- url: https://ecvapi.frosh.dex.care/api/9
+  description: DC DEV External Ingress
+- url: https://ecvapi.care-uat.ecommunity.com/api/9
+  description: CHN UAT External Ingress
+- url: https://ecvapi.care-uat.froedtert.com/api/9
+  description: FHI UAT External Ingress
+- url: https://ecvapi.care-uat.psjhealth.org/api/9
+  description: PSJH UAT External Ingress
+- url: https://ecvapi.kp-uat.dex.care/api/9
+  description: KP UAT External Ingress
+- url: https://ecvapi.uat.houstonmethodistcare.org/api/9
+  description: HM UAT External Ingress
+- url: https://ecvapi.demo-uat.dex.care/api/9
+  description: UH UAT External Ingress
+security: []
+tags:
+- name: tokbox
+paths:
+  /tokbox-events:
+    post:
+      description: Send an update for the virtual visit via webhook configured in Tokbox
+      operationId: processTokboxSessionEvents
+      security: []
+      tags:
+      - tokbox
+      parameters:
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+          format: uuid
+        required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+                properties:
+                  sessionId:
+                    type: string
+                  projectId:
+                    type: string
+                  event:
+                    type: string
+                  timestamp:
+                    type: integer
+                  connection:
+                    type: object
+                    description: Tokbox Connection object
+                    properties:
+                      id:
+                        type: string
+                        description: connectionId
+                      createdAt:
+                        type: integer
+                      data:
+                        type: string
+                        description: User connection data, usually stringified JSON
+              - type: object
+                properties:
+                  sessionId:
+                    type: string
+                  projectId:
+                    type: string
+                  event:
+                    type: string
+                  timestamp:
+                    type: integer
+                  stream:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      connection:
+                        type: object
+                        description: Tokbox Connection object
+                        properties:
+                          id:
+                            type: string
+                            description: connectionId
+                          createdAt:
+                            type: integer
+                          data:
+                            type: string
+                            description: User connection data, usually stringified JSON
+                      createdAt:
+                        type: integer
+                      name:
+                        type: string
+                      videoType:
+                        type: string
+      responses:
+        '202':
+          description: accepted request with no response body
+components:
+  securitySchemes:
+    PatientJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Patient] Bearer token format `Bearer {KEY}`'
+    StaffJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Staff] Bearer token format `Bearer {KEY}`'

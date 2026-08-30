@@ -1,0 +1,134 @@
+openapi: 3.2.0
+info:
+  title: Omni Search Analytics API
+  description: API specification for Omni's endpoints. Fast Pages Entities Schema Version - (4.2.2)
+  version: 2.21.0
+  license:
+    name: None
+    url: None
+servers:
+- url: https://dev${brand}omni.azurewebsites.net
+  description: Dev Server
+- url: https://qa${brand}omni.azurewebsites.net
+  description: QA Server
+- url: https://uat${brand}omni.azurewebsites.net
+  description: Test Server
+- url: https://${brand}omni.azurewebsites.net
+  description: Prod Server
+security:
+- {}
+tags:
+- name: OmniSearchAnalytics
+paths:
+  /api/OmniSearchAnalytics:
+    get:
+      operationId: Search_Analytics
+      summary: Omni Search Analytics
+      description: Proxy for Google Analytics (GA) collect endpoint, specifically for search page view events.
+      parameters:
+      - $ref: '#/components/parameters/BrandParam'
+      - name: cid
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/properties-cid'
+      - name: debug
+        in: query
+        schema:
+          $ref: '#/components/schemas/debug'
+      - name: dp
+        in: query
+        schema:
+          $ref: '#/components/schemas/dp'
+      - name: path
+        in: query
+        schema:
+          $ref: '#/components/schemas/path'
+      - name: tid
+        in: query
+        schema:
+          $ref: '#/components/schemas/tid'
+      responses:
+        '200':
+          description: Successful search analytics results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSearchAnalyticsSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Death waits for the slightest lapse in concentration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - OmniSearchAnalytics
+components:
+  schemas:
+    debug:
+      default: false
+      description: Set to true to include debug information in the response.
+      type: boolean
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    OmniSearchAnalyticsSuccessResponse:
+      properties:
+        cid:
+          type: string
+        ga:
+          additionalProperties: true
+          description: 'Raw response data from GA.
+
+            This is only included in the response when param `debug=true` is set, but never in production.'
+          properties: {}
+          type: object
+        url:
+          description: 'The final generated GA request URL.
+
+            This is only included in the response when param `debug=true` is set, but never in production.'
+          type: string
+      required:
+      - cid
+      type: object
+    path:
+      description: Document path, i.e. the path portion of the page URL. Either 'path' or 'dp' must be specified.
+      type: string
+    tid:
+      default: UA-1508202-16
+      description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
+      type: string
+    properties-cid:
+      description: Client ID (unique user ID).
+      type: string
+    dp:
+      description: Namespace. Either 'path' or 'dp' must be specified.
+      type: string
+  parameters:
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string

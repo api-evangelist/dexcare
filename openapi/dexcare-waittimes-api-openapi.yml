@@ -1,0 +1,612 @@
+openapi: 3.2.0
+info:
+  title: Visit Service Waittimes API
+  version: 9.2.0
+  description: Visit Service external API v9
+  contact:
+    name: DexCare Engineering
+    email: engineering@dexcarehealth.com
+servers:
+- url: https://ecvapi.frosh.dex.care/api/9
+  description: DC DEV External Ingress
+- url: https://ecvapi.care-uat.ecommunity.com/api/9
+  description: CHN UAT External Ingress
+- url: https://ecvapi.care-uat.froedtert.com/api/9
+  description: FHI UAT External Ingress
+- url: https://ecvapi.care-uat.psjhealth.org/api/9
+  description: PSJH UAT External Ingress
+- url: https://ecvapi.kp-uat.dex.care/api/9
+  description: KP UAT External Ingress
+- url: https://ecvapi.uat.houstonmethodistcare.org/api/9
+  description: HM UAT External Ingress
+- url: https://ecvapi.demo-uat.dex.care/api/9
+  description: UH UAT External Ingress
+security: []
+tags:
+- name: waittimes
+paths:
+  /regions/{regionCode}/waittimes:
+    get:
+      description: 'returns availability and wait times for provider queues for one region. Use query parameters to filter requested pools
+
+        '
+      operationId: getRegionAvailabilityAndWaitTimes
+      security: []
+      summary: get availability and wait times for region
+      tags:
+      - waittimes
+      parameters:
+      - name: regionCode
+        in: path
+        description: 'regionCode for the region.
+
+          '
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: assignmentQualifiers
+        description: additional assignment qualifiers to filter provider queue
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+        allowReserved: false
+      - in: query
+        name: visitTypeNames
+        description: visit types to get wait time and availability for
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - virtual
+        style: form
+        explode: true
+        allowReserved: false
+      - in: query
+        name: practiceId
+        description: specific practiceId to use; if not included, default will be used
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: homeMarket
+        description: home market for patient
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+          format: uuid
+        required: false
+      responses:
+        '200':
+          description: successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  anyOf:
+                  - allOf:
+                    - type: object
+                      description: Wait time and availability for region and visit type
+                      properties:
+                        available:
+                          type: boolean
+                          description: indicates if the region can accept new visit requests or not
+                        estimateGeneratedAt:
+                          type: string
+                          description: time the estimate was made in UTC format
+                        regionCode:
+                          type: string
+                          description: regionCode for wait time and availability
+                        visitTypeName:
+                          type: string
+                          description: visit type name
+                        practiceId:
+                          type: string
+                          description: practiceId for wait time
+                        assignmentQualifiers:
+                          type: array
+                          items:
+                            type: string
+                            description: qualifiers limiting this provider pool; can be an empty list; does not include specialties
+                        specialties:
+                          type: array
+                          items:
+                            type: string
+                            description: specialties limiting this provider pool; can be an empty list
+                        homeMarket:
+                          type: string
+                          description: home market for patient
+                      required:
+                      - available
+                      - estimateGeneratedAt
+                      - regionCode
+                      - visitTypeName
+                      - assignmentQualifiers
+                      - practiceId
+                    - type: object
+                      description: wait time for region and visit type when available
+                      properties:
+                        estimatedWaitTimeSeconds:
+                          type: integer
+                          description: estimated time in seconds as calculated by the system
+                      required:
+                      - estimatedWaitTimeSeconds
+                  - allOf:
+                    - type: object
+                      description: Wait time and availability for region and visit type
+                      properties:
+                        available:
+                          type: boolean
+                          description: indicates if the region can accept new visit requests or not
+                        estimateGeneratedAt:
+                          type: string
+                          description: time the estimate was made in UTC format
+                        regionCode:
+                          type: string
+                          description: regionCode for wait time and availability
+                        visitTypeName:
+                          type: string
+                          description: visit type name
+                        practiceId:
+                          type: string
+                          description: practiceId for wait time
+                        assignmentQualifiers:
+                          type: array
+                          items:
+                            type: string
+                            description: qualifiers limiting this provider pool; can be an empty list; does not include specialties
+                        specialties:
+                          type: array
+                          items:
+                            type: string
+                            description: specialties limiting this provider pool; can be an empty list
+                        homeMarket:
+                          type: string
+                          description: home market for patient
+                      required:
+                      - available
+                      - estimateGeneratedAt
+                      - regionCode
+                      - visitTypeName
+                      - assignmentQualifiers
+                      - practiceId
+                    - type: object
+                      description: wait time for region and visit type when unavailable
+                      properties:
+                        reason:
+                          type: string
+                          description: explanation for region being unavailable
+                          enum:
+                          - NO_ONCALL_PROVIDERS
+                          - REGION_BUSY
+                          - OFF_HOURS
+                          - NO_REGIONS_FOUND
+                        busyMessage:
+                          type: string
+                          description: message to display only when region is busy, i.e. reason is REGION_BUSY
+                      required:
+                      - reason
+              example:
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 33
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - pediatric
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 33
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - pediatric
+                specialties: []
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - adult
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - adult
+                specialties: []
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers: []
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers: []
+                specialties: []
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - pediatric
+                specialties:
+                - dermatology
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - pediatric
+                specialties: []
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - adult
+                specialties:
+                - dermatology
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - adult
+                specialties: []
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers: []
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers: []
+                specialties: []
+  /regions/waittimes:
+    get:
+      description: 'returns availability and wait times for all provider queues. Use query parameters to filter requested pools
+
+        '
+      operationId: getAvailabilityAndWaitTimes
+      security: []
+      summary: get availability and wait times
+      tags:
+      - waittimes
+      parameters:
+      - in: query
+        name: regionCodes
+        description: region codes to filter results
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+        allowReserved: false
+      - in: query
+        name: assignmentQualifiers
+        description: additional assignment qualifiers to filter provider queue
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+        allowReserved: false
+      - in: query
+        name: visitTypeNames
+        description: visit types to get wait time and availability for
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - virtual
+        style: form
+        explode: true
+        allowReserved: false
+      - in: query
+        name: practiceId
+        description: specific practiceId to use; if not included, default will be used
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: homeMarket
+        description: home market for patient
+        required: false
+        schema:
+          type: string
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+          format: uuid
+        required: false
+      responses:
+        '200':
+          description: successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  anyOf:
+                  - allOf:
+                    - type: object
+                      description: Wait time and availability for region and visit type
+                      properties:
+                        available:
+                          type: boolean
+                          description: indicates if the region can accept new visit requests or not
+                        estimateGeneratedAt:
+                          type: string
+                          description: time the estimate was made in UTC format
+                        regionCode:
+                          type: string
+                          description: regionCode for wait time and availability
+                        visitTypeName:
+                          type: string
+                          description: visit type name
+                        practiceId:
+                          type: string
+                          description: practiceId for wait time
+                        assignmentQualifiers:
+                          type: array
+                          items:
+                            type: string
+                            description: qualifiers limiting this provider pool; can be an empty list; does not include specialties
+                        specialties:
+                          type: array
+                          items:
+                            type: string
+                            description: specialties limiting this provider pool; can be an empty list
+                        homeMarket:
+                          type: string
+                          description: home market for patient
+                      required:
+                      - available
+                      - estimateGeneratedAt
+                      - regionCode
+                      - visitTypeName
+                      - assignmentQualifiers
+                      - practiceId
+                    - type: object
+                      description: wait time for region and visit type when available
+                      properties:
+                        estimatedWaitTimeSeconds:
+                          type: integer
+                          description: estimated time in seconds as calculated by the system
+                      required:
+                      - estimatedWaitTimeSeconds
+                  - allOf:
+                    - type: object
+                      description: Wait time and availability for region and visit type
+                      properties:
+                        available:
+                          type: boolean
+                          description: indicates if the region can accept new visit requests or not
+                        estimateGeneratedAt:
+                          type: string
+                          description: time the estimate was made in UTC format
+                        regionCode:
+                          type: string
+                          description: regionCode for wait time and availability
+                        visitTypeName:
+                          type: string
+                          description: visit type name
+                        practiceId:
+                          type: string
+                          description: practiceId for wait time
+                        assignmentQualifiers:
+                          type: array
+                          items:
+                            type: string
+                            description: qualifiers limiting this provider pool; can be an empty list; does not include specialties
+                        specialties:
+                          type: array
+                          items:
+                            type: string
+                            description: specialties limiting this provider pool; can be an empty list
+                        homeMarket:
+                          type: string
+                          description: home market for patient
+                      required:
+                      - available
+                      - estimateGeneratedAt
+                      - regionCode
+                      - visitTypeName
+                      - assignmentQualifiers
+                      - practiceId
+                    - type: object
+                      description: wait time for region and visit type when unavailable
+                      properties:
+                        reason:
+                          type: string
+                          description: explanation for region being unavailable
+                          enum:
+                          - NO_ONCALL_PROVIDERS
+                          - REGION_BUSY
+                          - OFF_HOURS
+                          - NO_REGIONS_FOUND
+                        busyMessage:
+                          type: string
+                          description: message to display only when region is busy, i.e. reason is REGION_BUSY
+                      required:
+                      - reason
+              example:
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 33
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - pediatric
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 33
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - pediatric
+                specialties: []
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - adult
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers:
+                - adult
+                specialties: []
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers: []
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: virtual
+                assignmentQualifiers: []
+                specialties: []
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - pediatric
+                specialties:
+                - dermatology
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - pediatric
+                specialties: []
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: ID
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - adult
+                specialties:
+                - dermatology
+              - available: false
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                reason: NO_ONCALL_PROVIDERS
+                regionCode: ID
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers:
+                - adult
+                specialties: []
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers: []
+                specialties:
+                - dermatology
+              - available: true
+                estimateGeneratedAt: '2021-09-30T23:04:25.114Z'
+                estimatedWaitTimeSeconds: 55
+                regionCode: WA
+                practiceId: 00000000-0000-0000-0000-000000000000
+                visitTypeName: phone
+                assignmentQualifiers: []
+                specialties: []
+components:
+  securitySchemes:
+    PatientJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Patient] Bearer token format `Bearer {KEY}`'
+    StaffJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Staff] Bearer token format `Bearer {KEY}`'

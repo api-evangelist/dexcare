@@ -1,0 +1,111 @@
+openapi: 3.2.0
+info:
+  title: Omni Slugs API
+  description: API specification for Omni's endpoints. Fast Pages Entities Schema Version - (4.2.2)
+  version: 2.21.0
+  license:
+    name: None
+    url: None
+servers:
+- url: https://dev${brand}omni.azurewebsites.net
+  description: Dev Server
+- url: https://qa${brand}omni.azurewebsites.net
+  description: QA Server
+- url: https://uat${brand}omni.azurewebsites.net
+  description: Test Server
+- url: https://${brand}omni.azurewebsites.net
+  description: Prod Server
+security:
+- {}
+tags:
+- name: OmniSlugs
+paths:
+  /api/OmniSlugs:
+    get:
+      operationId: Get_Slugs
+      summary: Omni Slugs
+      description: The slugs endpoint is used during frontend page builds to add search optimization and to set default Omni search parameters like search terms, custom descriptions, and location.
+      parameters:
+      - $ref: '#/components/parameters/BrandParam'
+      - name: name
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/name'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSlugsSuccessResponse'
+        '400':
+          description: Invalid request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not a known slug.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to load slugs reference.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: You will endure this loss and learn from it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - OmniSlugs
+components:
+  schemas:
+    name:
+      description: Slug name.
+      type: string
+    OmniSlugsSuccessResponse:
+      properties:
+        location:
+          description: City for location corresponding to slug
+          type: string
+        name:
+          description: Slug name
+          type: string
+        searchTerms:
+          description: Relevant search terms for slug
+          type: string
+        text:
+          description: Full name corresponding to slug
+          type: string
+      required:
+      - location
+      - name
+      - searchTerms
+      - text
+      type: object
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+  parameters:
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string

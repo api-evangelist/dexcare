@@ -1,0 +1,312 @@
+openapi: 3.2.0
+info:
+  title: Dexcare slots availability Providers API
+  version: 5.0.0
+servers:
+- url: https://api.{customerShorthand}.dexcare.io/v5
+  description: mTLS External Ingress
+  variables:
+    customerShorthand:
+      default: frosh
+      description: Customer's Short Name
+      enum:
+      - frosh
+      - kp-uat
+security:
+- ApiKey: []
+tags:
+- name: Providers
+paths:
+  /providers/{npid}/timeslots:
+    get:
+      operationId: getSingleProviderTimeslots
+      parameters:
+      - in: query
+        name: daysOfSlots
+        description: 'Allows use of getting slots by "page". Retrieve number of days that have slots
+
+          which can be nonconsecutive days for each "page".
+
+          Example: 3 entered returns 3 days of slots for today, tomorrow, and next Monday
+
+          as the dates between tomorrow and Monday do not have slots available.
+
+          '
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          example: 3
+      - in: path
+        name: npid
+        description: the provider national ID (NPIs)
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: product
+        description: product name assigned to client
+        required: false
+        schema:
+          type: string
+          default: DexCare
+      - in: query
+        name: visitTypeName
+        description: When visitTypeName is present, only get slots matches visitTypeName. Pass in multiple by repeating param visitTypeName
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            example:
+            - AdultWellness
+            - PediatricWellness
+      - in: query
+        name: startDate
+        description: start date for slots.
+        required: false
+        schema:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(Z|[-+]\d{2}:\d{2}))?$
+          description: start date in yyyy-MM-dd or yyyy-MM-Thh:mm:ss+hh:mm format
+          default: today
+          example:
+          - '2021-01-01'
+          - '2021-01-01T09:30:00-05:00'
+          - '2021-01-01T14:30:00Z'
+      - in: query
+        name: endDate
+        description: end date for slots
+        required: false
+        schema:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(Z|[-+]\d{2}:\d{2}))?$
+          description: end date in yyyy-MM-dd or yyyy-MM-Thh:mm:ss+hh:mm format
+          default: configured limit such as 90 days
+          example:
+          - '2021-01-10'
+          - '2021-01-10T09:30:00-05:00'
+          - '2021-01-10T14:30:00Z'
+      - in: query
+        name: newOrEstablishedPatient
+        description: Allows filtering of slots by patient type of new or established patient. Both types will be returned by default.
+        required: false
+        schema:
+          type: string
+          enum:
+          - newPatient
+          - establishedPatient
+          - bothNewAndEstablishedPatient
+      - in: query
+        name: visitTypeEmrId
+        description: Allows filtering slots by visit type ID, also known visitTypeId, the value used by an EMR. Pass in multiple by repeating param visitTypeName. If this is used with visitTypeName, slots will be filtered by both.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            example:
+            - '100045'
+      - in: query
+        name: departmentEmrId
+        description: Also known as departmentId, it allows filter by slots by department. This requires departmentEmrSystemId. Otherwise, all department slots are returned.
+        required: false
+        schema:
+          type: string
+          example:
+          - '100340323'
+      - in: query
+        name: departmentEmrSystemId
+        description: Also known as ehrSystemName or ehrInstance. This is the emrSystem instance that is required for departmentEmrId.
+        required: false
+        schema:
+          type: string
+          example:
+          - wellCareSystem.epic
+      - in: query
+        name: departmentUrlName
+        description: Allows filter by slots of by the department's unique url name. This does not require departmentEmrSystemId. You may not use this param with departmentEmrId/departmentEmrSystemId.
+        required: false
+        schema:
+          type: string
+          example:
+          - quickCareUrgentCare
+      responses:
+        '200':
+          description: success response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  slots:
+                    type: array
+                    description: array of slots by clinician-department combination. Multiple objects indicates clinician has multiple departments with slots
+                    items:
+                      type: object
+                      properties:
+                        npi:
+                          type: string
+                          description: the clinician national id
+                          example: '7890612345'
+                        timezone:
+                          type: string
+                          description: timezone of healthcare provider
+                          example: America/Los_Angeles
+                        departmentId:
+                          type: string
+                          description: external department ID
+                          example: '3200080012'
+                        departmentIdentifier:
+                          type: string
+                          description: EHR system and the department ID. Used for booking
+                          example: epic.one|3200080012
+                        slotsByVisitType:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              visitTypeId:
+                                type: string
+                                description: visit type id
+                                example: '4378'
+                              visitTypeName:
+                                type: string
+                                description: visit type short name
+                                example: AdultWellness
+                              visitTypeGuid:
+                                type: string
+                                description: unique visit type identifier
+                                example: e9314950-10e8-4250-bf15-8caf0a9a50cc
+                              visitTypeTitle:
+                                type: string
+                                description: Name of visitType
+                                example: Adult Annual or Physical Clinic Visit
+                              forNewPatient:
+                                type: boolean
+                                description: If the slot is for new patients
+                              forEstablishedPatient:
+                                type: boolean
+                                description: If the slot is for established patients
+                              isBookable:
+                                type: boolean
+                                description: If the slot is bookable
+                              scheduleDays:
+                                type: array
+                                description: array of slots ordered by date
+                                items:
+                                  type: object
+                                  properties:
+                                    date:
+                                      type: string
+                                      format: date
+                                      example: '2022-03-09'
+                                    slotTimes:
+                                      type: array
+                                      description: array of slots ordered by soonest time
+                                      items:
+                                        type: object
+                                        properties:
+                                          duration:
+                                            type: number
+                                            description: time span of slot in minutes
+                                            example: 30
+                                          slotDateTime:
+                                            type: string
+                                            format: datetime
+                                            example: '2022-03-09T15:00:00-08:00'
+                              previousEndDate:
+                                type: string
+                                format: date
+                                description: 'Present only when "daysOfSlots" param is used. Use this value as the end date in a subsequent request to get the previous "page" of slots. This does not mean that there are slots on this date but rather an instruction to use this date for an API request. A value of null means there are no slots available before the current page.
+
+                                  '
+                                example: '2025-01-10'
+                              nextStartDate:
+                                type: string
+                                format: date
+                                description: 'Present only when "daysOfSlots" param is used. This is the start date in a subsequent request to get the next "page" of slots. This does not mean that there are slots on this date but rather an instruction to use this date for an API request. A value of null means there are no slots available after the current page.
+
+                                  '
+                                example: '2025-01-20'
+                        ehrSystemName:
+                          type: string
+                          description: the ehr system of the department
+                          example: epic.one
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: API key is not valid
+                  status:
+                    type: number
+                    example: 401
+                required:
+                - message
+                - status
+        '404':
+          description: Provider not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: API key is not valid
+                  status:
+                    type: number
+                    example: 401
+                required:
+                - message
+                - status
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+      tags:
+      - Providers
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key (API_KEY_SLOTS) for ApiKey to ApiKey Authorization, provided by DexCare to customer

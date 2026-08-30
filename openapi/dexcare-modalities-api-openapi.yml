@@ -1,0 +1,92 @@
+openapi: 3.2.0
+info:
+  title: Visit Service Modalities API
+  version: 9.2.0
+  description: Visit Service external API v9
+  contact:
+    name: DexCare Engineering
+    email: engineering@dexcarehealth.com
+servers:
+- url: https://ecvapi.frosh.dex.care/api/9
+  description: DC DEV External Ingress
+- url: https://ecvapi.care-uat.ecommunity.com/api/9
+  description: CHN UAT External Ingress
+- url: https://ecvapi.care-uat.froedtert.com/api/9
+  description: FHI UAT External Ingress
+- url: https://ecvapi.care-uat.psjhealth.org/api/9
+  description: PSJH UAT External Ingress
+- url: https://ecvapi.kp-uat.dex.care/api/9
+  description: KP UAT External Ingress
+- url: https://ecvapi.uat.houstonmethodistcare.org/api/9
+  description: HM UAT External Ingress
+- url: https://ecvapi.demo-uat.dex.care/api/9
+  description: UH UAT External Ingress
+security: []
+tags:
+- name: modalities
+paths:
+  /modalities:
+    get:
+      description: get all modalities
+      operationId: getModalities
+      security: []
+      summary: get all modalities
+      tags:
+      - modalities
+      parameters:
+      - name: archived
+        in: query
+        description: include archived modalities
+        schema:
+          type: boolean
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+          format: uuid
+        required: false
+      responses:
+        '200':
+          description: modalities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  description: a modality
+                  properties:
+                    id:
+                      type: string
+                      description: the modality id
+                    name:
+                      type: string
+                      description: name value for modality
+                    version:
+                      type: integer
+                      description: version of database record
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: date and time of creation
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: date and time updated
+                    deletedAt:
+                      type: string
+                      format: date-time
+                      description: date and time deleted
+components:
+  securitySchemes:
+    PatientJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Patient] Bearer token format `Bearer {KEY}`'
+    StaffJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Staff] Bearer token format `Bearer {KEY}`'

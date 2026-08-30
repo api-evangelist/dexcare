@@ -1,0 +1,568 @@
+openapi: 3.2.0
+info:
+  description: Visit Booking Service
+  version: 1.2.0
+  title: Visit Booking Service Queued Guest Visit API
+  contact:
+    name: DexCare Developer Documentation
+    url: https://developers.dexcarehealth.com/
+servers:
+- url: https://api.{customerShorthand}.dexcare.io/v1
+  description: mTLS External Ingress
+  variables:
+    customerShorthand:
+      default: frosh
+      description: Customer's Short Name
+tags:
+- name: queued-guest-visit
+paths:
+  /booking/queued-guest-visit:
+    post:
+      description: request a new queued guest visit.
+      operationId: createQueuedGuestVisit
+      security:
+      - ApiKey: []
+      summary: request a new queued guest visit
+      tags:
+      - queued-guest-visit
+      parameters:
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+        required: false
+      - name: product
+        in: query
+        schema:
+          type: string
+          description: identifies the source system calling the queued guest visit creation endpoint
+          enum:
+          - DCIntSched
+          - Other
+          default: DCIntSched
+        required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - patient
+              - billingInfo
+              - visitDetails
+              properties:
+                actor:
+                  type: object
+                  description: individual acting as a Patient proxy - i.e. a guardian or helper to the patient; required when visitDetails declaration is 'other'
+                  additionalProperties: false
+                  required:
+                  - firstName
+                  - lastName
+                  - phone
+                  - gender
+                  - dateOfBirth
+                  properties:
+                    firstName:
+                      type: string
+                      description: actor first name
+                      maxLength: 60
+                    lastName:
+                      type: string
+                      description: actor last name
+                      maxLength: 60
+                    middleName:
+                      type: string
+                      description: actor middle name
+                      maxLength: 60
+                    suffixName:
+                      type: string
+                      description: actor name suffix
+                      maxLength: 80
+                    phone:
+                      type: string
+                      description: actor phone number
+                      maxLength: 15
+                    relationshipToPatient:
+                      type: string
+                      description: customer provided list of options describing how the actor is realted to the patient
+                      maxLength: 80
+                      default: Guardian
+                    gender:
+                      type: string
+                      description: actor gender - note that that not all values maybe supported by an EHR system
+                      enum:
+                      - male
+                      - female
+                      - other
+                      - unknown
+                      - nonbinary
+                      maxLength: 80
+                    dateOfBirth:
+                      type: string
+                      pattern: ^\d{4}-\d{2}-\d{2}$
+                      description: actor date of birth in YYYY-MM-DD format
+                      maxLength: 60
+                    email:
+                      type: string
+                      description: email address at which the actor can be reached
+                      maxLength: 320
+                billingInfo:
+                  oneOf:
+                  - type: object
+                    description: billing info self for insurance
+                    additionalProperties: true
+                    required:
+                    - paymentMethod
+                    - declaration
+                    - insuranceType
+                    - insuranceProviderId
+                    - insuranceMemberId
+                    properties:
+                      paymentMethod:
+                        type: string
+                        enum:
+                        - insurance
+                      declaration:
+                        type: string
+                        enum:
+                        - self
+                      insuranceType:
+                        type: string
+                        enum:
+                        - manual
+                      insuranceProviderId:
+                        type: string
+                        maxLength: 100
+                      insuranceMemberId:
+                        type: string
+                        maxLength: 20
+                      insuranceGroupNumber:
+                        description: group number for insurance, if applicable
+                        type:
+                        - string
+                        - 'null'
+                        maxLength: 256
+                  - type: object
+                    description: billing info other for insurance
+                    properties:
+                      paymentMethod:
+                        type: string
+                        enum:
+                        - insurance
+                      declaration:
+                        type: string
+                        enum:
+                        - other
+                      insuranceType:
+                        type: string
+                        enum:
+                        - manual
+                      insuranceProviderId:
+                        type: string
+                        maxLength: 100
+                      insuranceMemberId:
+                        type: string
+                        maxLength: 20
+                      insuranceGroupNumber:
+                        description: group number for insurance, if applicable
+                        type:
+                        - string
+                        - 'null'
+                        maxLength: 256
+                      firstName:
+                        type: string
+                        maxLength: 60
+                      lastName:
+                        type: string
+                        maxLength: 60
+                      gender:
+                        type: string
+                        enum:
+                        - male
+                        - female
+                        - other
+                        - unknown
+                        - nonbinary
+                        maxLength: 80
+                      dateOfBirth:
+                        type: string
+                        pattern: ^\d{4}-\d{2}-\d{2}$
+                        description: date of birth in YYYY-MM-DD format
+                        maxLength: 60
+                    additionalProperties: true
+                    required:
+                    - paymentMethod
+                    - declaration
+                    - insuranceType
+                    - insuranceProviderId
+                    - insuranceMemberId
+                    - firstName
+                    - lastName
+                    - gender
+                    - dateOfBirth
+                  - type: object
+                    description: billing info credit card
+                    properties:
+                      paymentMethod:
+                        type: string
+                        enum:
+                        - creditcard
+                      stripeToken:
+                        type: string
+                        maxLength: 30
+                    additionalProperties: false
+                    required:
+                    - paymentMethod
+                    - stripeToken
+                  - type: object
+                    description: billing info external self pay
+                    properties:
+                      paymentMethod:
+                        type: string
+                        enum:
+                        - external-self-pay
+                    additionalProperties: false
+                    required:
+                    - paymentMethod
+                  - type: object
+                    description: billing info coupon code
+                    additionalProperties: false
+                    required:
+                    - paymentMethod
+                    - couponCode
+                    properties:
+                      paymentMethod:
+                        type: string
+                        enum:
+                        - couponcode
+                      couponCode:
+                        type: string
+                        maxLength: 60
+                patient:
+                  type: object
+                  description: general patient fields
+                  additionalProperties: false
+                  required:
+                  - firstName
+                  - lastName
+                  - email
+                  - phone
+                  - gender
+                  - dateOfBirth
+                  - address
+                  properties:
+                    firstName:
+                      type: string
+                      description: patient first name
+                      maxLength: 60
+                    middleName:
+                      type: string
+                      description: patient middle name
+                      maxLength: 60
+                    lastName:
+                      type: string
+                      description: patient last name
+                      maxLength: 60
+                    suffixName:
+                      type: string
+                      description: patient suffix name
+                      maxLength: 80
+                    email:
+                      type: string
+                      description: email for patient
+                      maxLength: 320
+                    phone:
+                      type: string
+                      description: contact phone number for patient. For phone visits, provide number for provider to call patient
+                      maxLength: 15
+                    ssn:
+                      type: string
+                      description: last 4 digits of the social security number for patient
+                      maxLength: 4
+                    gender:
+                      type: string
+                      description: expected to match EHR system values
+                      enum:
+                      - male
+                      - female
+                      - other
+                      - unknown
+                      - nonbinary
+                    dateOfBirth:
+                      type: string
+                      pattern: ^\d{4}-\d{2}-\d{2}$
+                      description: patient date of birth in YYYY-MM-DD format
+                      maxLength: 60
+                    address:
+                      type: object
+                      properties:
+                        line1:
+                          type: string
+                          maxLength: 100
+                        line2:
+                          type: string
+                          maxLength: 100
+                        city:
+                          type: string
+                          maxLength: 100
+                        state:
+                          type: string
+                          maxLength: 30
+                        postalCode:
+                          type: string
+                          maxLength: 10
+                      required:
+                      - line1
+                      - city
+                      - state
+                      - postalCode
+                visitDetails:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - acceptedTerms
+                  - brand
+                  - declaration
+                  - practiceId
+                  - stateLicensure
+                  - visitReason
+                  - visitTypeName
+                  properties:
+                    acceptedTerms:
+                      description: patient has accepted terms of service
+                      type: boolean
+                    assessmentToolUsed:
+                      description: if patient has done preassessment, which tool was used
+                      type: string
+                      example: ada
+                      maxLength: 80
+                    assignmentQualifiers:
+                      description: qualifications to assign visit to a provider
+                      items:
+                        example: pediatric
+                        type: string
+                        enum:
+                        - adult
+                        - pediatric
+                        maxLength: 80
+                      type: array
+                      maxItems: 50
+                    attributionIds:
+                      type: string
+                      description: tracking IDs used for analytics sent by the health system
+                      maxLength: 256
+                    brand:
+                      type: string
+                      description: brand for visit, will use default for customer if none provided
+                      maxLength: 80
+                    declaration:
+                      description: is this visit being submitted by the patient or by a proxy (other)
+                      enum:
+                      - self
+                      - other
+                      type: string
+                    interpreterLanguage:
+                      description: 'optional language requested if interpreter services are available; ISO 639-3 Individual Language codes
+
+                        '
+                      type: string
+                      example: ase
+                      maxLength: 50
+                    practiceId:
+                      description: 'the identifier for the practice at which to schedule a visit
+
+                        '
+                      type: string
+                      format: uuid
+                    stateLicensure:
+                      description: state licensure required for provider to see patient
+                      type: string
+                      example: WA
+                      maxLength: 2
+                    scheduledDepartment:
+                      description: 'specify a department in which to schedule the appointment. If not provided,
+
+                        EHR and departmentId will be determined by stateLicensure and patient''s address
+
+                        as determined by customer patient catchment rules
+
+                        '
+                      properties:
+                        scheduledDepartmentId:
+                          description: generic provider departmentId in specified EHR to create appointment
+                          type: string
+                          maxLength: 80
+                        scheduledEhr:
+                          description: EHR in which to schedule appointment
+                          type: string
+                          maxLength: 50
+                      type: object
+                    traveling:
+                      description: should the patient be considered traveling
+                      type: boolean
+                      default: false
+                    urgency:
+                      description: urgency rating; 0 for default urgency
+                      type: number
+                    visitReason:
+                      description: patient's reason for visit
+                      maxLength: 500
+                      type: string
+                    visitTypeName:
+                      description: visit type being requested
+                      type: string
+                      default: virtual
+                      enum:
+                      - virtual
+                      - phone
+                      maxLength: 10
+                    initialStatus:
+                      description: initial status of the visit being created
+                      type: string
+                      default: requested
+                      enum:
+                      - requested
+                      - waitoffline
+                      maxLength: 50
+                    detectedLanguage:
+                      description: patient's primary browser language
+                      type: string
+                      default: en-US
+                      maxLength: 5
+                additionalDetails:
+                  type: array
+                  description: customer defined data for display and reporting purposes
+                  items:
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - key
+                    - value
+                    properties:
+                      key:
+                        type: string
+                        description: property name
+                        maxLength: 80
+                      value:
+                        type: string
+                        description: property value
+                        maxLength: 80
+        description: Queued guest visit request
+      responses:
+        '200':
+          description: queued guest visit response
+          content:
+            application/json:
+              schema:
+                type: object
+                description: create queued visit response
+                required:
+                - visitId
+                - visitRedirectUrl
+                properties:
+                  visitId:
+                    type: string
+                    format: uuid
+                    description: visit identifier
+                  visitRedirectUrl:
+                    type: string
+                    description: URL to Blissey for the patient
+        '400':
+          description: queued guest visit invalid request
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response
+                required:
+                - code
+                - error
+                properties:
+                  code:
+                    type: string
+                  error:
+                    type: string
+              examples:
+                ehr-lookup-failed:
+                  value:
+                    code: EHR_LOOKUP_FAILED
+                    error: Failed to lookup EHR system
+                openapi-validation-error:
+                  value:
+                    code: OPENAPI_VALIDATION_ERROR
+                    error: /requestBody/patient - must have required property 'firstName'
+        '401':
+          description: queued guest visit unauthorized
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response
+                required:
+                - code
+                - error
+                properties:
+                  code:
+                    type: string
+                  error:
+                    type: string
+              examples:
+                apikey-error:
+                  value:
+                    code: APIKEY_INVALID_OR_MISSING
+                    error: Unauthorized
+        '500':
+          description: queued guest visit internal server error
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response
+                required:
+                - code
+                - error
+                properties:
+                  code:
+                    type: string
+                  error:
+                    type: string
+              examples:
+                anonymous-user-error:
+                  value:
+                    code: ANONYMOUS_USER_CREATE_FAILED
+                    error: Internal Server Error
+                guest-patient-error:
+                  value:
+                    code: GUEST_PATIENT_CREATE_FAILED
+                    error: Internal Server Error
+                visit-create-error:
+                  value:
+                    code: VISIT_CREATE_FAILED
+                    error: Internal Server Error
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for ApiKey to ApiKey Authorization, provided by DexCare to customer

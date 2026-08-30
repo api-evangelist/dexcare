@@ -1,0 +1,115 @@
+openapi: 3.2.0
+info:
+  title: Omni Synonyms API
+  description: API specification for Omni's endpoints. Fast Pages Entities Schema Version - (4.2.2)
+  version: 2.21.0
+  license:
+    name: None
+    url: None
+servers:
+- url: https://dev${brand}omni.azurewebsites.net
+  description: Dev Server
+- url: https://qa${brand}omni.azurewebsites.net
+  description: QA Server
+- url: https://uat${brand}omni.azurewebsites.net
+  description: Test Server
+- url: https://${brand}omni.azurewebsites.net
+  description: Prod Server
+security:
+- {}
+tags:
+- name: OmniSynonyms
+paths:
+  /api/OmniSynonyms:
+    get:
+      operationId: Synonym_Search
+      summary: Omni Synonym Search
+      description: Retrieve a list of terms/phrases from the Omni Search synonym dictionary that match a given search query.
+      parameters:
+      - $ref: '#/components/parameters/BrandParam'
+      - $ref: '#/components/parameters/DataParam'
+      - name: search
+        in: query
+        allowEmptyValue: true
+        examples:
+          query1:
+            value: Spanish speaking primary care clinicians near me
+          query2:
+            value: family medicine
+        schema:
+          $ref: '#/components/schemas/properties-search'
+        required: true
+      responses:
+        '200':
+          description: Successful synonym results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OmniSynonymsSuccessResponse'
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Failed to search for synonyms.
+        default:
+          description: Remind yourself that overconfidence is a slow and insidious killer!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+      - OmniSynonyms
+components:
+  parameters:
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string
+  schemas:
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    properties-search:
+      description: A single search term to look up synonyms for.
+      type: string
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+      - clinicians
+      - departments
+      - locations
+      title: DataTag
+      tsEnumNames:
+      - Clinicians
+      - Departments
+      - Locations
+      type: string
+    OmniSynonymsSuccessResponse:
+      properties:
+        synonyms:
+          description: Synonyms for the search term/phrase
+          items:
+            type: string
+          type: array
+      required:
+      - synonyms
+      type: object

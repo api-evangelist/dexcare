@@ -1,0 +1,447 @@
+openapi: 3.2.0
+info:
+  title: Dexcare availability Slots API
+  version: 5.0.0
+servers:
+- url: https://api.{customerShorthand}.dexcare.io/v5
+  description: mTLS External Ingress
+  variables:
+    customerShorthand:
+      default: frosh
+      description: Customer's Short Name
+      enum:
+      - frosh
+      - kp-uat
+security:
+- ApiKey: []
+tags:
+- name: Slots
+paths:
+  /slots/search:
+    post:
+      description: search slots availabilities by providers information
+      operationId: getSlotsAvailability
+      summary: slots availability service
+      parameters:
+      - in: header
+        name: x-api-key
+        description: Client api key
+        schema:
+          type: string
+        required: false
+      requestBody:
+        description: criteria for querying slots
+        content:
+          application/json:
+            schema:
+              required:
+              - criteriaItems
+              type: object
+              properties:
+                startDate:
+                  description: start date for slots in YYYY-MM-DD format, this date will be considered as provider's timezone. when startDate is missing, search will start from first available date
+                  type: string
+                  example: '2022-06-01'
+                endDate:
+                  description: end date for slots in YYYY-MM-DD format, this date will be considered as provider's timezone. when endDate is missing, search duration will be n days after startDate, n is configurable in system, default is 30
+                  type: string
+                  example: '2022-06-10'
+                visitTypeNames:
+                  description: list of visit type names, when visitTypeName is present, only get slots matches to list of visitTypeNames.
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - AdultWellness
+                  - PediatricWellness
+                criteriaItems:
+                  type: array
+                  minItems: 1
+                  description: list of providers for querying slots
+                  items:
+                    required:
+                    - npi
+                    type: object
+                    properties:
+                      npi:
+                        type: string
+                        description: the provider national id
+                        example: '7890612345'
+                      ehrInstance:
+                        type: string
+                        description: identifier used to map internally to the correct ehr instance
+                        example: pacific.nw
+                      departmentId:
+                        type: string
+                        description: department id of provider, when departmentId is present, ehrInstance is required.
+                        example: '34589431'
+                    additionalProperties: false
+              additionalProperties: false
+        required: true
+      responses:
+        '200':
+          description: success response.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: slots search response
+                required:
+                - results
+                properties:
+                  results:
+                    description: response return back as array when there is multiple providers with valid slots. if non provider with valid slots, return empty array
+                    type: array
+                    items:
+                      description: if no slots found for certain provider in search criteria, this provider won't be able to present in response. only list providers with valid slots
+                      required:
+                      - npi
+                      - ehrInstance
+                      - departmentId
+                      - timezone
+                      - visitTypes
+                      type: object
+                      properties:
+                        npi:
+                          type: string
+                          description: the provider national IDs (NPIs)
+                          example: '7890612345'
+                        ehrInstance:
+                          type: string
+                          description: identifier used to map internally to the correct ehr instance
+                          example: pacific.nw
+                        departmentId:
+                          type: string
+                          description: department id for required provider
+                          example: '34589431'
+                        timezone:
+                          type: string
+                          description: timezone info, indicate the timezone of department
+                          example: America/Los_Angeles
+                        visitTypes:
+                          description: only list visit type when there are valid slots for this visit type.
+                          type: array
+                          items:
+                            required:
+                            - visitTypeId
+                            - visitTypeName
+                            - slots
+                            type: object
+                            properties:
+                              visitTypeId:
+                                type: string
+                                description: visit type id
+                                example: '4378'
+                              visitTypeName:
+                                type: string
+                                description: visit type name
+                                example: AdultWellness
+                              slots:
+                                type: array
+                                description: array of slots for each visit type
+                                items:
+                                  required:
+                                  - dateTime
+                                  - duration
+                                  type: object
+                                  properties:
+                                    dateTime:
+                                      description: start date of lookup in ISO format. Will be localized on lookup on slot timezone
+                                      type: string
+                                      format: date-time
+                                      example: '2022-03-09T15:00:00-08:00'
+                                    duration:
+                                      type: integer
+                                      description: length of the time slot
+                                      example: 30
+        '400':
+          description: Bad request error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: API key is not valid
+                  status:
+                    type: number
+                    example: 401
+                required:
+                - message
+                - status
+        '404':
+          description: Not found error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+        '500':
+          description: internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+      tags:
+      - Slots
+  /slots/slot-released:
+    post:
+      summary: slot released
+      description: indicate a slot has been released (e.g. slot is cancelled)
+      operationId: slotReleased
+      parameters:
+      - in: header
+        name: x-api-key
+        description: Client api key
+        schema:
+          type: string
+        required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                npi:
+                  description: the provider national IDs (NPIs)
+                  type: string
+                departmentId:
+                  description: department id for the required provider
+                  type: string
+                  minLength: 1
+                visitTypeId:
+                  description: visit type emr id
+                  type: string
+                  example: '12345'
+                  minLength: 1
+                slotDateTime:
+                  description: specific time slot date time
+                  type: string
+                  format: date-time
+                  example: '2022-02-04T23:28:05.456Z'
+                ehrInstance:
+                  description: identifier used to map internally to the correct ehr instance
+                  type: string
+                  example: pacific.nw
+                  minLength: 1
+                disableRefresh:
+                  description: optional flag used in automation testing to disable the trigger to refresh slot data from the EHR
+                  type: boolean
+                  example: true
+                  default: false
+              required:
+              - npi
+              - departmentId
+              - visitTypeId
+              - slotDateTime
+              - ehrInstance
+      responses:
+        '204':
+          description: success response
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+        '400':
+          description: 'client error; request cannot be processed with current parameters and should not be retried without addressing errors
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+        '500':
+          description: server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+      tags:
+      - Slots
+  /slots/slot-taken:
+    post:
+      summary: slot taken
+      description: indicate a slot has been taken (e.g. the slot has been booked)
+      operationId: slotTaken
+      parameters:
+      - in: header
+        name: x-api-key
+        description: Client api key
+        schema:
+          type: string
+        required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                npi:
+                  description: the provider national IDs (NPIs)
+                  type: string
+                  example: '1245662048'
+                departmentId:
+                  description: department id for the required provider
+                  type: string
+                  example: '100005'
+                  minLength: 1
+                visitTypeId:
+                  description: visit type emr id
+                  type: string
+                  example: '12345'
+                  minLength: 1
+                slotDateTime:
+                  description: specific time slot date time
+                  type: string
+                  format: date-time
+                  example: '2022-02-04T23:28:05.456Z'
+                ehrInstance:
+                  description: identifier used to map internally to the correct ehr instance
+                  type: string
+                  example: pacific.nw
+                  minLength: 1
+                disableRefresh:
+                  description: optional flag used in automation testing to disable the trigger to refresh slot data from the EHR
+                  type: boolean
+                  example: true
+                  default: false
+              required:
+              - npi
+              - departmentId
+              - visitTypeId
+              - slotDateTime
+              - ehrInstance
+      responses:
+        '204':
+          description: success response with no content
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+        '400':
+          description: 'client error; request cannot be processed with current parameters and should not be retried without addressing errors
+
+            '
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+        '500':
+          description: server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                    example: 500201
+                  message:
+                    type: string
+                    example: the value of virtual is not defined
+                required:
+                - errorCode
+                - message
+          headers:
+            correlation-id:
+              schema:
+                type: string
+                format: uuid
+              description: Unique id to correlate call logs between our microservices
+      tags:
+      - Slots
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key (API_KEY_SLOTS) for ApiKey to ApiKey Authorization, provided by DexCare to customer

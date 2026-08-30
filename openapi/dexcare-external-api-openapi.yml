@@ -1,0 +1,1803 @@
+openapi: 3.2.0
+info:
+  title: Care Options External API
+  description: DexCare Care Options API v1
+  version: 1.0.0
+servers:
+- url: https://api.{customerShorthand}.dexcare.io/v1
+  description: mTLS External Ingress
+  variables:
+    customerShorthand:
+      default: frosh
+      description: Customer's Short Name
+security:
+- ApiKey: []
+tags:
+- name: external
+paths:
+  /availability/providers:
+    post:
+      description: Search providers with availability by location
+      operationId: availableProvidersV1
+      security:
+      - ApiKey: []
+      summary: get available providers
+      tags:
+      - external
+      parameters:
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+        required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - description: Request body for searching available providers using latitude and longitude for location.
+                type: object
+                required:
+                - latitude
+                - longitude
+                properties:
+                  patient:
+                    description: Patient information used to correlate a search request to an appointment being booked
+                    type: object
+                    required:
+                    - patientId
+                    - patientIdType
+                    - ehrInstance
+                    properties:
+                      patientId:
+                        description: Patient EHR or DexCare identifier from , e.g. MRN
+                        type: string
+                        example: '900332632'
+                      patientIdType:
+                        description: EHR or DexCare identifier type for lookup
+                        type: string
+                        example: MRN
+                      ehrInstance:
+                        description: Patient EHR instance
+                        type: string
+                        example: ehr.region
+                  ehrInstances:
+                    description: EHR Instance Identifiers filter
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - ehr.region.1
+                    - ehr.region.2
+                  visitTypeNames:
+                    description: Health system defined visit type name filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - video
+                    - phone
+                    - in-clinic
+                  departmentIds:
+                    description: Department identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '5000101001'
+                    - '5000311000'
+                  specialty:
+                    description: Provider specialty filter
+                    type: string
+                    example: Pediatrics
+                  gender:
+                    description: Provider gender filter
+                    type: string
+                    example: Female
+                  latitude:
+                    description: Latitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -90
+                    maximum: 90
+                    example: 47.610692
+                  longitude:
+                    description: Longitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -180
+                    maximum: 180
+                    example: -122.321216
+                  radius:
+                    description: Radius around target visit location in miles
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    example: 30
+                    default: 30
+                  clinicTypes:
+                    description: Clinic type filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Retail
+                    - Primary Care
+                  sortBy:
+                    type: string
+                    enum:
+                    - nextAvailable
+                    - mostAvailable
+                    default: mostAvailable
+                    description: "Sort By:\n  * `nextAvailable` - Sort results by soonest available provider\n  * `mostAvailable` - Sort results by most available provider\n"
+              - description: Request body for searching available providers using departments for location.
+                type: object
+                required:
+                - departmentIds
+                properties:
+                  patient:
+                    description: Patient information used to correlate a search request to an appointment being booked
+                    type: object
+                    required:
+                    - patientId
+                    - patientIdType
+                    - ehrInstance
+                    properties:
+                      patientId:
+                        description: Patient EHR or DexCare identifier from , e.g. MRN
+                        type: string
+                        example: '900332632'
+                      patientIdType:
+                        description: EHR or DexCare identifier type for lookup
+                        type: string
+                        example: MRN
+                      ehrInstance:
+                        description: Patient EHR instance
+                        type: string
+                        example: ehr.region
+                  ehrInstances:
+                    description: EHR Instance Identifiers filter
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - ehr.region.1
+                    - ehr.region.2
+                  visitTypeNames:
+                    description: Health system defined visit type name filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - video
+                    - phone
+                    - in-clinic
+                  departmentIds:
+                    description: Department identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '5000101001'
+                    - '5000311000'
+                  specialty:
+                    description: Provider specialty filter
+                    type: string
+                    example: Pediatrics
+                  gender:
+                    description: Provider gender filter
+                    type: string
+                    example: Female
+                  latitude:
+                    description: Latitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -90
+                    maximum: 90
+                    example: 47.610692
+                  longitude:
+                    description: Longitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -180
+                    maximum: 180
+                    example: -122.321216
+                  postalCode:
+                    description: Zip code of the target visit location. Cannot use in tandem with latitude and longitude.
+                    type: string
+                    example: '98104'
+                  radius:
+                    description: Radius around target visit location in miles
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    example: 30
+                    default: 30
+                  clinicTypes:
+                    description: Clinic type filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Retail
+                    - Primary Care
+                  sortBy:
+                    type: string
+                    enum:
+                    - nextAvailable
+                    - mostAvailable
+                    default: mostAvailable
+                    description: "Sort By:\n  * `nextAvailable` - Sort results by soonest available provider\n  * `mostAvailable` - Sort results by most available provider\n"
+              - description: Request body for searching available providers using zip code for location.
+                type: object
+                required:
+                - postalCode
+                properties:
+                  patient:
+                    description: Patient information used to correlate a search request to an appointment being booked
+                    type: object
+                    required:
+                    - patientId
+                    - patientIdType
+                    - ehrInstance
+                    properties:
+                      patientId:
+                        description: Patient EHR or DexCare identifier from , e.g. MRN
+                        type: string
+                        example: '900332632'
+                      patientIdType:
+                        description: EHR or DexCare identifier type for lookup
+                        type: string
+                        example: MRN
+                      ehrInstance:
+                        description: Patient EHR instance
+                        type: string
+                        example: ehr.region
+                  ehrInstances:
+                    description: EHR Instance Identifiers filter
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - ehr.region.1
+                    - ehr.region.2
+                  visitTypeNames:
+                    description: Health system defined visit type name filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - video
+                    - phone
+                    - in-clinic
+                  departmentIds:
+                    description: Department identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '5000101001'
+                    - '5000311000'
+                  specialty:
+                    description: Provider specialty filter
+                    type: string
+                    example: Pediatrics
+                  gender:
+                    description: Provider gender filter
+                    type: string
+                    example: Female
+                  postalCode:
+                    description: Zip code of the target visit location.
+                    type: string
+                    example: '98104'
+                  radius:
+                    description: Radius around target visit location in miles
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    example: 30
+                    default: 30
+                  clinicTypes:
+                    description: Clinic type filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Retail
+                    - Primary Care
+                  sortBy:
+                    type: string
+                    enum:
+                    - nextAvailable
+                    - mostAvailable
+                    default: mostAvailable
+                    description: "Sort By:\n  * `nextAvailable` - Sort results by soonest available provider\n  * `mostAvailable` - Sort results by most available provider\n"
+            examples:
+              search-providers-by-location-using-departmentids:
+                summary: Request available providers using departments for location.
+                value:
+                  patient:
+                    patientId: '900332632'
+                    patientIdType: MRN
+                    ehrInstance: ehr.region
+                  departmentIds:
+                  - '3200080024'
+                  - '405517000'
+                  ehrInstances:
+                  - ehr.region.1
+                  - ehr.region.2
+                  visitTypeNames:
+                  - NewPatient
+                  - NewSymptoms
+                  clinicTypes:
+                  - Primary Care
+                  gender: female
+                  specialty: Pediatrics
+                  radius: 30
+                  sortBy: mostAvailable
+              search-providers-by-location-using-lat-lon:
+                summary: Request available providers using latitude and longitude for location.
+                value:
+                  patient:
+                    patientId: '900332632'
+                    patientIdType: MRN
+                    ehrInstance: ehr.region
+                  ehrInstances:
+                  - ehr.region.1
+                  - ehr.region.2
+                  visitTypeNames:
+                  - NewPatient
+                  - NewSymptoms
+                  clinicTypes:
+                  - Primary Care
+                  gender: female
+                  specialty: Pediatrics
+                  latitude: 47.610692
+                  longitude: -122.321216
+                  radius: 30
+                  sortBy: mostAvailable
+              search-providers-by-location-using-zipcode:
+                summary: Request available providers using postal code for location
+                value:
+                  patient:
+                    patientId: '900332632'
+                    patientIdType: MRN
+                    ehrInstance: ehr.region
+                  ehrInstances:
+                  - ehr.region.1
+                  - ehr.region.2
+                  visitTypeNames:
+                  - NewPatient
+                  - NewSymptoms
+                  clinicTypes:
+                  - Primary Care
+                  gender: female
+                  specialty: Pediatrics
+                  postalCode: '98104'
+                  radius: 30
+                  sortBy: mostAvailable
+      responses:
+        '200':
+          description: Search providers with availability by location response body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      description: Search available providers successful response body
+                      required:
+                      - npi
+                      - name
+                      - specialties
+                      - gender
+                      - departmentId
+                      - departmentName
+                      - ehrInstance
+                      - address
+                      - timezone
+                      - distanceFrom
+                      - visitTypes
+                      properties:
+                        npi:
+                          description: National provider id
+                          type: string
+                          example: '1245662048'
+                        name:
+                          description: Provider name
+                          type: string
+                          example: Jane Doe
+                        gender:
+                          description: Provider gender
+                          type:
+                          - string
+                          - 'null'
+                          example: Female
+                        specialties:
+                          description: Provider specialties
+                          type: array
+                          items:
+                            type: string
+                          example:
+                          - Family Medicine
+                          - Internal Medicine
+                        departmentId:
+                          description: Provider's department id
+                          type: string
+                          example: '3200080024'
+                        departmentName:
+                          description: Provider's department name
+                          type: string
+                          example: Seattle Medical Center
+                        ehrInstance:
+                          description: Department EHR Instance
+                          type: string
+                          example: ehr.region
+                        clinicType:
+                          description: Clinic type
+                          type: string
+                          example: Primary Care
+                        address:
+                          type: object
+                          description: Department address
+                          properties:
+                            line1:
+                              type: string
+                              example: 2324 Eastlake Ave E
+                            line2:
+                              type: string
+                              example: Suite 500
+                            city:
+                              type: string
+                              example: Seattle
+                            state:
+                              type: string
+                              example: WA
+                            zipCode:
+                              type: string
+                              example: '98102'
+                            postalCode:
+                              type: string
+                              example: '98102'
+                        timezone:
+                          description: Department timezone
+                          type: string
+                          example: America/Los_Angeles
+                        distanceFrom:
+                          description: Distance (in miles) from target visit location argument
+                          type: number
+                          format: decimal
+                          example: 10.4
+                        visitTypes:
+                          type: array
+                          items:
+                            description: Aggregated slot availability for a provider by health system defined visit type
+                            type: object
+                            required:
+                            - visitTypeId
+                            - visitTypeName
+                            - availability
+                            properties:
+                              visitTypeId:
+                                type: string
+                                description: Health system defined visit type id
+                                example: '124532'
+                              visitTypeName:
+                                type: string
+                                description: Health system defined visit type name
+                                example: Video
+                              availability:
+                                description: Aggregated slot availability for a provider for a health system defined visit type
+                                type: object
+                                properties:
+                                  windowDays:
+                                    type: integer
+                                    example: 40
+                                    description: Window in days used to calculate slot availability for provider
+                                  slotCount:
+                                    description: Number of available slots for provider across windowDays value
+                                    type: integer
+                                    example: 250
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Invalid request error
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: radius is required
+                  errorCode:
+                    type: number
+                    description: Error code
+                    example: 40001
+              examples:
+                missing-search-field:
+                  summary: error response when missing a required search field
+                  value:
+                    message: radius is required
+                    errorCode: 40001
+        '403':
+          description: Invalid API Key
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Forbidden error
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: Forbidden
+                  errorCode:
+                    type: number
+                    description: Error code
+                    example: 40301
+        '500':
+          description: Unknown error
+  /availability/slots:
+    post:
+      description: Search aggregated slots by location POST API
+      operationId: aggregatedSlotsV1
+      security:
+      - ApiKey: []
+      summary: get available slots POST API
+      tags:
+      - external
+      parameters:
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+        required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - description: Request body for searching aggregated slots using latitude and longitude for location.
+                type: object
+                required:
+                - latitude
+                - longitude
+                - visitTypeNames
+                properties:
+                  latitude:
+                    description: Latitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -90
+                    maximum: 90
+                    example: 47.610692
+                  longitude:
+                    description: Longitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -180
+                    maximum: 180
+                    example: -122.321216
+                  clinicTypes:
+                    description: Clinic type filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Retail
+                    - Primary Care
+                  radius:
+                    description: Radius around target visit location in miles
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    example: 30
+                    default: 30
+                  visitTypeNames:
+                    description: Health system defined visit type name filter.
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                    example:
+                    - video
+                    - phone
+                    - in-clinic
+                  startDate:
+                    description: Start date of slots with yyyy-MM-dd format, default set to today if not present.
+                    type: string
+                    example: '2022-08-01'
+                  endDate:
+                    description: End date of slots with yyyy-MM-dd format, end days will be certain days after start date if not present.
+                    type: string
+                    example: '2022-08-01'
+                  patient:
+                    description: Patient information used to correlate a search request to an appointment being booked
+                    type: object
+                    required:
+                    - patientId
+                    - patientIdType
+                    - ehrInstance
+                    properties:
+                      patientId:
+                        description: Patient EHR or DexCare identifier from , e.g. MRN
+                        type: string
+                        example: '900332632'
+                      patientIdType:
+                        description: EHR or DexCare identifier type for lookup
+                        type: string
+                        example: MRN
+                      ehrInstance:
+                        description: Patient EHR instance
+                        type: string
+                        example: ehr.region
+                  ehrInstances:
+                    description: EHR Instance Identifiers filter
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - ehr.region.1
+                    - ehr.region.2
+                  departmentIds:
+                    description: Department identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '5000101001'
+                    - '5000311000'
+                  clinicianNPIs:
+                    description: Clinician identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '1295268407'
+                    - '1710330808'
+                  specialty:
+                    description: Provider specialty filter
+                    type: string
+                    example: Pediatrics
+                  gender:
+                    description: Provider gender filter
+                    type: string
+                    example: Female
+                  newOrEstablishedPatient:
+                    description: Allows filter by slots of patient type of new or established patient. Both types will be returned by default.
+                    type: string
+                    enum:
+                    - newPatient
+                    - establishedPatient
+                    - bothNewAndEstablishedPatient
+              - description: Request body for searching aggregated slots using departments for location.
+                type: object
+                required:
+                - departmentIds
+                - visitTypeNames
+                properties:
+                  latitude:
+                    description: Latitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -90
+                    maximum: 90
+                    example: 47.610692
+                  longitude:
+                    description: Longitude of target visit location
+                    type: number
+                    format: double
+                    minimum: -180
+                    maximum: 180
+                    example: -122.321216
+                  postalCode:
+                    description: Zip code of the target visit location. Cannot use in tandem with latitude and longitude.
+                    type: string
+                    example: '98104'
+                  clinicTypes:
+                    description: Clinic type filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Retail
+                    - Primary Care
+                  radius:
+                    description: Radius around target visit location in miles
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    example: 30
+                    default: 30
+                  visitTypeNames:
+                    description: Health system defined visit type name filter.
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                    example:
+                    - video
+                    - phone
+                    - in-clinic
+                  startDate:
+                    description: Start date of slots with yyyy-MM-dd format, default set to today if not present.
+                    type: string
+                    example: '2022-08-01'
+                  endDate:
+                    description: End date of slots with yyyy-MM-dd format, end days will be certain days after start date if not present.
+                    type: string
+                    example: '2022-08-01'
+                  patient:
+                    description: Patient information used to correlate a search request to an appointment being booked
+                    type: object
+                    required:
+                    - patientId
+                    - patientIdType
+                    - ehrInstance
+                    properties:
+                      patientId:
+                        description: Patient EHR or DexCare identifier from , e.g. MRN
+                        type: string
+                        example: '900332632'
+                      patientIdType:
+                        description: EHR or DexCare identifier type for lookup
+                        type: string
+                        example: MRN
+                      ehrInstance:
+                        description: Patient EHR instance
+                        type: string
+                        example: ehr.region
+                  ehrInstances:
+                    description: EHR Instance Identifiers filter
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - ehr.region.1
+                    - ehr.region.2
+                  departmentIds:
+                    description: Department identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '5000101001'
+                    - '5000311000'
+                  clinicianNPIs:
+                    description: Clinician identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '1295268407'
+                    - '1710330808'
+                  specialty:
+                    description: Provider specialty filter
+                    type: string
+                    example: Pediatrics
+                  gender:
+                    description: Provider gender filter
+                    type: string
+                    example: Female
+                  newOrEstablishedPatient:
+                    description: Allows filter by slots of patient type of new or established patient. Both types will be returned by default.
+                    type: string
+                    enum:
+                    - newPatient
+                    - establishedPatient
+                    - bothNewAndEstablishedPatient
+              - description: Request body for searching aggregated slots using zip code for location.
+                type: object
+                required:
+                - postalCode
+                - visitTypeNames
+                properties:
+                  postalCode:
+                    description: Zip code of the target visit location.
+                    type: string
+                    example: '98104'
+                  clinicTypes:
+                    description: Clinic type filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - Retail
+                    - Primary Care
+                  radius:
+                    description: Radius around target visit location in miles.
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    example: 30
+                    default: 30
+                  visitTypeNames:
+                    description: Health system defined visit type name filter.
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                    example:
+                    - video
+                    - phone
+                    - in-clinic
+                  startDate:
+                    description: Start date of slots with yyyy-MM-dd format, default set to today if not present.
+                    type: string
+                    example: '2022-08-01'
+                  endDate:
+                    description: End date of slots with yyyy-MM-dd format, end days will be certain days after start date if not present.
+                    type: string
+                    example: '2022-08-01'
+                  patient:
+                    description: Patient information used to correlate a search request to an appointment being booked
+                    type: object
+                    required:
+                    - patientId
+                    - patientIdType
+                    - ehrInstance
+                    properties:
+                      patientId:
+                        description: Patient EHR or DexCare identifier from , e.g. MRN
+                        type: string
+                        example: '900332632'
+                      patientIdType:
+                        description: EHR or DexCare identifier type for lookup
+                        type: string
+                        example: MRN
+                      ehrInstance:
+                        description: Patient EHR instance
+                        type: string
+                        example: ehr.region
+                  ehrInstances:
+                    description: EHR Instance Identifiers filter
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - ehr.region.1
+                    - ehr.region.2
+                  departmentIds:
+                    description: Department identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '5000101001'
+                    - '5000311000'
+                  clinicianNPIs:
+                    description: Clinician identifier filter.
+                    type: array
+                    items:
+                      type: string
+                    example:
+                    - '1295268407'
+                    - '1710330808'
+                  specialty:
+                    description: Provider specialty filter
+                    type: string
+                    example: Pediatrics
+                  gender:
+                    description: Provider gender filter
+                    type: string
+                    example: Female
+                  newOrEstablishedPatient:
+                    description: Allows filter by slots of patient type of new or established patient. Both types will be returned by default.
+                    type: string
+                    enum:
+                    - newPatient
+                    - establishedPatient
+                    - bothNewAndEstablishedPatient
+              - description: Request body for reproducing a previous search.
+                type: object
+                required:
+                - searchContext
+                properties:
+                  searchContext:
+                    type: string
+                    example: f55ffea269ba54d65d190a7225f01208
+            examples:
+              aggregate-slots-department:
+                summary: Request aggregate slots using departments for location.
+                value:
+                  radius: 3
+                  startDate: '2022-08-01'
+                  endDate: '2022-08-08'
+                  patient:
+                    patientId: '900332632'
+                    patientIdType: MRN
+                    ehrInstance: ehr.region
+                  departmentIds:
+                  - '3200080024'
+                  - '405517000'
+                  ehrInstances:
+                  - ehr.region.1
+                  - ehr.region.2
+                  visitTypeNames:
+                  - NewPatient
+                  - NewSymptoms
+                  clinicTypes:
+                  - Primary Care
+                  gender: female
+                  specialty: Pediatrics
+                  newOrEstablishedPatient: bothNewAndEstablishedPatient
+              aggregate-slots-lat-lon:
+                summary: Request aggregate slots using latitude and longitude for location.
+                value:
+                  latitude: 47.610692
+                  longitude: -122.321216
+                  radius: 3
+                  startDate: '2022-08-01'
+                  endDate: '2022-08-08'
+                  patient:
+                    patientId: '900332632'
+                    patientIdType: MRN
+                    ehrInstance: ehr.region
+                  ehrInstances:
+                  - ehr.region.1
+                  - ehr.region.2
+                  visitTypeNames:
+                  - NewPatient
+                  - NewSymptoms
+                  clinicTypes:
+                  - Primary Care
+                  gender: female
+                  specialty: Pediatrics
+                  newOrEstablishedPatient: bothNewAndEstablishedPatient
+              aggregate-slots-zip:
+                summary: Request aggregate slots using postal code for location.
+                value:
+                  postalCode: '98104'
+                  radius: 3
+                  startDate: '2022-08-01'
+                  endDate: '2022-08-08'
+                  patient:
+                    patientId: '900332632'
+                    patientIdType: MRN
+                    ehrInstance: ehr.region
+                  ehrInstances:
+                  - ehr.region.1
+                  - ehr.region.2
+                  visitTypeNames:
+                  - NewPatient
+                  - NewSymptoms
+                  clinicTypes:
+                  - Primary Care
+                  gender: female
+                  specialty: Pediatrics
+                  newOrEstablishedPatient: bothNewAndEstablishedPatient
+              search-contex-request:
+                summary: Execute a previous search using search context
+                value:
+                  searchContext: f55ffea269ba54d65d190a7225f01208
+      responses:
+        '200':
+          description: Search aggregated slots response body
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Search available providers successful response body
+                required:
+                - slots
+                - providers
+                - departments
+                - searchContext
+                properties:
+                  slots:
+                    type: array
+                    required:
+                    - slotDateTime
+                    - visitTypeName
+                    - providerOptions
+                    items:
+                      description: slot detail information
+                      type: object
+                      properties:
+                        slotDateTime:
+                          description: Available slot with date and time, including timezone offset in value
+                          type: string
+                          example: '2020-08-01T09:30:00-00:00'
+                        visitTypeName:
+                          description: Visit type name of slot
+                          type: string
+                          example: phone
+                        providerOptions:
+                          description: Provider and visit information of slot
+                          type: array
+                          items:
+                            type: object
+                            required:
+                            - npi
+                            - departmentEhrIdentifier
+                            - visitTypeId
+                            properties:
+                              npi:
+                                description: National provider id
+                                type: string
+                                example: '1245662048'
+                              departmentEhrIdentifier:
+                                description: Unique id combined with department id and ehr instance id
+                                type: string
+                                example: org.ptc.dig.epic.northwest|3200080024
+                              visitTypeId:
+                                description: Visit type id
+                                type: string
+                                example: '100005'
+                              duration:
+                                description: Slot duration
+                                type: number
+                                example: 20
+                  providers:
+                    description: providers referred in response
+                    type: object
+                    additionalProperties:
+                      description: provider information
+                      type: object
+                      required:
+                      - name
+                      properties:
+                        name:
+                          description: Provider's name
+                          type: string
+                          example: John Doe
+                        gender:
+                          description: Provider's gender
+                          type:
+                          - string
+                          - 'null'
+                          example: Male
+                        specialties:
+                          description: Specialties of provider
+                          type: array
+                          items:
+                            type: string
+                          example:
+                          - video
+                          - phone
+                  departments:
+                    description: departments referred in response
+                    type: object
+                    additionalProperties:
+                      description: department information
+                      type: object
+                      required:
+                      - departmentId
+                      - ehrInstance
+                      - departmentName
+                      - distanceFrom
+                      - timezone
+                      - address
+                      properties:
+                        departmentGuid:
+                          description: Unique id of department
+                          type: string
+                          example: 801e9199-6d7c-420e-81f0-191b6c8fd2d1
+                        departmentId:
+                          description: Department id used in EHR
+                          type: string
+                          example: '3200080024'
+                        ehrInstance:
+                          description: Department EHR Instance
+                          type: string
+                          example: org.ptc.dig.epic.northwest
+                        departmentName:
+                          description: Department name
+                          type: string
+                          example: SMG PRIMARY CARE MAGNOLIA
+                        distanceFrom:
+                          description: Distance (in miles) from target visit location argument
+                          type: number
+                          example: 10
+                        timezone:
+                          description: Department timezone
+                          type: string
+                          example: America/Los_Angeles
+                        clinicType:
+                          description: Clinic type
+                          type: string
+                          example: Primary Care
+                        address:
+                          type: object
+                          description: Department address
+                          properties:
+                            line1:
+                              type: string
+                              example: 2324 Eastlake Ave E
+                            line2:
+                              type: string
+                              example: Suite 500
+                            city:
+                              type: string
+                              example: Seattle
+                            state:
+                              type: string
+                              example: WA
+                            zipCode:
+                              type: string
+                              example: '98102'
+                            postalCode:
+                              type: string
+                              example: '98102'
+                  searchContext:
+                    description: Token used to repeat a previous search. Can be passed in as the only argument to the /availability/slots API.
+                    type: string
+                    example: f55ffea269ba54d65d190a7225f01208
+              examples:
+                slots-search-complete:
+                  summary: complete response body example
+                  value:
+                    slots:
+                    - slotDateTime: '2020-08-01T09:30:00-00:00'
+                      visitTypeName: phone
+                      providerOptions:
+                      - npi: '1245662048'
+                        departmentEhrIdentifier: org.ptc.dig.epic.northwest|3200080024
+                        visitTypeId: '100005'
+                        duration: 20
+                    providers:
+                      '1245662048':
+                        name: John Doe
+                        gender: Male
+                        specialties:
+                        - video
+                        - phone
+                    departments:
+                      org.ptc.dig.epic.northwest|3200080024:
+                        departmentId: '3200080024'
+                        ehrInstance: org.ptc.dig.epic.northwest
+                        departmentName: SMG PRIMARY CARE MAGNOLIA
+                        distanceFrom: 10
+                        timezone: America/Los_Angeles
+                        clinicType: Primary Care
+                        address:
+                          line1: 2324 Eastlake Ave E
+                          line2: Suite 500
+                          city: Seattle
+                          state: WA
+                          zipCode: '98102'
+                          postalCode: '98102'
+                    searchContext: f55ffea269ba54d65d190a7225f01208
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - type: object
+                  description: Invalid search context error
+                  properties:
+                    message:
+                      type: string
+                      description: Error message
+                      example: Invalid Search Context
+                    errorCode:
+                      type: number
+                      description: Error code
+                      example: 40002
+                - type: object
+                  description: Invalid request error
+                  properties:
+                    message:
+                      type: string
+                      description: Error message
+                      example: radius is required
+                    errorCode:
+                      type: number
+                      description: Error code
+                      example: 40001
+              examples:
+                missing-search-field:
+                  summary: error response when missing a required search field
+                  value:
+                    message: radius is required
+                    errorCode: 40001
+                invalid-search-context:
+                  summary: invalid search context error response
+                  value:
+                    message: Invalid Search Context UUID
+                    errorCode: 40002
+        '403':
+          description: Invalid API Key
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Forbidden error
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: Forbidden
+                  errorCode:
+                    type: number
+                    description: Error code
+                    example: 40301
+        '500':
+          description: Unknown error
+    get:
+      summary: Search aggregated slots by location GET API
+      operationId: getAggregatedSlotsV1
+      description: "Get aggregate slots, as a GET API.\nMinimum parameters is at least one of the following:\n - latitude/longitude (both is required)\n - postalCode\n - departmentEmrIds\n - npis\nIf latitude/longitude AND postalCode are passed in, postalCode will\ntake precedence. If a location (lat/long or postalCode) are passed in\nwith departmentEmrIds and/or npis, the results will be filtered\nby departmentEmrIds and npis, respectively.\n"
+      tags:
+      - external
+      parameters:
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+        required: false
+      - name: clinicTypes
+        in: query
+        description: Clinic type filter. Separate multiple with commas. Case-insensitive.
+        schema:
+          type: string
+          example: retail,primary care
+        explode: true
+        style: form
+      - name: daysOfSlots
+        in: query
+        description: 'Allows use of getting slots by "page". Retrieve number of days that have slots
+
+          which can be nonconsecutive days for each "page".
+
+          Example: 3 entered returns 3 days of slots for today, tomorrow, and next Monday
+
+          as the dates between tomorrow and Monday do not have slots available.
+
+          '
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          example: 3
+      - name: departmentEmrIds
+        in: query
+        description: Department identifier filter.  Separate multiple with commas.
+        schema:
+          type: string
+          minLength: 1
+          example: '5000311000'
+        explode: true
+        style: form
+      - name: ehrInstances
+        in: query
+        description: EHR Instance Identifiers filter. Separate multiple with commas.
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          pattern: .+
+          example: ehr.region.2
+        explode: true
+        style: form
+      - name: endDate
+        in: query
+        description: End date of slots with yyyy-MM-dd format, end days will be certain days after start date if not present.
+        schema:
+          type: string
+          pattern: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
+          example: '2022-08-01'
+      - name: gender
+        in: query
+        description: Clinician gender filter
+        schema:
+          type: string
+          minLength: 1
+          example: '''F'',  ''Male'', ''female'''
+      - name: latitude
+        in: query
+        description: Latitude of target visit location. "longitude" is required with this parameter.
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+          example: 47.610692
+      - name: longitude
+        in: query
+        description: Longitude of target visit location. "latitude" is required with this parameter.
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+          example: -122.321216
+      - name: newOrEstablishedPatient
+        in: query
+        description: allows filter by slots of patient type of new or established patient. Both types will be returned by default.
+        required: false
+        schema:
+          type: string
+          enum:
+          - newPatient
+          - establishedPatient
+          - bothNewAndEstablishedPatient
+      - name: npis
+        in: query
+        description: Clinician national provider identifier (NPI) filter. Pass in multiple by repeating param npi
+        schema:
+          type: string
+          minLength: 1
+          example: '5000311000'
+        explode: true
+        style: form
+      - name: postalCode
+        in: query
+        description: Zip code of the target visit location. Cannot use in tandem with latitude and longitude, postalCode will be used if both types are present.
+        schema:
+          type: string
+          pattern: (^\d{5}$)|(^\d{5}-\d{4}$)
+          example: '98104'
+      - name: radius
+        in: query
+        description: Radius around postalCode or lat/long location in miles for slots
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 50
+          default: 30
+      - name: specialty
+        in: query
+        description: Clinician specialty filter. Currently only support one specialty.
+        schema:
+          type: string
+          minLength: 1
+          example: Pediatrics
+      - name: startDate
+        in: query
+        description: Start date of slots with yyyy-MM-dd format, default set to today if not present.
+        schema:
+          type: string
+          pattern: ^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$
+          example: '2022-08-01'
+      - name: userTimezone
+        in: query
+        description: 'Optional param to pass in a timezone to change the dates and times in the response to a specific timezone.
+
+          If not present, defaults to presenting dates and times in the timezone of the hospital system''s department or location.
+
+          '
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          example: America/Los_Angeles
+      - name: visitTypeNames
+        in: query
+        description: Filter slots by visitTypeName. Separate multiple with commas. Case-insensitive.
+        schema:
+          type: string
+          example: adultphysical,followup
+        explode: true
+        style: form
+      - name: product
+        in: query
+        description: Product filter.
+        required: false
+        schema:
+          type: string
+          minLength: 1
+          example: Product
+      responses:
+        '200':
+          description: Search aggregated slots response body
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Search available providers successful response body
+                required:
+                - slotsByVisitType
+                - providers
+                - departments
+                - searchContext
+                properties:
+                  timezone:
+                    type: string
+                    description: Timezone of the slots
+                    example: America/New_York
+                  slotsByVisitType:
+                    type: array
+                    description: slots by visit type detail information
+                    items:
+                      type: object
+                      required:
+                      - previousEndDate
+                      - nextStartDate
+                      - visitTypeName
+                      - visitTypeEmrId
+                      - visitTypeDisplayName
+                      - visitTypeUuids
+                      - forNewPatient
+                      - forEstablishedPatient
+                      - modality
+                      - scheduleDays
+                      properties:
+                        previousEndDate:
+                          description: previous end date of the search
+                          type:
+                          - string
+                          - 'null'
+                          format: date
+                          example: '2025-07-02'
+                        nextStartDate:
+                          description: next start date of the search
+                          type:
+                          - string
+                          - 'null'
+                          format: date
+                          example: '2025-07-01'
+                        visitTypeDisplayName:
+                          description: Visit type name
+                          type: string
+                          example: Office Visit New Symptoms
+                        visitTypeName:
+                          description: Visit type name
+                          type: string
+                          example: NewSymptoms
+                        visitTypeEmrId:
+                          description: Visit type EMR identifier
+                          type: string
+                          example: '12214648'
+                        visitTypeUuids:
+                          type: array
+                          description: Uuids of the visit type, which can be more than one due to similar visit types in different departments
+                          items:
+                            type: string
+                            example: b1a8f5e2-1c4e-11ee-be56-0242ac120002
+                        forNewPatient:
+                          type: boolean
+                        forEstablishedPatient:
+                          type: boolean
+                        modality:
+                          type: string
+                          enum:
+                          - INCLINIC
+                          - VIDEO
+                          - PHONE
+                          description: How the patient will engage with the provider for this visitType
+                        scheduleDays:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                            - date
+                            - slotTimes
+                            properties:
+                              date:
+                                description: Date of the schedule
+                                type: string
+                                format: date
+                                example: '2025-07-05'
+                              slotTimes:
+                                type: array
+                                items:
+                                  type: object
+                                  required:
+                                  - slotDateTime
+                                  - providerOptions
+                                  properties:
+                                    slotDateTime:
+                                      description: Date and time of the slot
+                                      type: string
+                                      format: date-time
+                                      example: '2025-07-05T15:00:00-07:00'
+                                    providerOptions:
+                                      type: array
+                                      items:
+                                        type: object
+                                        required:
+                                        - npi
+                                        - departmentEhrIdentifier
+                                        - duration
+                                        properties:
+                                          npi:
+                                            description: Provider's NPI
+                                            type: string
+                                            example: '1851303465'
+                                          departmentEhrIdentifier:
+                                            description: Department EHR identifier
+                                            type: string
+                                            example: org.providence.dig.epic.provwamt|3000365001
+                                          duration:
+                                            description: Duration of the slot in minutes
+                                            type: integer
+                                            example: 15
+                  providers:
+                    description: providers referred in response
+                    type: object
+                    additionalProperties:
+                      description: provider information
+                      type: object
+                      required:
+                      - name
+                      properties:
+                        emrId:
+                          description: Provider's ID in Emr system
+                          type: string
+                          example: '32261'
+                        name:
+                          description: Provider's name
+                          type: string
+                          example: John Doe
+                        gender:
+                          description: Provider's gender
+                          type:
+                          - string
+                          - 'null'
+                          example: Male
+                        specialties:
+                          description: Specialties of provider
+                          type: array
+                          items:
+                            type: string
+                          example:
+                          - video
+                          - phone
+                  departments:
+                    description: departments referred in response
+                    type: object
+                    additionalProperties:
+                      description: department information
+                      type: object
+                      required:
+                      - departmentEmrId
+                      - ehrInstance
+                      - departmentName
+                      - distanceFrom
+                      - timezone
+                      - address
+                      properties:
+                        departmentUuid:
+                          description: Unique id of department
+                          type: string
+                          example: 801e9199-6d7c-420e-81f0-191b6c8fd2d1
+                        departmentEmrId:
+                          description: Department id used in EHR
+                          type: string
+                          example: '3200080024'
+                        ehrInstance:
+                          description: Department EHR Instance
+                          type: string
+                          example: org.ptc.dig.epic.northwest
+                        departmentName:
+                          description: Department name
+                          type: string
+                          example: SMG PRIMARY CARE MAGNOLIA
+                        distanceFrom:
+                          description: Distance (in miles) from target visit location argument
+                          type: number
+                          example: 10
+                        timezone:
+                          description: Department timezone
+                          type: string
+                          example: America/Los_Angeles
+                        clinicType:
+                          description: Clinic type
+                          type: string
+                          example: Primary Care
+                        address:
+                          type: object
+                          description: Department address
+                          properties:
+                            line1:
+                              type: string
+                              example: 2324 Eastlake Ave E
+                            line2:
+                              type: string
+                              example: Suite 500
+                            city:
+                              type: string
+                              example: Seattle
+                            state:
+                              type: string
+                              example: WA
+                            zipCode:
+                              type: string
+                              example: '98102'
+                            postalCode:
+                              type: string
+                              example: '98102'
+                            latitude:
+                              type: number
+                              example: 34.159642
+                            longitude:
+                              type: number
+                              example: -118.254338
+                  searchContext:
+                    description: Token used to repeat a previous search. Can be passed in as the only argument to the /availability/slots API.
+                    type: string
+                    example: f55ffea269ba54d65d190a7225f01208
+              examples:
+                slots-search-complete:
+                  summary: complete response body example
+                  value:
+                    timezone: America/Los_Angeles
+                    slotsByVisitType:
+                    - visitTypeEmrId: '12214648'
+                      visitTypeName: FollowUp
+                      visitTypeDisplayName: Follow Up
+                      visitTypeUuids:
+                      - 0ce9c3ac-df48-40f3-9ee0-4ac9df2d7b9d
+                      previousEndDate: '2025-07-02'
+                      nextStartDate: '2025-07-20'
+                      forNewPatient: false
+                      forEstablishedPatient: true
+                      modality: INCLINIC
+                      scheduleDays:
+                      - date: '2025-07-05'
+                        slotTimes:
+                        - slotDateTime: '2025-07-05T15:00:00-07:00'
+                          providerOptions:
+                          - npi: '1851303465'
+                            departmentEhrIdentifier: org.providence.dig.epic.provwamt|3000365001
+                            duration: 30
+                          - npi: '1366531329'
+                            departmentEhrIdentifier: org.providence.dig.epic.provwamt|3100039001
+                            duration: 30
+                        - slotDateTime: '2025-07-06T15:00:00-07:00'
+                          providerOptions:
+                          - npi: '1366531329'
+                            departmentEhrIdentifier: org.providence.dig.epic.provwamt|3100039001
+                            duration: 30
+                    - visitTypeEmrId: '122861'
+                      visitTypeName: FollowUp
+                      visitTypeDisplayName: Follow Up
+                      visitTypeUuids:
+                      - f55826ef-ec46-4dc6-a12a-d829eb11c207
+                      previousEndDate: '2025-07-02'
+                      nextStartDate: '2025-07-12'
+                      forNewPatient: false
+                      forEstablishedPatient: true
+                      modality: VIDEO
+                      scheduleDays:
+                      - date: '2025-07-05'
+                        slotTimes:
+                        - slotDateTime: '2025-07-05T15:00:00-07:00'
+                          providerOptions:
+                          - npi: '1366531329'
+                            departmentEhrIdentifier: org.providence.dig.epic.provwamt|3100039001
+                            duration: 30
+                    - visitTypeEmrId: '12214648'
+                      visitTypeName: NewPatient
+                      visitTypeDisplayName: New Patient
+                      visitTypeUuids:
+                      - d552be4a-396f-42d8-91f8-87709fb02b65
+                      previousEndDate: '2025-07-02'
+                      nextStartDate: '2025-07-15'
+                      forNewPatient: true
+                      forEstablishedPatient: false
+                      modality: PHONE
+                      scheduleDays:
+                      - date: '2025-07-05'
+                        slotTimes:
+                        - slotDateTime: '2025-07-05T15:00:00-07:00'
+                          providerOptions:
+                          - npi: '1366531329'
+                            departmentEhrIdentifier: org.providence.dig.epic.provwamt|503502000
+                            duration: 30
+                    departments:
+                      org.providence.dig.epic.provwamt|3000365001:
+                        departmentUuid: 0ce9c3ac-df48-40f3-9ee0-4ac9df2d7b9d
+                        departmentEmrId: '3000365001'
+                        departmentName: PMG E WA GRAND PEDIATRICS
+                        distanceFrom: 0
+                        ehrInstance: org.providence.dig.epic.provwamt
+                        clinicType: Primary Care
+                        timezone: America/Los_Angeles
+                        address:
+                          line1: 1402 S GRAND BLVD
+                          line2: ''
+                          city: Spokane
+                          state: WA
+                          zipCode: '99203'
+                          postalCode: '99203'
+                          longitude: 33.45344343
+                          latitude: -118.67983342
+                      org.providence.dig.epic.provwamt|3100039001:
+                        departmentUuid: 0ce9c3ac-df48-40f3-9ee0-4ac9df2d7b9d
+                        departmentEmrId: '3100039001'
+                        departmentName: PMG E WA GRAND PEDIATRICS
+                        distanceFrom: 0
+                        ehrInstance: org.providence.dig.epic.provwamt
+                        clinicType: Primary Care
+                        timezone: America/Los_Angeles
+                        address:
+                          line1: 1402 S GRAND BLVD
+                          line2: ''
+                          city: Spokane
+                          state: WA
+                          zipCode: '99203'
+                          postalCode: '99203'
+                          longitude: 33.4534063
+                          latitude: -118.6798942
+                      org.providence.dig.epic.provwamt|503502000:
+                        departmentUuid: 0ce9c3ac-df48-40f3-9ee0-4ac9df2d7b9d
+                        departmentEmrId: '503502000'
+                        departmentName: PMG E WA GRAND PEDIATRICS
+                        distanceFrom: 0
+                        ehrInstance: org.providence.dig.epic.provwamt
+                        clinicType: Primary Care
+                        timezone: America/Los_Angeles
+                        address:
+                          line1: 1402 S GRAND BLVD
+                          line2: ''
+                          city: Spokane
+                          state: WA
+                          zipCode: '99203'
+                          postalCode: '99203'
+                          longitude: 33.8534063
+                          latitude: -118.3798942
+                    providers:
+                      '1366531329':
+                        name: Lex Kent
+                        emrId: '23512'
+                        gender: Male
+                        specialties:
+                        - Pediatrics
+                      '1851303465':
+                        name: Kimberly Alexander
+                        emrId: '15493'
+                        gender: Female
+                        specialties:
+                        - Pediatrics
+                    searchContext: f55ffea269ba54d65d190a7225f01208
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - type: object
+                  description: Invalid search context error
+                  properties:
+                    message:
+                      type: string
+                      description: Error message
+                      example: Invalid Search Context
+                    errorCode:
+                      type: number
+                      description: Error code
+                      example: 40002
+                - type: object
+                  description: Invalid request error
+                  properties:
+                    message:
+                      type: string
+                      description: Error message
+                      example: radius is required
+                    errorCode:
+                      type: number
+                      description: Error code
+                      example: 40001
+              examples:
+                missing-search-field:
+                  summary: error response when missing a required search field
+                  value:
+                    message: radius is required
+                    errorCode: 40001
+                invalid-search-context:
+                  summary: invalid search context error response
+                  value:
+                    message: Invalid Search Context UUID
+                    errorCode: 40002
+        '500':
+          description: Unknown error
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for ApiKey to ApiKey Authorization, provided by DexCare to customer

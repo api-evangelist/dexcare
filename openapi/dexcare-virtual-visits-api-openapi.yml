@@ -1,0 +1,74 @@
+openapi: 3.2.0
+info:
+  title: Visit Service Virtual Visits API
+  version: 9.2.0
+  description: Visit Service external API v9
+  contact:
+    name: DexCare Engineering
+    email: engineering@dexcarehealth.com
+servers:
+- url: https://ecvapi.frosh.dex.care/api/9
+  description: DC DEV External Ingress
+- url: https://ecvapi.care-uat.ecommunity.com/api/9
+  description: CHN UAT External Ingress
+- url: https://ecvapi.care-uat.froedtert.com/api/9
+  description: FHI UAT External Ingress
+- url: https://ecvapi.care-uat.psjhealth.org/api/9
+  description: PSJH UAT External Ingress
+- url: https://ecvapi.kp-uat.dex.care/api/9
+  description: KP UAT External Ingress
+- url: https://ecvapi.uat.houstonmethodistcare.org/api/9
+  description: HM UAT External Ingress
+- url: https://ecvapi.demo-uat.dex.care/api/9
+  description: UH UAT External Ingress
+security: []
+tags:
+- name: virtual-visits
+paths:
+  /visits/{visitId}/acceptTerms:
+    put:
+      description: Update whether patient accept terms for a visit
+      operationId: updateAcceptTerms
+      security:
+      - PatientJWT: []
+      tags:
+      - virtual-visits
+      summary: Update whether patient accept terms for a visit
+      parameters:
+      - in: path
+        name: visitId
+        description: ID of visit to update patient accept terms
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: header
+        name: correlation-id
+        description: Unique id to correlate call logs between our microservices
+        schema:
+          type: string
+          format: uuid
+        required: false
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Unauthorized
+        '404':
+          description: Visit not found
+        '409':
+          description: Visit not in allowed status
+        '500':
+          description: Server error
+components:
+  securitySchemes:
+    PatientJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Patient] Bearer token format `Bearer {KEY}`'
+    StaffJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: '[Staff] Bearer token format `Bearer {KEY}`'
