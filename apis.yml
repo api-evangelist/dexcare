@@ -130,6 +130,8 @@ apis:
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
+  - External
+  tags_raw:
   - external
   properties:
   - type: OpenAPI
@@ -156,6 +158,8 @@ apis:
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
+  - Modalities
+  tags_raw:
   - modalities
   properties:
   - type: OpenAPI
@@ -390,6 +394,8 @@ apis:
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
+  - PDM
+  tags_raw:
   - Pdm
   properties:
   - type: OpenAPI
@@ -546,6 +552,8 @@ apis:
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
+  - Visits
+  tags_raw:
   - visits
   properties:
   - type: OpenAPI
@@ -572,6 +580,8 @@ apis:
   humanURL: https://developers.dexcarehealth.com/api/
   baseURL: https://api.care.dexcarehealth.com
   tags:
+  - Wait Times
+  tags_raw:
   - waittimes
   properties:
   - type: OpenAPI
