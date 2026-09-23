@@ -88,10 +88,9 @@ paths:
       - OmniAnalytics
 components:
   schemas:
-    debug:
-      default: false
-      description: Set to true to include debug information in the response.
-      type: boolean
+    uip:
+      description: (Ignored) - The IP address of the user is stripped from the request if included.
+      type: string
     ErrorResponse:
       description: Error response
       properties:
@@ -103,6 +102,12 @@ components:
       type: object
       required:
       - error
+    event_name:
+      description: Name of event for GA.
+      type: string
+    v:
+      description: (Ignored) - The protocol version is hardcoded to 1.
+      type: string
     OmniAnalyticsSuccessResponse:
       description: Analytics response from GA
       properties:
@@ -119,22 +124,17 @@ components:
             This is only included in the response when param `debug=true` is set, but never in production.'
           type: string
       type: object
-    event_name:
-      description: Name of event for GA.
-      type: string
     dh:
       description: (Ignored) - The document hostname is automatically determined based on brand.
-      type: string
-    uip:
-      description: (Ignored) - The IP address of the user is stripped from the request if included.
       type: string
     tid:
       default: UA-1508202-16
       description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
       type: string
-    v:
-      description: (Ignored) - The protocol version is hardcoded to 1.
-      type: string
+    debug:
+      default: false
+      description: Set to true to include debug information in the response.
+      type: boolean
   parameters:
     BrandParam:
       name: brand

@@ -77,21 +77,6 @@ paths:
       - OmniSearchAnalytics
 components:
   schemas:
-    debug:
-      default: false
-      description: Set to true to include debug information in the response.
-      type: boolean
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
     OmniSearchAnalyticsSuccessResponse:
       properties:
         cid:
@@ -111,12 +96,19 @@ components:
       required:
       - cid
       type: object
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
     path:
       description: Document path, i.e. the path portion of the page URL. Either 'path' or 'dp' must be specified.
-      type: string
-    tid:
-      default: UA-1508202-16
-      description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
       type: string
     properties-cid:
       description: Client ID (unique user ID).
@@ -124,6 +116,14 @@ components:
     dp:
       description: Namespace. Either 'path' or 'dp' must be specified.
       type: string
+    tid:
+      default: UA-1508202-16
+      description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
+      type: string
+    debug:
+      default: false
+      description: Set to true to include debug information in the response.
+      type: boolean
   parameters:
     BrandParam:
       name: brand

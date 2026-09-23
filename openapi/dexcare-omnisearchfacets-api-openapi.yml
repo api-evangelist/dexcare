@@ -69,6 +69,40 @@ paths:
       - OmniSearchFacets
 components:
   schemas:
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    count:
+      default: false
+      description: Whether to include counts for each facet value
+      type: boolean
+    stringvalues:
+      default: true
+      description: Whether to limit results to only string value type facets
+      type: boolean
+    childBrand:
+      description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
+      type: string
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+      - clinicians
+      - departments
+      - locations
+      title: DataTag
+      tsEnumNames:
+      - Clinicians
+      - Departments
+      - Locations
+      type: string
     Facets:
       anyOf:
       - additionalProperties:
@@ -116,17 +150,6 @@ components:
           type: array
         type: object
       description: Facets
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
     OmniSearchFacetsSuccessResponse:
       properties:
         facets:
@@ -134,35 +157,7 @@ components:
       required:
       - facets
       type: object
-    count:
-      default: false
-      description: Whether to include counts for each facet value
-      type: boolean
-    stringvalues:
-      default: true
-      description: Whether to limit results to only string value type facets
-      type: boolean
-    DataTag:
-      description: The data type to lookup. The returned response will be an array of this type.
-      enum:
-      - clinicians
-      - departments
-      - locations
-      title: DataTag
-      tsEnumNames:
-      - Clinicians
-      - Departments
-      - Locations
-      type: string
-    childBrand:
-      description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
-      type: string
   parameters:
-    DataParam:
-      name: data
-      in: query
-      schema:
-        $ref: '#/components/schemas/DataTag'
     BrandParam:
       name: brand
       in: query
@@ -170,3 +165,8 @@ components:
       description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
       schema:
         type: string
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'

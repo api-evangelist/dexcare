@@ -23,7 +23,7 @@ servers:
   description: UH UAT External Ingress
 security: []
 tags:
-- name: visits
+- name: Visits
 paths:
   /visits:
     post:
@@ -33,7 +33,7 @@ paths:
       - PatientJWT: []
       summary: request visit
       tags:
-      - visits
+      - Visits
       parameters:
       - in: header
         name: correlation-id
@@ -893,15 +893,13 @@ paths:
             '
   /visits/{visitId}/waittime:
     get:
-      description: 'Returns the wait time for a virtual visit if active.
-
-        '
+      description: Returns the wait time for a virtual visit if active.
       operationId: getEstimatedVirtualVisitWaitTime
       security:
       - PatientJWT: []
       summary: get virtual visit wait time
       tags:
-      - visits
+      - Visits
       parameters:
       - in: path
         name: visitId
@@ -968,15 +966,13 @@ paths:
                     type: string
   /visits/{visitId}/summary:
     get:
-      description: 'Returns a summarized visit, with minimum data needed for the virtual visit waiting room application
-
-        '
+      description: Returns a summarized visit, with minimum data needed for the virtual visit waiting room application
       operationId: visitSummaryV9
       security:
       - StaffJWT: []
       summary: Returns a summarized visit
       tags:
-      - visits
+      - Visits
       parameters:
       - in: path
         name: visitId

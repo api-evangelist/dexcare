@@ -63,20 +63,20 @@ paths:
       tags:
       - OmniSynonyms
 components:
-  parameters:
-    DataParam:
-      name: data
-      in: query
-      schema:
-        $ref: '#/components/schemas/DataTag'
-    BrandParam:
-      name: brand
-      in: query
-      required: true
-      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
-      schema:
-        type: string
   schemas:
+    properties-search:
+      description: A single search term to look up synonyms for.
+      type: string
+    OmniSynonymsSuccessResponse:
+      properties:
+        synonyms:
+          description: Synonyms for the search term/phrase
+          items:
+            type: string
+          type: array
+      required:
+      - synonyms
+      type: object
     ErrorResponse:
       description: Error response
       properties:
@@ -88,9 +88,6 @@ components:
       type: object
       required:
       - error
-    properties-search:
-      description: A single search term to look up synonyms for.
-      type: string
     DataTag:
       description: The data type to lookup. The returned response will be an array of this type.
       enum:
@@ -103,13 +100,16 @@ components:
       - Departments
       - Locations
       type: string
-    OmniSynonymsSuccessResponse:
-      properties:
-        synonyms:
-          description: Synonyms for the search term/phrase
-          items:
-            type: string
-          type: array
-      required:
-      - synonyms
-      type: object
+  parameters:
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'

@@ -27,9 +27,7 @@ tags:
 paths:
   /regions/{regionCode}/waittimes:
     get:
-      description: 'returns availability and wait times for provider queues for one region. Use query parameters to filter requested pools
-
-        '
+      description: returns availability and wait times for provider queues for one region. Use query parameters to filter requested pools
       operationId: getRegionAvailabilityAndWaitTimes
       security: []
       summary: get availability and wait times for region
@@ -312,9 +310,7 @@ paths:
                 specialties: []
   /regions/waittimes:
     get:
-      description: 'returns availability and wait times for all provider queues. Use query parameters to filter requested pools
-
-        '
+      description: returns availability and wait times for all provider queues. Use query parameters to filter requested pools
       operationId: getAvailabilityAndWaitTimes
       security: []
       summary: get availability and wait times

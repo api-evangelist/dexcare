@@ -27,7 +27,6 @@ tags:
 paths:
   /visits/{visitId}/acceptTerms:
     put:
-      description: Update whether patient accept terms for a visit
       operationId: updateAcceptTerms
       security:
       - PatientJWT: []

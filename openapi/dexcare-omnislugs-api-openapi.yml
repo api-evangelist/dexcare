@@ -66,10 +66,15 @@ paths:
       tags:
       - OmniSlugs
 components:
+  parameters:
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string
   schemas:
-    name:
-      description: Slug name.
-      type: string
     OmniSlugsSuccessResponse:
       properties:
         location:
@@ -101,11 +106,6 @@ components:
       type: object
       required:
       - error
-  parameters:
-    BrandParam:
-      name: brand
-      in: query
-      required: true
-      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
-      schema:
-        type: string
+    name:
+      description: Slug name.
+      type: string

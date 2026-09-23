@@ -23,16 +23,15 @@ servers:
   description: UH UAT External Ingress
 security: []
 tags:
-- name: modalities
+- name: Modalities
 paths:
   /modalities:
     get:
-      description: get all modalities
       operationId: getModalities
       security: []
       summary: get all modalities
       tags:
-      - modalities
+      - Modalities
       parameters:
       - name: archived
         in: query

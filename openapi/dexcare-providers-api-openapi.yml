@@ -303,6 +303,8 @@ paths:
                 - message
       tags:
       - Providers
+      summary: Get single provider timeslots
+      x-summary-source: derived
 components:
   securitySchemes:
     ApiKey:

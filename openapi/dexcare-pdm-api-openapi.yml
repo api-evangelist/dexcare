@@ -16,7 +16,7 @@ servers:
 security:
 - ApiKey: []
 tags:
-- name: Pdm
+- name: PDM
 paths:
   /pdm/batch:
     post:
@@ -49,11 +49,10 @@ paths:
         default:
           $ref: '#/components/responses/default'
       tags:
-      - Pdm
+      - PDM
   /pdm/schema/{namespace}/{name}:
     get:
       operationId: getPdmEntitySchema
-      description: Returns the json schema the entity
       summary: Returns the json schema the entity
       security:
       - ApiKey: []
@@ -86,156 +85,9 @@ paths:
         default:
           $ref: '#/components/responses/default'
       tags:
-      - Pdm
+      - PDM
 components:
-  responses:
-    '401':
-      description: invalid authentication error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    '400':
-      description: invalid input error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    '404':
-      description: Not found error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    default:
-      description: Unexpected error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    '500':
-      description: internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
-    JSONSchemaProperty:
-      title: JSON Schema Property
-      description: This is a JSON schema property.
-      type: object
-      additionalProperties: true
-    EntityQueryResult:
-      title: EntityQueryResult
-      description: EntityQueryResult
-      allOf:
-      - $ref: '#/components/schemas/QueryResult'
-      - type: object
-        properties:
-          data:
-            $ref: '#/components/schemas/EntityList'
-        required:
-        - data
-    AnyEntity:
-      title: Any Entity Schema
-      description: This is a generic entity schema.
-      allOf:
-      - $ref: '#/components/schemas/Entity'
-      - type: object
-        additionalProperties: true
-    BaseEntity:
-      title: Base Entity Schema
-      description: This is a base entity schema.
-      type: object
-      properties:
-        type:
-          type: string
-          description: type of entity
-        version:
-          type: string
-          description: version of entity
-      required:
-      - type
-      - version
-      - lastModifiedDate
-      - createDate
-      - lastModifiedUser
-    Entity:
-      title: Generic Entity Schema
-      description: This is a generic entity schema.
-      allOf:
-      - $ref: '#/components/schemas/BaseEntity'
-      - type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: id of entity
-          lastModifiedDate:
-            type: string
-            format: date-time
-            description: last modified date of entity
-          createDate:
-            type: string
-            format: date-time
-            description: create date of entity
-          lastModifiedUser:
-            type: string
-            description: last modified user of entity
-        required:
-        - id
-        - lastModifiedDate
-        - createDate
-        - lastModifiedUser
-    QueryResult:
-      title: Query Result
-      description: 'This is a generic query result schema.
-
-        '
-      type: object
-      properties:
-        total:
-          type: integer
-          description: Total number of items
-      required:
-      - total
-    ApiError:
-      title: API Error
-      description: API Error object
-      type: object
-      additionalProperties: false
-      properties:
-        code:
-          type: string
-          description: Standardized code that can be used as a key for localization
-        message:
-          type: string
-          description: Human readable error details
-        details:
-          type: object
-          description: Additional details about the error
-          additionalProperties: true
-      required:
-      - code
-      - message
-    EntitySchemaProperties:
-      title: Entity Schema Properties
-      description: This is a list of entity schema properties.
-      type: object
-      additionalProperties: true
-      properties:
-        id:
-          $ref: '#/components/schemas/JSONSchemaProperty'
-        version:
-          $ref: '#/components/schemas/JSONSchemaProperty'
-        type:
-          $ref: '#/components/schemas/JSONSchemaProperty'
-        lastModifiedDate:
-          $ref: '#/components/schemas/JSONSchemaProperty'
-        lastModifiedUser:
-          $ref: '#/components/schemas/JSONSchemaProperty'
-        createdDate:
-          $ref: '#/components/schemas/JSONSchemaProperty'
     PdmEntitySchema:
       title: PDM Entity Schema
       description: This is an entity schema.
@@ -256,12 +108,29 @@ components:
           description: The schema of the entity schema.
         properties:
           $ref: '#/components/schemas/EntitySchemaProperties'
-    EntityList:
-      title: Generic Entity List Schema
-      description: This is a generic entity list schema.
-      type: array
-      items:
-        $ref: '#/components/schemas/AnyEntity'
+    EntityQueryResult:
+      title: EntityQueryResult
+      description: EntityQueryResult
+      allOf:
+      - $ref: '#/components/schemas/QueryResult'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/EntityList'
+        required:
+        - data
+    JSONSchemaProperty:
+      title: JSON Schema Property
+      description: This is a JSON schema property.
+      type: object
+      additionalProperties: true
+    AnyEntity:
+      title: Any Entity Schema
+      description: This is a generic entity schema.
+      allOf:
+      - $ref: '#/components/schemas/Entity'
+      - type: object
+        additionalProperties: true
     PaginatedFilteredEntityRequest:
       type: object
       required:
@@ -345,6 +214,136 @@ components:
             value:
             - Urgent Care
             operator: CONTAINS
+    EntitySchemaProperties:
+      title: Entity Schema Properties
+      description: This is a list of entity schema properties.
+      type: object
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        version:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        type:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        lastModifiedDate:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        lastModifiedUser:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+        createdDate:
+          $ref: '#/components/schemas/JSONSchemaProperty'
+    ApiError:
+      title: API Error
+      description: API Error object
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+          description: Standardized code that can be used as a key for localization
+        message:
+          type: string
+          description: Human readable error details
+        details:
+          type: object
+          description: Additional details about the error
+          additionalProperties: true
+      required:
+      - code
+      - message
+    QueryResult:
+      title: Query Result
+      description: 'This is a generic query result schema.
+
+        '
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+      required:
+      - total
+    Entity:
+      title: Generic Entity Schema
+      description: This is a generic entity schema.
+      allOf:
+      - $ref: '#/components/schemas/BaseEntity'
+      - type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: id of entity
+          lastModifiedDate:
+            type: string
+            format: date-time
+            description: last modified date of entity
+          createDate:
+            type: string
+            format: date-time
+            description: create date of entity
+          lastModifiedUser:
+            type: string
+            description: last modified user of entity
+        required:
+        - id
+        - lastModifiedDate
+        - createDate
+        - lastModifiedUser
+    BaseEntity:
+      title: Base Entity Schema
+      description: This is a base entity schema.
+      type: object
+      properties:
+        type:
+          type: string
+          description: type of entity
+        version:
+          type: string
+          description: version of entity
+      required:
+      - type
+      - version
+      - lastModifiedDate
+      - createDate
+      - lastModifiedUser
+    EntityList:
+      title: Generic Entity List Schema
+      description: This is a generic entity list schema.
+      type: array
+      items:
+        $ref: '#/components/schemas/AnyEntity'
+  responses:
+    '404':
+      description: Not found error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '400':
+      description: invalid input error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '401':
+      description: invalid authentication error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    '500':
+      description: internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   parameters:
     name:
       name: name

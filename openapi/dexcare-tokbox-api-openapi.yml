@@ -103,6 +103,8 @@ paths:
       responses:
         '202':
           description: accepted request with no response body
+      summary: Process tokbox session events
+      x-summary-source: derived
 components:
   securitySchemes:
     PatientJWT:
