@@ -63,43 +63,6 @@ paths:
       tags:
       - OmniSynonyms
 components:
-  schemas:
-    properties-search:
-      description: A single search term to look up synonyms for.
-      type: string
-    OmniSynonymsSuccessResponse:
-      properties:
-        synonyms:
-          description: Synonyms for the search term/phrase
-          items:
-            type: string
-          type: array
-      required:
-      - synonyms
-      type: object
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
-    DataTag:
-      description: The data type to lookup. The returned response will be an array of this type.
-      enum:
-      - clinicians
-      - departments
-      - locations
-      title: DataTag
-      tsEnumNames:
-      - Clinicians
-      - Departments
-      - Locations
-      type: string
   parameters:
     BrandParam:
       name: brand
@@ -113,3 +76,40 @@ components:
       in: query
       schema:
         $ref: '#/components/schemas/DataTag'
+  schemas:
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+      - clinicians
+      - departments
+      - locations
+      title: DataTag
+      tsEnumNames:
+      - Clinicians
+      - Departments
+      - Locations
+      type: string
+    properties-search:
+      description: A single search term to look up synonyms for.
+      type: string
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    OmniSynonymsSuccessResponse:
+      properties:
+        synonyms:
+          description: Synonyms for the search term/phrase
+          items:
+            type: string
+          type: array
+      required:
+      - synonyms
+      type: object
