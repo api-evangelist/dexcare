@@ -76,24 +76,12 @@ paths:
       tags:
       - OmniSearchAnalytics
 components:
-  parameters:
-    BrandParam:
-      name: brand
-      in: query
-      required: true
-      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
-      schema:
-        type: string
   schemas:
-    properties-cid:
-      description: Client ID (unique user ID).
+    dp:
+      description: Namespace. Either 'path' or 'dp' must be specified.
       type: string
     path:
       description: Document path, i.e. the path portion of the page URL. Either 'path' or 'dp' must be specified.
-      type: string
-    tid:
-      default: UA-1508202-16
-      description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
       type: string
     OmniSearchAnalyticsSuccessResponse:
       properties:
@@ -114,8 +102,8 @@ components:
       required:
       - cid
       type: object
-    dp:
-      description: Namespace. Either 'path' or 'dp' must be specified.
+    properties-cid:
+      description: Client ID (unique user ID).
       type: string
     ErrorResponse:
       description: Error response
@@ -128,7 +116,19 @@ components:
       type: object
       required:
       - error
+    tid:
+      default: UA-1508202-16
+      description: GA tracking ID. Defaults to UA-1508202-16 if not defined.
+      type: string
     debug:
       default: false
       description: Set to true to include debug information in the response.
       type: boolean
+  parameters:
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string
