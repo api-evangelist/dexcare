@@ -1,25 +1,23 @@
-# Kin Score artifact — dexcare — 2026-08-25T154045
+# Kin Score artifact — dexcare — 2026-10-03T000835
 # The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
 ---
 kin_score:
   slug: dexcare
-  schema_version: 0.14.0
-  scored_at: '2026-08-25'
-  run_ts: 2026-08-25T154045
-  composite: 52.1
+  schema_version: 0.23.0
+  scored_at: '2026-10-03'
+  run_ts: 2026-10-03T000835
+  composite: 47.3
   band: developing
   facets:
-    discoverability: 81.5
-    contract_quality: 54.7
-    governance: 30.3
+    discoverability: 78.6
+    contract_quality: 49.7
+    contract_governance: 18.2
     operational_transparency: 26.3
     developer_ergonomics: 73.2
-    commercial_clarity: 28.9
-    contract_governance: 30.3
     access_clarity: 28.9
   agent_readiness:
-    score: 29.7
-    band: agent-ready
+    score: 27.2
+    band: agent-aware
     dimensions:
       spec_presence: true
       agentic_access: false
@@ -28,7 +26,7 @@ kin_score:
       auth_clarity: bearer
       idempotency: false
       error_semantics: verified
-      openapi_examples: verified
+      openapi_examples: partial
       rate_limit_signal: documented
       event_surface_described: false
       agent_skills: derived
@@ -44,14 +42,14 @@ kin_score:
     applies: true
     regime: Health
     regime_id: health
-    score: 37.5
+    score: 23.4
     matched_via: tags
   provenance:
     mcp: derived
     skills: derived
     conformance: first-party
     contracts:
-      total: 6
+      total: 19
       derived: 0
       coverage: 0.0
-      callable: 83.3
+      callable: 100.0
