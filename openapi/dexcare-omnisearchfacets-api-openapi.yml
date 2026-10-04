@@ -69,25 +69,10 @@ paths:
       - OmniSearchFacets
 components:
   schemas:
-    DataTag:
-      description: The data type to lookup. The returned response will be an array of this type.
-      enum:
-      - clinicians
-      - departments
-      - locations
-      title: DataTag
-      tsEnumNames:
-      - Clinicians
-      - Departments
-      - Locations
-      type: string
-    OmniSearchFacetsSuccessResponse:
-      properties:
-        facets:
-          $ref: '#/components/schemas/Facets'
-      required:
-      - facets
-      type: object
+    stringvalues:
+      default: true
+      description: Whether to limit results to only string value type facets
+      type: boolean
     Facets:
       anyOf:
       - additionalProperties:
@@ -135,6 +120,18 @@ components:
           type: array
         type: object
       description: Facets
+    DataTag:
+      description: The data type to lookup. The returned response will be an array of this type.
+      enum:
+      - clinicians
+      - departments
+      - locations
+      title: DataTag
+      tsEnumNames:
+      - Clinicians
+      - Departments
+      - Locations
+      type: string
     ErrorResponse:
       description: Error response
       properties:
@@ -146,18 +143,26 @@ components:
       type: object
       required:
       - error
-    stringvalues:
-      default: true
-      description: Whether to limit results to only string value type facets
-      type: boolean
     childBrand:
       description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
       type: string
+    OmniSearchFacetsSuccessResponse:
+      properties:
+        facets:
+          $ref: '#/components/schemas/Facets'
+      required:
+      - facets
+      type: object
     count:
       default: false
       description: Whether to include counts for each facet value
       type: boolean
   parameters:
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'
     BrandParam:
       name: brand
       in: query
@@ -165,8 +170,3 @@ components:
       description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
       schema:
         type: string
-    DataParam:
-      name: data
-      in: query
-      schema:
-        $ref: '#/components/schemas/DataTag'

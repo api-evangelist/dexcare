@@ -57,20 +57,14 @@ paths:
       tags:
       - OmniSitemap
 components:
-  parameters:
-    DataParam:
-      name: data
-      in: query
-      schema:
-        $ref: '#/components/schemas/DataTag'
-    BrandParam:
-      name: brand
-      in: query
-      required: true
-      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
-      schema:
-        type: string
   schemas:
+    OmniSitemapSuccessResponse:
+      properties:
+        urls:
+          items:
+            type: string
+          type: array
+      type: object
     DataTag:
       description: The data type to lookup. The returned response will be an array of this type.
       enum:
@@ -94,10 +88,16 @@ components:
       type: object
       required:
       - error
-    OmniSitemapSuccessResponse:
-      properties:
-        urls:
-          items:
-            type: string
-          type: array
-      type: object
+  parameters:
+    DataParam:
+      name: data
+      in: query
+      schema:
+        $ref: '#/components/schemas/DataTag'
+    BrandParam:
+      name: brand
+      in: query
+      required: true
+      description: (Required) - The brand to lookup results for. The results must exist in that brand's index, or they will be treated as though they don't exist.
+      schema:
+        type: string

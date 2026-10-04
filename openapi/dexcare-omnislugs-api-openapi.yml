@@ -67,17 +67,9 @@ paths:
       - OmniSlugs
 components:
   schemas:
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
+    name:
+      description: Slug name.
+      type: string
     OmniSlugsSuccessResponse:
       properties:
         location:
@@ -98,9 +90,17 @@ components:
       - searchTerms
       - text
       type: object
-    name:
-      description: Slug name.
-      type: string
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
   parameters:
     BrandParam:
       name: brand
