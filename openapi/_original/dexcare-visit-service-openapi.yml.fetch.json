@@ -1,0 +1,12 @@
+{
+ "url": "https://developers.dexcarehealth.com/assets/files/v9bundled_public.json",
+ "requested_url": "https://developers.dexcarehealth.com/assets/files/v9bundled_public.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 107815,
+ "sha256": "36ec34dfafb54c68b7bf0bc62ea25eb878667c50c9c6b617277450117accdce3",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}

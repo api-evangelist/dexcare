@@ -1,0 +1,12 @@
+{
+ "url": "https://developers.dexcarehealth.com/assets/files/CareOptionsAPI.json",
+ "requested_url": "https://developers.dexcarehealth.com/assets/files/CareOptionsAPI.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 101427,
+ "sha256": "a6ec732e17be5954a458b5cb396a1a6300748cdd02eca84069ea402690cb3319",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
