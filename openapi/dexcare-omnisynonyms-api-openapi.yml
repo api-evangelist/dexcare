@@ -64,6 +64,20 @@ paths:
       - OmniSynonyms
 components:
   schemas:
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    properties-search:
+      description: A single search term to look up synonyms for.
+      type: string
     DataTag:
       description: The data type to lookup. The returned response will be an array of this type.
       enum:
@@ -76,17 +90,6 @@ components:
       - Departments
       - Locations
       type: string
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
     OmniSynonymsSuccessResponse:
       properties:
         synonyms:
@@ -97,9 +100,6 @@ components:
       required:
       - synonyms
       type: object
-    properties-search:
-      description: A single search term to look up synonyms for.
-      type: string
   parameters:
     DataParam:
       name: data

@@ -69,10 +69,20 @@ paths:
       - OmniSearchFacets
 components:
   schemas:
-    stringvalues:
-      default: true
-      description: Whether to limit results to only string value type facets
-      type: boolean
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
+    childBrand:
+      description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
+      type: string
     Facets:
       anyOf:
       - additionalProperties:
@@ -132,20 +142,10 @@ components:
       - Departments
       - Locations
       type: string
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
-    childBrand:
-      description: A child brand to filter results to, such as THR Breeze or Piedmont OrthoAtlanta.
-      type: string
+    stringvalues:
+      default: true
+      description: Whether to limit results to only string value type facets
+      type: boolean
     OmniSearchFacetsSuccessResponse:
       properties:
         facets:

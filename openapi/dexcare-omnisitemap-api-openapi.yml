@@ -58,6 +58,17 @@ paths:
       - OmniSitemap
 components:
   schemas:
+    ErrorResponse:
+      description: Error response
+      properties:
+        error:
+          description: Reason for the failure.
+          type: string
+        errorData:
+          description: (Optional) Additional error details, if available.
+      type: object
+      required:
+      - error
     OmniSitemapSuccessResponse:
       properties:
         urls:
@@ -77,17 +88,6 @@ components:
       - Departments
       - Locations
       type: string
-    ErrorResponse:
-      description: Error response
-      properties:
-        error:
-          description: Reason for the failure.
-          type: string
-        errorData:
-          description: (Optional) Additional error details, if available.
-      type: object
-      required:
-      - error
   parameters:
     DataParam:
       name: data
