@@ -312,3 +312,9 @@ components:
       in: header
       name: x-api-key
       description: API key (API_KEY_SLOTS) for ApiKey to ApiKey Authorization, provided by DexCare to customer
+x-provenance:
+  method: harvested
+  publisher: DexCare
+  source: https://developers.dexcarehealth.com/assets/files/forq-availabilityBundled.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
